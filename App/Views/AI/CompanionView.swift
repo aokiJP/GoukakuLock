@@ -2,7 +2,7 @@ import SwiftUI
 import GoukakuAI
 
 /// 体験タブ:相棒AIと、人生の中でどんな体験ができるかを一緒に見つける。
-/// 提案は「やらなきゃ」ではなく「やってみると、〜かも」。決めるのは本人で、点数はつけない
+/// 提案は義務ではなく体験として。決めるのは本人。AIの言葉はしばらない
 struct CompanionView: View {
     @Environment(AppModel.self) private var model
     @Environment(CompanionModel.self) private var companion

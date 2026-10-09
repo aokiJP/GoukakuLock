@@ -158,9 +158,10 @@ public enum PromptBook {
 
     // MARK: 相棒と話す
 
-    /// 会話の役割の説明。決まりごとは足さず、この人について知っていることと、いまの時間だけを添える
+    /// 会話の役割の説明。決まりごとは足さず、だれとだれの会話かと、この人について知っていること・いまの時間だけを添える
+    /// (小さなモデルは、相手のことを書いておくと、自分がその人になったように話しはじめることがあるため)
     public static func chatSystem(context: CompanionContext, tuning: GenerationTuning) -> String {
-        var text = system
+        var text = system + "\n話しかけてくるのは「この人」で、あなたは相棒として返事をします。"
         let notes = context.notes.prefix(tuning.contextItems)
         if !notes.isEmpty { text += "\nこの人について知っていること: " + notes.map(sentence).joined() }
         let recent = context.recentExperiences.prefix(3)

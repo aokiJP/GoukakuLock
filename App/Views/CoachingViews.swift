@@ -132,7 +132,7 @@ struct WeeklyReviewView: View {
                     PencilNote(text: letter, caption: "相棒からの手紙")
                 }
             } footer: {
-                Text("この週の体験から、相棒が短い手紙を書きます。数字で評価したり、比べたりはしません。")
+                Text("この週の体験から、相棒が手紙を書きます。")
             }
             Section("何が効いた?") {
                 TextField("例:朝いちばんにやると決めたこと", text: $worked, axis: .vertical)

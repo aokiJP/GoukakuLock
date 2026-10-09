@@ -300,6 +300,7 @@ final class BrainTests: XCTestCase {
         XCTAssertEqual(req.history.map(\.text), ["6", "7", "8", "9"])
         XCTAssertTrue(req.examples.isEmpty, "会話には手本を入れない(1往復目の会話を手本と取りちがえないため)")
         XCTAssertTrue(req.system.contains("この人について知っていること: 英語の勉強をしている。散歩が好き。"))
+        XCTAssertTrue(req.system.contains("あなたは相棒として返事をします"), "だれとだれの会話かを書く")
         XCTAssertGreaterThanOrEqual(req.maxTokens, 600, "返事の長さをしばらない")
     }
 }

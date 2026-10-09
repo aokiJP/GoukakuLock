@@ -263,6 +263,8 @@ schemes:
       config: Debug
     test:
       config: Debug
+      # UI テストではデバッガをつながない(大きくなったアプリに LLDB をつなぐと、起動待ちが切れることがある)
+      debugEnabled: false
       targets:
         - GoukakuLockUITests
     archive:

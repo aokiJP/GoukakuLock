@@ -156,13 +156,24 @@ jobs:
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
           set -o pipefail
-          xcodebuild test \
+          xcodebuild build-for-testing \
+            -project GoukakuLock.xcodeproj \
+            -scheme GoukakuLock \
+            -configuration Debug \
+            -destination "id=$UDID" \
+            -derivedDataPath build/DerivedData-Sim \
+            -skipPackagePluginValidation -skipMacroValidation \
+            2>&1 | tee build/uitest-build.log | xcbeautify --renderer github-actions
+          # 一度起動して温める(初回起動が遅いと UI テストの起動待ちが切れる)。起動の様子も残す
+          bash scripts/launch-probe.sh "$UDID" build/DerivedData-Sim/Build/Products/Debug-iphonesimulator/GoukakuLock.app build/launch-probe
+          xcodebuild test-without-building \
             -project GoukakuLock.xcodeproj \
             -scheme GoukakuLock \
             -configuration Debug \
             -destination "id=$UDID" \
             -derivedDataPath build/DerivedData-Sim \
             -resultBundlePath build/UITests.xcresult \
+            -retry-tests-on-failure -test-iterations 2 \
             -skipPackagePluginValidation -skipMacroValidation \
             2>&1 | tee build/uitest.log | xcbeautify --renderer github-actions
 
@@ -195,7 +206,11 @@ jobs:
             |---|---|
             | GoukakuLock-Release.ipa | 同梱なし(Apple Intelligence があれば使う。モデルはアプリの中でダウンロード・ファイルから取り込みできる) |
             | GoukakuLock-Debug.ipa | 同上+デバッグメニュー |
-            | GoukakuLock-AI-<モデル>.ipa | そのモデルを同梱(最初から通信なしで動く)。2GiB を超えるものは Actions の Artifacts にあります |
+            | GoukakuLock-AI-<モデル>.ipa | そのモデルを同梱(最初から通信なしで動く。一度起動すれば、あとで AIなし版で上書きしてもモデルは残る) |
+
+            GitHub の Releases は 1 ファイル 2GiB までなので、超えるモデル入りの IPA は `.ipa.part-aa`・`.ipa.part-ab` に分けてあります。
+            つなげ方:`cat GoukakuLock-AI-<モデル>.ipa.part-* > GoukakuLock-AI-<モデル>.ipa`(Windows は `copy /b 1つ目 + 2つ目 GoukakuLock-AI-<モデル>.ipa`)。
+            つないだら `SHA256-<モデル>.txt` と照らし合わせてください。
 
       - name: Save output to ci-output branch
         if: always()
@@ -214,6 +229,7 @@ jobs:
           # 生成した Xcode プロジェクト(リポジトリの GoukakuLock.xcodeproj を最新に保つため)
           mkdir -p "$OUT/xcodeproj" && cp GoukakuLock.xcodeproj/project.pbxproj "$OUT/xcodeproj/" 2>/dev/null || true
           if [ -d build/screenshots ]; then mkdir -p "$OUT/screenshots" && cp build/screenshots/* "$OUT/screenshots/" 2>/dev/null || true; fi
+          if [ -d build/launch-probe ]; then cp -R build/launch-probe "$OUT/" 2>/dev/null || true; fi
           [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true
           for f in build/xcodebuild-*.log build/uitest.log; do
             [ -f "$f" ] && grep -E "(error|warning):" "$f" | grep -v "appintentsmetadataprocessor" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true

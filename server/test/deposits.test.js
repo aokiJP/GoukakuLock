@@ -314,6 +314,31 @@ test("自動で続ける:次の週を自分で預け直していたら、それ�
   assert.equal([...w.stripe.intents.values()].filter((pi) => pi.status === "succeeded").length, 2, "請求は増えない");
 });
 
+test("やめる:まだ始まっていない日の分を返し、自動で続けるのも止める。今日までは結果しだい", async () => {
+  const w = world();
+  const token = await w.register();
+  const created = await w.deposit(token);
+  w.stripe.pay(created.depositId);
+  // 1日目を達成して返金ずみ。3日目の昼にやめる
+  w.now = FIRST_START + 3600;
+  await w.call("POST", `/v1/deposits/${created.depositId}/days/2026-10-12`, { token, body: { outcome: "achieved" } });
+  w.now = FIRST_START + 2 * DAY + 12 * 3600;
+  const r = await w.call("POST", `/v1/deposits/${created.depositId}/cancel`, { token });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.renew, false);
+  assert.deepEqual(r.body.days.map((d) => d.refunded), [true, false, false, true, true, true, true]);
+  assert.deepEqual(r.body.days.slice(3).map((d) => d.outcome), ["canceled", "canceled", "canceled", "canceled"]);
+  assert.equal(r.body.refunded, 300 + 4 * 300);
+  // 今日(3日目)は、達成すればこれまでどおり返る。もう一度やめても増えない
+  const today = await w.call("POST", `/v1/deposits/${created.depositId}/days/2026-10-14`, { token, body: { outcome: "achieved" } });
+  assert.equal(today.body.refunded, 1800);
+  const again = await w.call("POST", `/v1/deposits/${created.depositId}/cancel`, { token });
+  assert.equal(again.body.refunded, 1800);
+  // 週が終わっても、自動では続けない
+  w.now = FIRST_START + 7 * DAY + 60;
+  assert.deepEqual(await w.cron(), []);
+});
+
 test("返金は預けた額を超えない", async () => {
   const w = world();
   const token = await w.register();

@@ -363,6 +363,36 @@ export function depositService({ stripe, cfg, now }) {
       return depositView(pi, refunds, t, cfg);
     },
 
+    /**
+     * やめる(やめる合図):まだ始まっていない日の分を返し、自動で続けるのも止める。
+     * 始まった日(今日を含む)は、これまでどおり結果しだい(ロックの「ゆるめる変更は翌日から」と同じ考え)
+     */
+    async cancel(customerId, piId) {
+      const pi = await owned(customerId, piId);
+      if (pi.status !== "succeeded") throw new HttpError(409, "not_paid", "まだ支払いが終わっていません");
+      const plan = readPlan(pi);
+      const t = now();
+      let refunds = await listAllRefunds(stripe, piId);
+      const live = liveRefunds(refunds);
+      let remaining = pi.amount - live.reduce((sum, r) => sum + r.amount, 0);
+      let returned = 0;
+      for (let i = 0; i < plan.keys.length; i++) {
+        const key = plan.keys[i];
+        if (plan.starts[i] <= t || live.some((r) => r.metadata?.day === key)) continue;
+        const amount = Math.min(plan.daily, remaining);
+        if (amount <= 0) break;
+        await stripe.createRefund(
+          { payment_intent: piId, amount, reason: "requested_by_customer", metadata: { app: "goukakulock", day: key, outcome: "canceled" } },
+          { idempotencyKey: `goukaku-refund-${piId}-${key}` },
+        );
+        remaining -= amount;
+        returned += amount;
+      }
+      const updated = await stripe.updatePaymentIntent(piId, { metadata: { renew: "off", canceled_at: String(t) } });
+      refunds = returned > 0 ? await listAllRefunds(stripe, piId) : refunds;
+      return depositView(updated, refunds, t, cfg);
+    },
+
     async setRenew(customerId, piId, body) {
       await owned(customerId, piId);
       const on = body?.on === true;

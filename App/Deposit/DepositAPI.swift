@@ -152,6 +152,11 @@ struct DepositAPI {
         try await send("POST", "/v1/deposits/\(escape(depositID))/renew", body: ["on": on])
     }
 
+    /// やめる(まだ始まっていない日の分を返してもらい、自動で続けるのも止める)
+    func cancel(depositID: String) async throws -> DepositWeek {
+        try await send("POST", "/v1/deposits/\(escape(depositID))/cancel", body: [String: String]())
+    }
+
     // MARK: 中身
 
     private func escape(_ text: String) -> String {

@@ -7,6 +7,7 @@ struct DepositView: View {
     @Environment(DepositModel.self) private var deposit
     @Environment(AppModel.self) private var model
     @State private var confirmDisconnect = false
+    @State private var cancelTarget: DepositWeek?
 
     var body: some View {
         @Bindable var deposit = deposit
@@ -47,6 +48,14 @@ struct DepositView: View {
         }
         .alert(deposit.message ?? "", isPresented: Binding(get: { deposit.message != nil }, set: { if !$0 { deposit.message = nil } })) {
             Button("OK", role: .cancel) {}
+        }
+        .confirmationDialog("預け金をやめますか?", isPresented: Binding(get: { cancelTarget != nil }, set: { if !$0 { cancelTarget = nil } }),
+                            titleVisibility: .visible, presenting: cancelTarget) { week in
+            Button("やめる(明日からの\(Fmt.yen(deposit.cancelableAmount(week)))を返してもらう)", role: .destructive) {
+                Task { await deposit.cancel(week) }
+            }
+        } message: { _ in
+            Text("今日までの分は、これまでどおり結果しだいです(今日達成すれば返ってきます)。明日からの分を返金し、次の週も預けません。\n\(AppConstants.quitSignal)")
         }
         .confirmationDialog("このサーバーとのつながりを外しますか?", isPresented: $confirmDisconnect, titleVisibility: .visible) {
             Button("外す", role: .destructive) { deposit.disconnect() }
@@ -100,6 +109,11 @@ struct DepositView: View {
                     set: { on in Task { await deposit.setRenew(on, for: week) } }
                 ))
                 .disabled(deposit.isSample)
+                if deposit.cancelableAmount(week) > 0 {
+                    Button("やめる(明日からの分を返してもらう)", role: .destructive) { cancelTarget = week }
+                        .font(.footnote)
+                        .disabled(deposit.isSample)
+                }
             } else {
                 Label("次の週も預けています", systemImage: "arrow.turn.down.right")
                     .font(.footnote)

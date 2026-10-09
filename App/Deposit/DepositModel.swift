@@ -309,6 +309,28 @@ final class DepositModel {
         }
     }
 
+    /// やめる(やめる合図):明日からの分を返してもらい、自動で続けるのも止める。今日までは結果しだい
+    func cancel(_ week: DepositWeek) async {
+        guard !isSample, let api else { return }
+        do {
+            let updated = try await api.cancel(depositID: week.id)
+            if let i = weeks.firstIndex(where: { $0.id == updated.id }) { weeks[i] = updated }
+            let returned = updated.days.filter { $0.outcome == "canceled" }.reduce(0) { $0 + $1.refundedAmount }
+            app.log("deposit", "預け金をやめた(明日からの分 \(Fmt.yen(returned)) を返金)")
+            app.save()
+            message = returned > 0
+                ? "やめました。明日からの\(Fmt.yen(returned))を返金します。今日までの分は、これまでどおりです。"
+                : "やめました。次の週は預けません。"
+        } catch {
+            message = Self.describe(error)
+        }
+    }
+
+    /// やめたときに返ってくる額(まだ始まっていない日の分)
+    func cancelableAmount(_ week: DepositWeek, now: Date = Date()) -> Int {
+        week.days.filter { $0.startsAt > now && !$0.refunded }.count * week.daily
+    }
+
     // MARK: きっかけ
 
     private func observe() {

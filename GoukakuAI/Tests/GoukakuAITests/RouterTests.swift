@@ -39,6 +39,11 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(d.skipped.map(\.name), ["gemma"])
         XCTAssertTrue(d.skipped[0].reason.contains("メモリが足りない"))
         XCTAssertEqual(d.tuning.contextItems, 3, "小さいモデルにはプロンプトを短く")
+        XCTAssertFalse(d.tuning.useHints, "小さいモデルにはきっかけの言葉を添えない")
+        XCTAssertEqual(d.tuning.suggestionTemperature, 0.7, accuracy: 0.001)
+        let big = EngineRouter.decide(profile: profile(ramGB: 8, availableGB: 6), installed: [gemma, lfm], preference: .automatic)
+        XCTAssertEqual(big.choice, .mlx(gemma))
+        XCTAssertTrue(big.tuning.useHints)
     }
 
     func testFallsBackToAppleThenRules() {

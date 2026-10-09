@@ -137,11 +137,18 @@ public struct GenerationTuning: Sendable, Equatable {
     public var contextItems: Int
     /// 会話の履歴を何往復まで入れるか
     public var chatTurns: Int
+    /// 提案に「思いつきのきっかけ」の言葉を添えるか(小さいモデルはその言葉に引っぱられて話がそれるので添えない)
+    public var useHints: Bool
+    /// 提案の1回目の温度(小さいモデルは低めにして、形と話の筋を守る)
+    public var suggestionTemperature: Double
 
-    public init(lengthScale: Double = 1, contextItems: Int = 6, chatTurns: Int = 6) {
+    public init(lengthScale: Double = 1, contextItems: Int = 6, chatTurns: Int = 6,
+                useHints: Bool = true, suggestionTemperature: Double = 0.85) {
         self.lengthScale = lengthScale
         self.contextItems = contextItems
         self.chatTurns = chatTurns
+        self.useHints = useHints
+        self.suggestionTemperature = suggestionTemperature
     }
 
     public func tokens(_ base: Int) -> Int { max(48, Int((Double(base) * lengthScale).rounded())) }
@@ -288,7 +295,7 @@ public enum EngineRouter {
 
 extension GenerationTuning {
     /// モデルの大きさで、プロンプトに入れる量を変える(小さいモデルほど少なく)
-    mutating func apply(for model: InstalledModel) {
+    public mutating func apply(for model: InstalledModel) {
         let gb = Double(model.runtimeBytes) / 1_073_741_824
         if gb < 1.2 {
             contextItems = 3
@@ -300,5 +307,9 @@ extension GenerationTuning {
             contextItems = 6
             chatTurns = 6
         }
+        // 小さいモデル(CI で LFM2.5・Qwen3.5 2B を見た):きっかけの言葉に引っぱられて
+        // 「地図」→「公共交通機関で…」のように話がそれるので、言葉は添えず、温度も下げる
+        useHints = gb >= 2.2
+        suggestionTemperature = gb >= 2.2 ? 0.85 : 0.7
     }
 }

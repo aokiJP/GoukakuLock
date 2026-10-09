@@ -117,6 +117,26 @@ final class BrainTests: XCTestCase {
         XCTAssertTrue(ContextFit.fits(stretch, context: nightAtHome), "ひとことの中の言葉までは見ない")
     }
 
+    func testSmallModelsGetNoHintWords() async throws {
+        let reply = "体験: 好きな音楽を聴く\nひとこと: 心が緩むかも\nはじめ方: 1曲選ぶ\n時間: 5分\n種類: こころ"
+        let recorder = Recorder()
+        let engine = ScriptedEngine { request in recorder.add(request); return reply }
+        // 大きいモデル:1回目にきっかけの言葉を添える
+        _ = try await collect(CompanionBrain(engine: engine).suggestions(context: nightAtHome, count: 1, avoid: [], seed: 2))
+        XCTAssertTrue(recorder.all.first?.prompt.contains("思いつきのきっかけ") == true)
+        XCTAssertEqual(recorder.all.first?.temperature ?? 0, 0.85, accuracy: 0.001)
+        // 小さいモデル:言葉を添えず、温度も低め
+        recorder.reset()
+        let small = GenerationTuning(contextItems: 3, chatTurns: 3, useHints: false, suggestionTemperature: 0.7)
+        _ = try await collect(CompanionBrain(engine: engine, tuning: small).suggestions(context: nightAtHome, count: 1, avoid: [], seed: 2))
+        XCTAssertFalse(recorder.all.contains { $0.prompt.contains("思いつきのきっかけ") })
+        XCTAssertEqual(recorder.all.first?.temperature ?? 0, 0.7, accuracy: 0.001)
+        // CI で LFM2.5 が「地図」から出した提案は、夜の家ではじく
+        let bus = ExperienceDraft(title: "公共交通機関で食べ物を持って眠り過ごす", line: "", firstStep: "路線を調べる",
+                                  duration: .fifteen, category: .learn, origin: .ai("x"))
+        XCTAssertFalse(ContextFit.fits(bus, context: nightAtHome))
+    }
+
     func testDuplicateAIIdeasAreNotRepeated() async throws {
         let engine = ScriptedEngine { _ in "体験: 好きな音楽を聴く\nひとこと: 心が緩むかも\nはじめ方: 1曲選ぶ\n時間: 5分\n種類: こころ" }
         let brain = CompanionBrain(engine: engine)
@@ -190,6 +210,27 @@ final class BrainTests: XCTestCase {
         let req = PromptBook.chat(context: nightAtHome, history: history, message: "次", tuning: tuning)
         XCTAssertEqual(req.history.map(\.text), ["6", "7", "8", "9"])
         XCTAssertTrue(req.system.contains("この人について知っていること: 英語の勉強をしている。散歩が好き。"))
+    }
+}
+
+/// AIへの頼みを記録する(テスト用)
+final class Recorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var requests: [GenerationRequest] = []
+
+    func add(_ request: GenerationRequest) {
+        lock.lock(); defer { lock.unlock() }
+        requests.append(request)
+    }
+
+    func reset() {
+        lock.lock(); defer { lock.unlock() }
+        requests.removeAll()
+    }
+
+    var all: [GenerationRequest] {
+        lock.lock(); defer { lock.unlock() }
+        return requests
     }
 }
 

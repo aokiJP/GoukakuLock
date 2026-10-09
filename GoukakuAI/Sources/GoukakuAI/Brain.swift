@@ -41,8 +41,9 @@ public struct CompanionBrain: Sendable {
                     do {
                         draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { attempt in
                             PromptBook.suggestion(context: context, angle: angle, avoid: avoid + produced,
-                                                  tuning: self.tuning, temperature: attempt == 0 ? 0.85 : 0.6,
-                                                  hint: attempt == 0 ? hint : nil)
+                                                  tuning: self.tuning,
+                                                  temperature: attempt == 0 ? self.tuning.suggestionTemperature : 0.6,
+                                                  hint: attempt == 0 && self.tuning.useHints ? hint : nil)
                         } parse: { raw in
                             ExperienceParser.suggestion(from: raw, angle: angle, budget: context.budget, engine: engine.info.name)
                         } accept: { d in

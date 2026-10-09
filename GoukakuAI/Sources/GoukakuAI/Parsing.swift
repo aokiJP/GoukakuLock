@@ -245,7 +245,10 @@ public enum ExperienceParser {
         guard TextCheck.hasJapanese(reply), ContentGuard.isAcceptable(text: reply) else { return nil }
         if let q = question {
             question = trimSentence(q, limit: 90)
-            if question?.isEmpty == true || !(question.map(ContentGuard.isAcceptable(text:)) ?? true) { question = nil }
+            // 「問い: -」のような空の問いは出さない
+            if let value = question, value.isEmpty || !TextCheck.hasJapanese(value) || !ContentGuard.isAcceptable(text: value) {
+                question = nil
+            }
         }
         return ReflectionDraft(reply: reply, question: question, noteCandidate: noteCandidate(memo, title: title),
                                fromAI: true)
@@ -341,7 +344,7 @@ public enum ContextFit {
     static let goingOut: [String] = [
         "カフェ", "喫茶店", "公園", "散歩", "街角", "街を", "街へ", "お店", "店に", "店へ", "駅", "海へ", "海に",
         "山へ", "山に", "旅行", "旅に", "出かけ", "外出", "外に出", "映画館", "美術館", "博物館", "図書館",
-        "ジム", "レストラン", "予約", "屋上",
+        "ジム", "レストラン", "予約", "屋上", "電車", "バス", "公共交通", "地下鉄", "タクシー",
     ]
 
     public static func fits(_ draft: ExperienceDraft, context: CompanionContext) -> Bool {

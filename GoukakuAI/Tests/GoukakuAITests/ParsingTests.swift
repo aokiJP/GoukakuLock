@@ -110,6 +110,14 @@ final class ParsingTests: XCTestCase {
         XCTAssertTrue(r3.reply.hasPrefix("答えが見つからなくても"), r3.reply)
     }
 
+    /// CI で LFM2.5 が返した「問い: -」「メモ: -」は、ないものとして扱う
+    func testDashQuestionAndMemoAreDropped() throws {
+        let raw = "返事: 夕焼けを見に屋上へ行くという体験は、心地よい感覚を与えてくれましたね。\n問い: -\nメモ: -"
+        let r = try XCTUnwrap(ExperienceParser.reflection(from: raw, title: "夕焼けを見に屋上へ", note: "風が気持ちよかった"))
+        XCTAssertNil(r.question)
+        XCTAssertNil(r.noteCandidate)
+    }
+
     /// CI で LFM2.5 が出した「夕食に食べるのをやめて…」のような、食べることを減らす誘いははじく
     func testRejectsEatingRestriction() {
         let raw = "体験: 食事の前に視覚的な休憩\nひとこと: 夕食に食べるのをやめて、一度視線を上げると、呼吸にゆっくりと意識が向くかも\nはじめ方: 好きな料理を見る\n時間: 15分\n種類: つくる"

@@ -60,13 +60,11 @@ struct TipsView: View {
         let entry = model.widgetPreviewEntry()
         List {
             Section {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 14) {
-                        WidgetPreviewFrame(entry: entry, family: .systemSmall)
-                        WidgetPreviewFrame(entry: entry, family: .systemMedium)
-                    }
-                    .padding(.vertical, 6)
+                VStack(alignment: .leading, spacing: 12) {
+                    WidgetPreviewFrame(entry: entry, family: .systemSmall)
+                    WidgetPreviewFrame(entry: entry, family: .systemMedium)
                 }
+                .padding(.vertical, 6)
                 Text("ホーム画面を長押し →「編集」→「ウィジェットを追加」→「合格ロック」。充電中に横向きにすると、StandBy でも大きく見えます。タップするとチェックイン画面が開きます。")
                     .font(.footnote)
             } header: {
@@ -82,6 +80,12 @@ struct TipsView: View {
                     .font(.footnote)
             } header: {
                 Text("ロック画面")
+            }
+            Section {
+                Label("ホーム画面で合格ロックのアイコンを長押し →「チェックイン」か「集中タイマー」。", systemImage: "hand.tap")
+                    .font(.footnote)
+            } header: {
+                Text("アイコンから")
             }
             Section {
                 Label("コントロールセンターを開いて「+」→「コントロールを追加」→「合格ロックでチェックイン」。アクションボタン(対応機種)にも割り当てられます。", systemImage: "switch.2")

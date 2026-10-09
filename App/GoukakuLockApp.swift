@@ -5,6 +5,7 @@ import GoukakuKit
 
 @main
 struct GoukakuLockApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model: AppModel
     @State private var router: NotificationRouter
     @Environment(\.scenePhase) private var scenePhase

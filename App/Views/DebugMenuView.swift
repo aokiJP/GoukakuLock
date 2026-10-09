@@ -145,12 +145,8 @@ struct DebugGalleryView: View {
         let sample = StatusEntry.sample(date: now)
         List {
             Section("ウィジェット(いまの状態)") {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        WidgetPreviewFrame(entry: current, family: .systemSmall)
-                        WidgetPreviewFrame(entry: current, family: .systemMedium)
-                    }
-                }
+                WidgetPreviewFrame(entry: current, family: .systemSmall)
+                WidgetPreviewFrame(entry: current, family: .systemMedium)
                 HStack(spacing: 12) {
                     WidgetPreviewFrame(entry: current, family: .accessoryCircular)
                     WidgetPreviewFrame(entry: current, family: .accessoryRectangular)
@@ -158,12 +154,8 @@ struct DebugGalleryView: View {
                 WidgetPreviewFrame(entry: current, family: .accessoryInline)
             }
             Section("ウィジェット(見本:ロック中)") {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        WidgetPreviewFrame(entry: sample, family: .systemSmall)
-                        WidgetPreviewFrame(entry: sample, family: .systemMedium)
-                    }
-                }
+                WidgetPreviewFrame(entry: sample, family: .systemSmall)
+                WidgetPreviewFrame(entry: sample, family: .systemMedium)
                 HStack(spacing: 12) {
                     WidgetPreviewFrame(entry: sample, family: .accessoryCircular)
                     WidgetPreviewFrame(entry: sample, family: .accessoryRectangular)

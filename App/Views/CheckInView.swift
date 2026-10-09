@@ -140,19 +140,42 @@ struct CheckInView: View {
     }
 }
 
-/// 通知から開いたとき:今日のコミットから選ぶ
+/// 通知・ウィジェット・コントロール・クイックアクションから開いたとき:今日のコミットから選ぶ。
+/// 残りが1つだけなら、選ぶ手間を省いてその記録画面をすぐ出す。
 struct CheckInPickerView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    /// 開いた時点で決める(記録したあとに一覧へ切り替わらないよう、State に固定する)
+    @State private var direct: HabitSnapshot?
+
+    init(direct: HabitSnapshot? = nil) {
+        _direct = State(initialValue: direct)
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                if let today = model.today {
-                    let candidates = today.required + today.optional
-                    if candidates.isEmpty {
-                        Text("今日のサイクルに予定されたコミットはありません。")
-                    } else {
+            if let direct {
+                CheckInDestination(habit: direct)
+            } else {
+                list
+            }
+        }
+    }
+
+    private var list: some View {
+        List {
+            if let today = model.today {
+                let candidates = today.required + today.optional
+                if candidates.isEmpty {
+                    Text("今日のサイクルに予定されたコミットはありません。")
+                } else {
+                    if candidates.allSatisfy({ today.isDone($0.id) }) {
+                        Section {
+                            Label("今日のコミットはすべて記録済みです。おつかれさまでした。", systemImage: "checkmark.seal.fill")
+                                .foregroundStyle(Theme.seal)
+                        }
+                    }
+                    Section {
                         ForEach(candidates) { habit in
                             if today.isDone(habit.id) {
                                 Label(habit.title, systemImage: "checkmark.circle.fill")
@@ -171,13 +194,22 @@ struct CheckInPickerView: View {
                     }
                 }
             }
-            .navigationTitle("チェックイン")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("閉じる") { dismiss() }
-                }
+        }
+        .navigationTitle("チェックイン")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("閉じる") { dismiss() }
             }
         }
+    }
+}
+
+extension AppModel {
+    /// 今日まだ記録していないコミットがちょうど1つなら、それを返す
+    var singlePendingHabit: HabitSnapshot? {
+        guard let today else { return nil }
+        let pending = (today.required + today.optional).filter { !today.isDone($0.id) }
+        return pending.count == 1 ? pending[0] : nil
     }
 }

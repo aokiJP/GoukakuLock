@@ -50,6 +50,29 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>checkmark.seal</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>今日のコミットを記録</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>チェックイン</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.aokijp.goukakulock.quick.checkin</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>timer</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>アプリを開いている時間だけ数える</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>集中タイマー</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.aokijp.goukakulock.quick.timer</string>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

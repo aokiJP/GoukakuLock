@@ -44,6 +44,8 @@ struct StatusWidgetView: View {
 
 struct SmallStatusView: View {
     var entry: StatusEntry
+    /// 直近7日の記号を出すか(中のウィジェットでは右側に出すので false)
+    var showsRecent = true
 
     var body: some View {
         if let s = entry.summary {
@@ -61,6 +63,10 @@ struct SmallStatusView: View {
                     }
                 }
                 Spacer(minLength: 2)
+                if showsRecent && !entry.snapshot.recent.isEmpty {
+                    RecentMarksRow(outcomes: entry.snapshot.recentOutcomes)
+                        .padding(.bottom, 2)
+                }
                 Text(s.shortHeadline)
                     .font(.system(size: 15, weight: .bold, design: .serif))
                     .foregroundStyle(Theme.ink)
@@ -80,7 +86,7 @@ struct MediumStatusView: View {
     var body: some View {
         if let s = entry.summary {
             HStack(alignment: .top, spacing: 14) {
-                SmallStatusView(entry: entry)
+                SmallStatusView(entry: entry, showsRecent: false)
                     .frame(maxWidth: 140)
                 Rectangle().fill(Theme.rule).frame(width: 1)
                 VStack(alignment: .leading, spacing: 6) {

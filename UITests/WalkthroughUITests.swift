@@ -133,9 +133,9 @@ final class WalkthroughUITests: XCTestCase {
         tap(app.buttons["ウィジェット・Live Activity・お祝い"])
         sleep(1)
         snap("26-見本-ウィジェット")
-        app.swipeUp()
+        bringToTop(app.staticTexts["ウィジェット(見本:ロック中)"])
         snap("27-見本-ウィジェット2")
-        app.swipeUp()
+        bringToTop(app.staticTexts["Live Activity"])
         snap("28-見本-LiveActivity")
         scrollTo(app.buttons["集中タイマー(見本)"])
         tap(app.buttons["集中タイマー(見本)"])
@@ -170,6 +170,25 @@ final class WalkthroughUITests: XCTestCase {
         tap(app.buttons["一時停止"])
         sleep(1)
         snap("35-一時停止")
+        tap(app.buttons["閉じる"].firstMatch)
+
+        // ホーム画面のクイックアクション(アイコンを長押し →「チェックイン」)
+        XCUIDevice.shared.press(.home)
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let icon = springboard.icons["合格ロック"]
+        waitFor(icon)
+        var pages = 0
+        while !icon.isHittable && pages < 4 {
+            springboard.swipeLeft()
+            pages += 1
+        }
+        icon.press(forDuration: 1.4)
+        let quickCheckIn = springboard.buttons.matching(NSPredicate(format: "label BEGINSWITH 'チェックイン'")).firstMatch
+        waitFor(quickCheckIn)
+        snap("36-クイックアクション")
+        quickCheckIn.tap()
+        waitFor(app.navigationBars["チェックイン"], timeout: 15)
+        snap("37-クイックアクションから")
     }
 
     @MainActor
@@ -193,6 +212,21 @@ final class WalkthroughUITests: XCTestCase {
             tries += 1
         }
         XCTAssertTrue(element.exists, "スクロールしても見つからない: \(element)", file: file, line: line)
+    }
+
+    /// 要素を画面の上のほうまで持ってくる(スクリーンショットの構図をそろえる)
+    @MainActor
+    private func bringToTop(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        scrollTo(element, file: file, line: line)
+        if element.frame.midY > app.frame.height * 0.7 {
+            // タブバーの近くにあるときは、まず少しだけ上げる
+            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+            let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+            from.press(forDuration: 0.05, thenDragTo: to, withVelocity: .slow, thenHoldForDuration: 0.2)
+        }
+        let start = element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.16))
+        start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.3)
     }
 
     /// 見えるところまで下へ(画面の上のほうへ)戻る

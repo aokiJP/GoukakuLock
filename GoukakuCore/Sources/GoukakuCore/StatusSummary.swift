@@ -115,7 +115,7 @@ public struct StatusSummary: Equatable, Sendable {
         case .achieved:
             s = StatusSummary(seal: "合格", tone: .achieved, headline: "今日は達成。\(clock(boundary)) まで使えます",
                               shortHeadline: "今日は達成", detail: nil,
-                              countdownTo: boundary, countdownLabel: "次の切り替えまで",
+                              countdownTo: boundary, countdownLabel: "切り替えまで",
                               shouldLock: false, cycle: decision.cycle)
         case .earnWindowActive(let until):
             s = StatusSummary(seal: "解", tone: .earn, headline: "解除中", shortHeadline: "解除中",

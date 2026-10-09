@@ -42,6 +42,7 @@ targets:
     sources:
       - path: App
       - path: Shared/UI
+      - path: Shared/Intents
       - path: Widgets/Views
     dependencies:
       - package: GoukakuCore
@@ -77,6 +78,15 @@ targets:
           - CFBundleURLName: com.aokijp.goukakulock
             CFBundleURLSchemes:
               - goukakulock
+        UIApplicationShortcutItems:
+          - UIApplicationShortcutItemType: com.aokijp.goukakulock.quick.checkin
+            UIApplicationShortcutItemTitle: チェックイン
+            UIApplicationShortcutItemSubtitle: 今日のコミットを記録
+            UIApplicationShortcutItemIconSymbolName: checkmark.seal
+          - UIApplicationShortcutItemType: com.aokijp.goukakulock.quick.timer
+            UIApplicationShortcutItemTitle: 集中タイマー
+            UIApplicationShortcutItemSubtitle: アプリを開いている時間だけ数える
+            UIApplicationShortcutItemIconSymbolName: timer
     entitlements:
       path: App/GoukakuLock.entitlements
       properties:
@@ -188,6 +198,7 @@ targets:
       - path: Widgets/Extension
       - path: Widgets/Views
       - path: Shared/UI
+      - path: Shared/Intents
     dependencies:
       - package: GoukakuCore
       - package: GoukakuKit

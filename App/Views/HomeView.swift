@@ -26,7 +26,10 @@ enum HomeSheet: Identifiable {
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(NotificationRouter.self) private var router
+    @Environment(\.scenePhase) private var scenePhase
     @State private var sheet: HomeSheet?
+    /// ホーム画面・ロック画面にウィジェットが置いてあるか(わかるまでは nil)
+    @State private var widgetInstalled: Bool?
 
     var body: some View {
         NavigationStack {
@@ -43,7 +46,7 @@ struct HomeView: View {
                     todaySection
                     RecentStrip()
                     StreakRow(onShare: { sheet = .share })
-                    WidgetNudgeCard()
+                    WidgetNudgeCard(installed: widgetInstalled)
                     if model.rampSuggestionDue {
                         RampCard()
                     }
@@ -69,6 +72,11 @@ struct HomeView: View {
             }
             .refreshable {
                 await model.onLaunchOrForeground()
+            }
+            .task(id: scenePhase) {
+                // ウィジェットを置いて戻ってきたら案内が消えるよう、前面に戻るたびに確かめる
+                guard scenePhase == .active else { return }
+                widgetInstalled = await WidgetNudgeCard.hasInstalledWidget()
             }
             .onChange(of: router.openTimer, initial: true) { _, open in
                 guard open else { return }
@@ -542,9 +550,8 @@ struct WarningBanners: View {
 /// 置いてあれば出さない。閉じたら二度と出さない。
 struct WidgetNudgeCard: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.scenePhase) private var scenePhase
     @AppStorage("nudge.widget.dismissed") private var dismissed = false
-    @State private var installed: Bool?
+    var installed: Bool?
 
     var body: some View {
         Group {
@@ -559,7 +566,7 @@ struct WidgetNudgeCard: View {
                             Text("ホーム画面に置こう")
                                 .font(Theme.heading(.headline))
                                 .foregroundStyle(Theme.ink)
-                            Text("開かなくても残り時間が見え、タップ1回でチェックインできます。")
+                            Text("アプリを開かなくても今日の状態と残り時間が見え、タップするとすぐ記録の画面が開きます。")
                                 .font(.subheadline)
                                 .foregroundStyle(Theme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -583,11 +590,6 @@ struct WidgetNudgeCard: View {
                 }
                 .transition(.opacity)
             }
-        }
-        .task(id: scenePhase) {
-            // ウィジェットを置いて戻ってきたら消えるよう、前面に戻るたびに確かめる
-            guard !dismissed, scenePhase == .active else { return }
-            installed = await Self.hasInstalledWidget()
         }
     }
 

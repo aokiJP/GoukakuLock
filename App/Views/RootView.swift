@@ -16,7 +16,7 @@ struct RootView: View {
             get: { router.openCheckIn && !model.needsOnboarding },
             set: { router.openCheckIn = $0 }
         )) {
-            CheckInPickerView()
+            CheckInPickerView(direct: model.singlePendingHabit)
         }
         .overlay {
             if let celebration = model.celebration {

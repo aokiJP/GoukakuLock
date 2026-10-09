@@ -71,25 +71,30 @@ struct LiveActivityContentView: View {
     var state: GoukakuActivityAttributes.ContentState
 
     var body: some View {
-        HStack(spacing: 14) {
-            SealView(text: LiveActivityStyle.seal(state), color: LiveActivityStyle.color(state), filled: false, size: 50)
+        HStack(spacing: 12) {
+            SealView(text: LiveActivityStyle.seal(state), color: LiveActivityStyle.color(state), filled: false, size: 46)
             VStack(alignment: .leading, spacing: 3) {
                 Text(LiveActivityStyle.title(state))
                     .font(Theme.heading(.headline))
                     .foregroundStyle(Theme.ink)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(LiveActivityStyle.subtitle(state))
                     .font(.caption)
                     .foregroundStyle(Theme.muted)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer(minLength: 8)
+            Spacer(minLength: 4)
             LiveActivityTimerText(state: state)
                 .font(.system(size: 26, weight: .semibold, design: .serif))
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
                 .foregroundStyle(LiveActivityStyle.color(state))
                 .multilineTextAlignment(.trailing)
-                .frame(maxWidth: 120, alignment: .trailing)
+                .frame(width: 104, alignment: .trailing)
         }
         .padding(16)
     }

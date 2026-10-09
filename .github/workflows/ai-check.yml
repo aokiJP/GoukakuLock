@@ -1,0 +1,135 @@
+name: AI check (MLX)
+
+# 相棒AIの芯(GoukakuAI)の単体テストと、MLX で実際のモデルを読んで日本語が返るかの確認。
+# - GoukakuAIMLX を iOS 向けにビルド(アプリに入る形でコンパイルが通るか)
+# - macOS で、目録のモデルを Hugging Face から取って MLX で読み、相棒の提案・ふり返りを作る
+# 結果(ログ・生成した文)は ci-output-ai ブランチに置く。
+
+on:
+  push:
+    branches: [main, ai-companion]
+    paths:
+      - "GoukakuAI/**"
+      - "GoukakuAIMLX/**"
+      - "AI/**"
+      - "scripts/fetch-model.py"
+      - ".github/workflows/ai-check.yml"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "確かめるモデルの id(AI/models.json)"
+        required: false
+        default: "lfm2.5-1.2b-jp"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mlx:
+    runs-on: macos-26
+    timeout-minutes: 120
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      MODEL: ${{ inputs.model || 'lfm2.5-1.2b-jp' }}
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Versions and Metal
+        run: |
+          mkdir -p build
+          {
+            sw_vers; xcodebuild -version; swift --version
+            echo "--- metal"; xcrun -f metal || echo "metal: not found"
+            echo "--- gpu"; system_profiler SPDisplaysDataType 2>/dev/null | head -20 || true
+            echo "--- memory"; sysctl hw.memsize
+          } 2>&1 | tee build/versions.txt
+
+      - name: Metal toolchain (Xcode 26 は別ダウンロード)
+        run: |
+          if ! xcrun -f metal >/dev/null 2>&1 || ! echo 'kernel void k(){}' | xcrun metal -x metal -c - -o /tmp/k.air 2>/dev/null; then
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tail -5
+          fi
+          echo 'kernel void k(){}' | xcrun metal -x metal -c - -o /tmp/k.air && echo "metal compiler OK" | tee -a build/versions.txt
+
+      - name: Core unit tests (GoukakuAI)
+        run: |
+          set -o pipefail
+          swift test --package-path GoukakuAI 2>&1 | tee build/ai-core-tests.log | tail -n 20
+
+      - name: Fetch model (${{ env.MODEL }})
+        run: |
+          set -o pipefail
+          python3 scripts/fetch-model.py "$MODEL" "$RUNNER_TEMP/model" 2>&1 | tee build/fetch-model.log
+
+      - name: Build GoukakuAIMLX for iOS
+        run: |
+          set -o pipefail
+          cd GoukakuAIMLX
+          xcodebuild -list 2>&1 | tee ../build/mlx-schemes.txt
+          xcodebuild build -scheme GoukakuAIMLX -destination 'generic/platform=iOS' \
+            -skipMacroValidation -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath ../build/DD-mlx-ios 2>&1 | tee ../build/mlx-ios-build.log | xcbeautify --renderer github-actions
+
+      - name: Smoke test on macOS (GPU)
+        id: gpu
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          cd GoukakuAIMLX
+          SCHEME=$(grep -q "GoukakuAIMLX-Package" ../build/mlx-schemes.txt && echo GoukakuAIMLX-Package || echo GoukakuAIMLX)
+          TEST_RUNNER_GOUKAKU_MODEL_DIR="$RUNNER_TEMP/model" TEST_RUNNER_GOUKAKU_MODEL_ID="$MODEL" \
+          TEST_RUNNER_GOUKAKU_CATALOG="$GITHUB_WORKSPACE/AI/models.json" \
+          xcodebuild test -scheme "$SCHEME" -destination 'platform=macOS' \
+            -skipMacroValidation -skipPackagePluginValidation \
+            -derivedDataPath ../build/DD-mlx-mac 2>&1 | tee ../build/mlx-smoke-gpu.log | grep -E "\[smoke\]|error:|Test Case|Executed" | head -n 80
+
+      - name: Smoke test on macOS (CPU)
+        id: cpu
+        if: steps.gpu.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          cd GoukakuAIMLX
+          SCHEME=$(grep -q "GoukakuAIMLX-Package" ../build/mlx-schemes.txt && echo GoukakuAIMLX-Package || echo GoukakuAIMLX)
+          TEST_RUNNER_GOUKAKU_MODEL_DIR="$RUNNER_TEMP/model" TEST_RUNNER_GOUKAKU_MODEL_ID="$MODEL" \
+          TEST_RUNNER_GOUKAKU_CATALOG="$GITHUB_WORKSPACE/AI/models.json" TEST_RUNNER_GOUKAKU_MLX_CPU=1 \
+          xcodebuild test -scheme "$SCHEME" -destination 'platform=macOS' \
+            -skipMacroValidation -skipPackagePluginValidation \
+            -derivedDataPath ../build/DD-mlx-mac 2>&1 | tee ../build/mlx-smoke-cpu.log | grep -E "\[smoke\]|error:|Test Case|Executed" | head -n 80
+
+      - name: Save output to ci-output-ai branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUT="$RUNNER_TEMP/ci-output-ai"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp build/*.log build/*.txt "$OUT/" 2>/dev/null || true
+          for f in build/mlx-smoke-gpu.log build/mlx-smoke-cpu.log; do
+            [ -f "$f" ] && grep -E "\[smoke\]" "$f" > "$OUT/$(basename "$f" .log)-lines.txt" || true
+          done
+          for f in build/*.log; do
+            [ -f "$f" ] && grep -E "(error|warning):" "$f" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true
+          done
+          {
+            echo "run=${{ github.run_number }}"
+            echo "sha=${{ github.sha }}"
+            echo "ref=${{ github.ref }}"
+            echo "model=$MODEL"
+            echo "status=${{ job.status }}"
+            echo "gpu=${{ steps.gpu.outcome }}"
+            echo "cpu=${{ steps.cpu.outcome }}"
+            date -u +"time=%Y-%m-%dT%H:%M:%SZ"
+          } > "$OUT/status.txt"
+          cd "$OUT"
+          git init -q
+          git checkout -q -b ci-output-ai
+          git add -A
+          git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "AI check: run ${{ github.run_number }} (${{ job.status }}) for ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-output-ai

@@ -1,6 +1,7 @@
 import Foundation
 import ManagedSettings
 import GoukakuCore
+import GoukakuShared
 
 extension ManagedSettingsStore.Name {
     /// 本体と拡張が共有する名前つきストア(Swift 6 の並行性チェックで止まらないよう計算プロパティにする)

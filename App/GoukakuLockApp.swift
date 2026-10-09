@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import GoukakuKit
 
 @main
 struct GoukakuLockApp: App {
@@ -9,9 +10,11 @@ struct GoukakuLockApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
-        let model = AppModel(container: Persistence.makeContainer())
-        let router = NotificationRouter()
+        // 通知・Siri・バックグラウンド更新でも同じものを使うので、共有のインスタンスにする
+        let model = AppModel.shared
+        let router = NotificationRouter.shared
         UNUserNotificationCenter.current().delegate = router
+        CheckInNotifier.registerCategories()   // 通知を長押しして、一言書いて記録できるように
         _model = State(initialValue: model)
         _router = State(initialValue: router)
     }

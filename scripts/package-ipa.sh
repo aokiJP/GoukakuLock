@@ -33,6 +33,7 @@ fi
 sign "$APP/PlugIns/GoukakuMonitor.appex"      "$ROOT/Extensions/Monitor/GoukakuMonitor.entitlements"
 sign "$APP/PlugIns/GoukakuShieldConfig.appex" "$ROOT/Extensions/ShieldConfig/GoukakuShieldConfig.entitlements"
 sign "$APP/PlugIns/GoukakuShieldAction.appex" "$ROOT/Extensions/ShieldAction/GoukakuShieldAction.entitlements"
+sign "$APP/PlugIns/GoukakuWidget.appex"       "$ROOT/Widgets/Extension/GoukakuWidget.entitlements"
 sign "$APP"                                   "$ROOT/App/GoukakuLock.entitlements"
 
 codesign --verify --deep --strict --verbose=2 "$APP"

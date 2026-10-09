@@ -2,13 +2,30 @@ import SwiftUI
 import GoukakuCore
 import GoukakuKit
 
+/// ホームから開く画面
+enum HomeSheet: Identifiable {
+    case checkIn(HabitSnapshot)
+    case emergency
+    case pause
+    case review(CycleID)
+    case share
+
+    var id: String {
+        switch self {
+        case .checkIn(let habit): return "checkin-\(habit.id)"
+        case .emergency: return "emergency"
+        case .pause: return "pause"
+        case .review(let week): return "review-\(week)"
+        case .share: return "share"
+        }
+    }
+}
+
 /// S-02 ホーム
 struct HomeView: View {
     @Environment(AppModel.self) private var model
-    @State private var checkInHabit: HabitSnapshot?
-    @State private var showingEmergency = false
-    @State private var showingPause = false
-    @State private var showingRecovery = false
+    @Environment(NotificationRouter.self) private var router
+    @State private var sheet: HomeSheet?
 
     var body: some View {
         NavigationStack {
@@ -17,10 +34,17 @@ struct HomeView: View {
                     WarningBanners()
                     StatusPanel()
                     if model.consecutiveMisses >= 3 {
-                        RecoveryCard(showingPause: $showingPause)
+                        RecoveryCard(showPause: { sheet = .pause })
+                    }
+                    if let week = model.weeklyReviewDue {
+                        WeeklyReviewCard(week: week) { sheet = .review(week) }
                     }
                     todaySection
-                    StreakRow()
+                    RecentStrip()
+                    StreakRow(onShare: { sheet = .share })
+                    if model.rampSuggestionDue {
+                        RampCard()
+                    }
                     exitRow
                 }
                 .padding()
@@ -36,32 +60,46 @@ struct HomeView: View {
                     }
                 }
             }
-            .sheet(item: $checkInHabit) { habit in
-                NavigationStack { CheckInView(habit: habit) }
-            }
-            .sheet(isPresented: $showingEmergency) {
+            .sheet(item: $sheet) { sheet in
                 NavigationStack {
-                    EmergencyView()
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("閉じる") { showingEmergency = false }
-                            }
-                        }
-                }
-            }
-            .sheet(isPresented: $showingPause) {
-                NavigationStack {
-                    PauseView()
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("閉じる") { showingPause = false }
-                            }
-                        }
+                    sheetContent(sheet)
                 }
             }
             .refreshable {
                 await model.onLaunchOrForeground()
             }
+            .onChange(of: router.openTimer, initial: true) { _, open in
+                guard open else { return }
+                router.openTimer = false
+                let today = model.today
+                if let habit = today?.required.first(where: { $0.method == .timer && !(today?.isDone($0.id) ?? false) })
+                    ?? today?.required.first(where: { $0.method == .timer }) {
+                    sheet = .checkIn(habit)
+                } else {
+                    router.openCheckIn = true
+                }
+            }
+            .onChange(of: router.openEmergency, initial: true) { _, open in
+                guard open else { return }
+                router.openEmergency = false
+                sheet = .emergency
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: HomeSheet) -> some View {
+        switch sheet {
+        case .checkIn(let habit):
+            CheckInDestination(habit: habit)
+        case .emergency:
+            EmergencyView().closeButton { self.sheet = nil }
+        case .pause:
+            PauseView().closeButton { self.sheet = nil }
+        case .review(let week):
+            WeeklyReviewView(week: week)
+        case .share:
+            ShareSheetView()
         }
     }
 
@@ -74,13 +112,15 @@ struct HomeView: View {
                     .font(Theme.heading(.headline))
                     .foregroundStyle(Theme.ink)
                 ForEach(today.required) { habit in
-                    CommitRow(habit: habit, done: today.latestAchievement(for: habit.id), required: true) {
-                        checkInHabit = habit
+                    CommitRow(habit: habit, done: today.latestAchievement(for: habit.id), required: true,
+                              earnMode: model.isEarnMode, earnMinutes: model.earnWindowMinutes) {
+                        sheet = .checkIn(habit)
                     }
                 }
                 ForEach(today.optional) { habit in
-                    CommitRow(habit: habit, done: today.latestAchievement(for: habit.id), required: false) {
-                        checkInHabit = habit
+                    CommitRow(habit: habit, done: today.latestAchievement(for: habit.id), required: false,
+                              earnMode: model.isEarnMode, earnMinutes: model.earnWindowMinutes) {
+                        sheet = .checkIn(habit)
                     }
                 }
             }
@@ -102,7 +142,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Button {
-                    showingEmergency = true
+                    sheet = .emergency
                 } label: {
                     Label("緊急解除", systemImage: "clock.badge.exclamationmark")
                         .frame(maxWidth: .infinity)
@@ -110,7 +150,7 @@ struct HomeView: View {
                 .buttonStyle(.bordered)
                 .tint(Theme.amber)
                 Button {
-                    showingPause = true
+                    sheet = .pause
                 } label: {
                     Label(model.activePause == nil ? "一時停止" : "再開", systemImage: "pause.circle")
                         .frame(maxWidth: .infinity)
@@ -125,125 +165,105 @@ struct HomeView: View {
     }
 }
 
+extension View {
+    /// シートの左上に「閉じる」を付ける
+    func closeButton(_ action: @escaping () -> Void) -> some View {
+        toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("閉じる", action: action)
+            }
+        }
+    }
+}
+
+/// コミットの確かめ方に合わせて、記録の画面を出し分ける
+struct CheckInDestination: View {
+    @Environment(AppModel.self) private var model
+    let habit: HabitSnapshot
+
+    var body: some View {
+        switch habit.method {
+        case .timer:
+            let detail = model.habit(habit.id)
+            FocusTimerView(habit: habit, fullMinutes: habit.targetMinutes ?? 25,
+                           minimumMinutes: detail?.minimumMinutes ?? 5, strict: detail?.strictTimer ?? false)
+        case .photo:
+            PhotoCheckInView(habit: habit)
+        case .appUsage:
+            UsageInfoView(habit: habit)
+        default:
+            CheckInView(habit: habit)
+        }
+    }
+}
+
+/// 使用時間で自動達成するコミットの説明
+struct UsageInfoView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let habit: HabitSnapshot
+
+    var body: some View {
+        let done = model.today?.isDone(habit.id) ?? false
+        Form {
+            Section {
+                Text(habit.title).font(Theme.heading(.title3)).foregroundStyle(Theme.ink)
+                Label(done ? "今日は自動で達成しました" : "選んだ学習アプリを合計\(habit.targetMinutes ?? 0)分使うと、自動で達成します",
+                      systemImage: done ? "checkmark.seal.fill" : "hourglass")
+                    .foregroundStyle(done ? Theme.seal : Theme.ink)
+            } footer: {
+                Text("Screen Time の計測を使うので参考精度です。その日の 23:59 までの利用だけを数えます。アプリを開かなくても、達成した時点でロックが外れます。")
+            }
+            Section {
+                Button("今すぐ確かめる") {
+                    model.reconcile(source: "usageCheck")
+                    model.scheduleWidgetRefresh()
+                }
+            }
+        }
+        .navigationTitle("使用時間")
+        .navigationBarTitleDisplayMode(.inline)
+        .closeButton { dismiss() }
+    }
+}
+
 /// 状態の欄:印・見出し・次に変わる時刻までの残り
 struct StatusPanel: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
         let now = Date()
-        let presentation = StatusPresentation.make(model: model, now: now)
         RuledBox {
-            HStack(alignment: .top, spacing: 16) {
-                SealView(text: presentation.seal, color: presentation.color, filled: presentation.filled)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(presentation.headline)
-                        .font(Theme.heading(.title3))
-                        .foregroundStyle(Theme.ink)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if let detail = presentation.detail {
-                        Text(detail)
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.muted)
+            if let summary = model.statusSummary(now: now) {
+                HStack(alignment: .top, spacing: 16) {
+                    SealView(text: summary.seal, color: summary.tone.color, filled: summary.tone.filled)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(summary.headline)
+                            .font(Theme.heading(.title3))
+                            .foregroundStyle(Theme.ink)
                             .fixedSize(horizontal: false, vertical: true)
-                    }
-                    if let until = presentation.countdownTo, until > now {
-                        HStack(spacing: 4) {
-                            Text(presentation.countdownLabel)
-                            Text(timerInterval: now...until, countsDown: true)
-                                .monospacedDigit()
+                        if let detail = summary.detail {
+                            Text(detail)
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(presentation.color)
+                        if let until = summary.countdownTo, until > now {
+                            HStack(spacing: 4) {
+                                Text(summary.countdownLabel)
+                                Text(timerInterval: now...until, countsDown: true)
+                                    .monospacedDigit()
+                            }
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(summary.tone.color)
+                        }
                     }
                 }
+            } else {
+                Text("読み込み中…").foregroundStyle(Theme.muted)
             }
         }
         .accessibilityElement(children: .combine)
-    }
-}
-
-/// 判定の理由ごとの見出し(仕様書 第5.2節の表)
-struct StatusPresentation {
-    var seal: String
-    var color: Color
-    var filled: Bool
-    var headline: String
-    var detail: String?
-    var countdownTo: Date?
-    var countdownLabel = "あと"
-
-    @MainActor
-    static func make(model: AppModel, now: Date) -> StatusPresentation {
-        guard let decision = model.decision, let state = model.state else {
-            return StatusPresentation(seal: "待", color: Theme.muted, filled: false, headline: "読み込み中…")
-        }
-        let cal = model.cycleCalendar
-        let today = model.today
-        let pending = today?.pendingRequired ?? []
-        let name = pending.first.map { "「\($0.title)」" } ?? "今日のコミット"
-        let more = pending.count > 1 ? "ほか\(pending.count - 1)件" : ""
-        let boundary = cal.end(of: decision.cycle)
-        var p: StatusPresentation
-        switch decision.reason {
-        case .awaitingCommit:
-            p = StatusPresentation(seal: "未", color: Theme.ink, filled: false,
-                                   headline: "今日の\(name)\(more)がまだです",
-                                   detail: "ロック中。達成すると、お金を使うアプリのロックが外れます。")
-        case .carryOver:
-            p = StatusPresentation(seal: "未", color: Theme.ink, filled: false,
-                                   headline: "昨日は未達成。今日の分を終えるまでロック中",
-                                   detail: "今日の\(name)\(more)を終えると外れます。")
-        case .earnWindowExpired:
-            var window = ""
-            if case .earn(let minutes) = state.schedule.mode { window = Fmt.duration(minutes: minutes) }
-            p = StatusPresentation(seal: "未", color: Theme.ink, filled: false,
-                                   headline: "解除枠が終わりました。もう1回で\(window)")
-        case .achieved:
-            p = StatusPresentation(seal: "合格", color: Theme.seal, filled: true,
-                                   headline: "今日は達成。\(Fmt.clock(boundary, now: now)) まで使えます",
-                                   detail: nil, countdownTo: boundary, countdownLabel: "次の切り替えまで")
-        case .earnWindowActive(let until):
-            p = StatusPresentation(seal: "解", color: Theme.seal, filled: false,
-                                   headline: "解除中", detail: nil, countdownTo: until)
-        case .emergency(let until):
-            p = StatusPresentation(seal: "急", color: Theme.amber, filled: false,
-                                   headline: "緊急解除中", detail: "\(Fmt.clock(until, now: now)) に判定し直します。",
-                                   countdownTo: until)
-        case .beforeLockStart(let lockAt):
-            p = StatusPresentation(seal: "猶", color: Theme.ink, filled: false,
-                                   headline: "\(Fmt.hm(lockAt)) からロック。それまでにやろう",
-                                   detail: "今日の\(name)\(more)を終えれば、ロックはかかりません。",
-                                   countdownTo: lockAt, countdownLabel: "ロックまで")
-        case .restDay:
-            p = StatusPresentation(seal: "休", color: Theme.rest, filled: false, headline: "今日は休養日",
-                                   detail: "ロックはかかりません。ストリークも途切れません。")
-        case .noCommitToday:
-            p = StatusPresentation(seal: "空", color: Theme.muted, filled: false, headline: "今日は予定なし",
-                                   detail: "予定された必須コミットがない日はロックしません。")
-        case .paused:
-            let end = model.activePause?.end
-            p = StatusPresentation(seal: "停", color: Theme.muted, filled: false, headline: "一時停止中",
-                                   detail: end.map { "\(Fmt.clock($0, now: now)) に再開します。" } ?? "無期限。再開するまでロックしません。")
-        case .monitorOnly:
-            p = StatusPresentation(seal: "見", color: Theme.rest, filled: false, headline: "見守りモード(記録だけ)",
-                                   detail: "ロックはせず、記録とストリークだけを続けます。")
-        case .notStarted:
-            let start = cal.start(of: state.activeSince)
-            p = StatusPresentation(seal: "待", color: Theme.muted, filled: false,
-                                   headline: "\(Fmt.clock(start, now: now)) から始まります",
-                                   detail: "それまではロックしません。", countdownTo: start, countdownLabel: "開始まで")
-        }
-        if decision.shouldLock {
-            p.detail = [p.detail, "切り替え:\(Fmt.clock(boundary, now: now))"].compactMap { $0 }.joined(separator: "\n")
-        }
-        if let startsAt = decision.emergencyStartsAt {
-            p.detail = [p.detail, "緊急解除は \(Fmt.clock(startsAt, now: now)) から"].compactMap { $0 }.joined(separator: "\n")
-            if p.countdownTo == nil {
-                p.countdownTo = startsAt
-                p.countdownLabel = "緊急解除まで"
-            }
-        }
-        return p
     }
 }
 
@@ -252,7 +272,33 @@ struct CommitRow: View {
     var habit: HabitSnapshot
     var done: Achievement?
     var required: Bool
+    var earnMode = false
+    var earnMinutes: Int?
     var onCheckIn: () -> Void
+
+    private var methodLabel: String {
+        switch habit.method {
+        case .timer: return "集中タイマー \(habit.targetMinutes ?? 25)分"
+        case .photo: return "写真"
+        case .appUsage: return "使用時間 \(habit.targetMinutes ?? 0)分(自動)"
+        default: return "自己申告"
+        }
+    }
+
+    private var actionLabel: String? {
+        if habit.method == .appUsage { return nil }
+        if earnMode {
+            guard habit.method != .selfReport else { return nil }
+            let gain = earnMinutes.map { "+\(Fmt.duration(minutes: $0))" } ?? ""
+            return done == nil ? "\(habit.method == .photo ? "撮る" : "はじめる") \(gain)" : "もう1回 \(gain)"
+        }
+        guard done == nil else { return nil }
+        switch habit.method {
+        case .timer: return "はじめる"
+        case .photo: return "撮る"
+        default: return "チェックイン"
+        }
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -263,25 +309,32 @@ struct CommitRow: View {
                     .foregroundStyle(Theme.ink)
                     .fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 6) {
-                    Text(required ? "必須" : "任意(記録だけ)")
-                    if let minimum = habit.minimumTitle {
+                    Text(required ? "必須" : "任意")
+                    Text(methodLabel)
+                    if let minimum = habit.minimumTitle, !minimum.isEmpty {
                         Text("最小版:\(minimum)")
                     }
                 }
                 .font(.caption)
                 .foregroundStyle(Theme.muted)
+                .lineLimit(1)
                 if let done {
-                    Text("\(Fmt.hm(done.at)) に\(done.kind == .minimum ? "最小版で" : "")達成")
+                    Text("\(Fmt.hm(done.at)) に\(done.kind == .minimum ? "最小版で" : "")\(done.source == .monitor ? "自動で" : "")達成")
                         .font(.caption)
                         .foregroundStyle(Theme.seal)
                 }
             }
             Spacer(minLength: 8)
-            if done == nil {
-                Button("チェックイン", action: onCheckIn)
+            if let actionLabel {
+                Button(actionLabel, action: onCheckIn)
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.seal)
                     .font(.subheadline.weight(.semibold))
+            } else if habit.method == .appUsage && done == nil {
+                Button(action: onCheckIn) {
+                    Image(systemName: "info.circle")
+                }
+                .accessibilityLabel("使用時間の説明")
             }
         }
         .padding(.vertical, 10)
@@ -293,21 +346,64 @@ struct CommitRow: View {
     }
 }
 
-/// ストリークと通算
-struct StreakRow: View {
+/// この2週間の記録(◯△✕)
+struct RecentStrip: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
+        let items = model.recentOutcomes(days: 14)
+        let cal = model.cycleCalendar
+        let current = model.currentCycle
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("この2週間")
+                    .font(Theme.heading(.headline))
+                    .foregroundStyle(Theme.ink)
+                HStack(spacing: 0) {
+                    ForEach(items) { item in
+                        VStack(spacing: 4) {
+                            MarkView(outcome: item.cycle > current ? .blank : item.outcome.mark, size: 16)
+                            Text(Fmt.weekdaySymbols[cal.weekday(of: item.cycle) - 1])
+                                .font(.system(size: 9))
+                                .foregroundStyle(item.cycle == current ? Theme.seal : Theme.muted)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                .padding(.vertical, 8)
+                .background(Theme.paperSunken, in: RoundedRectangle(cornerRadius: 6))
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("この2週間の達成 \(items.filter { $0.outcome == .achieved || $0.outcome == .minimum }.count)日")
+        }
+    }
+}
+
+/// ストリークと通算
+struct StreakRow: View {
+    @Environment(AppModel.self) private var model
+    var onShare: () -> Void = {}
+
+    var body: some View {
         let stats = model.stats()
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-            stat(value: stats.streak, label: "連続", note: "日")
-            Rectangle().fill(Theme.rule).frame(width: 1, height: 44)
-            stat(value: stats.total, label: "通算", note: "日")
-            Rectangle().fill(Theme.rule).frame(width: 1, height: 44)
-            stat(value: stats.longest, label: "最長", note: "日")
+        VStack(spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                stat(value: stats.streak, label: "連続", note: "日")
+                Rectangle().fill(Theme.rule).frame(width: 1, height: 44)
+                stat(value: stats.total, label: "通算", note: "日")
+                Rectangle().fill(Theme.rule).frame(width: 1, height: 44)
+                stat(value: stats.longest, label: "最長", note: "日")
+            }
+            .accessibilityElement(children: .combine)
+            if stats.total > 0 {
+                Button(action: onShare) {
+                    Label("合格証をつくる", systemImage: "rosette")
+                        .font(.footnote.weight(.semibold))
+                }
+                .tint(Theme.seal)
+            }
         }
         .padding(.vertical, 6)
-        .accessibilityElement(children: .combine)
     }
 
     private func stat(value: Int, label: String, note: String) -> some View {
@@ -325,10 +421,38 @@ struct StreakRow: View {
     }
 }
 
+/// 合格証のシート
+struct ShareSheetView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        let stats = model.stats()
+        ScrollView {
+            VStack(spacing: 18) {
+                CertificateCard(streak: stats.streak, total: stats.total, goal: nil, date: Date())
+                    .scaleEffect(0.85)
+                    .frame(width: 306, height: 383)
+                    .shadow(color: .black.opacity(0.12), radius: 10, y: 4)
+                ShareCertificateButton(streak: stats.streak, total: stats.total)
+                    .padding(.horizontal)
+                Text("送るかどうか、何を載せるかはあなたが決めます。")
+                    .font(.footnote)
+                    .foregroundStyle(Theme.muted)
+            }
+            .padding(.vertical)
+        }
+        .background(Theme.paper)
+        .navigationTitle("合格証")
+        .navigationBarTitleDisplayMode(.inline)
+        .closeButton { dismiss() }
+    }
+}
+
 /// 3日続けて未達成のときの「立て直し」(追い込まず、下げる・休む・止める道を並べる)
 struct RecoveryCard: View {
     @Environment(AppModel.self) private var model
-    @Binding var showingPause: Bool
+    var showPause: () -> Void
 
     var body: some View {
         RuledBox {
@@ -347,7 +471,7 @@ struct RecoveryCard: View {
                     NavigationLink { RestDaysView() } label: {
                         Label("休養日を置く", systemImage: "bed.double")
                     }
-                    Button { showingPause = true } label: {
+                    Button(action: showPause) {
                         Label("一時停止する", systemImage: "pause.circle")
                     }
                 }

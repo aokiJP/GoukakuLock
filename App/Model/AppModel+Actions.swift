@@ -30,28 +30,81 @@ struct OnboardingDraft {
 extension AppModel {
     // MARK: チェックイン
 
-    /// 自己申告で達成を記録する。成功したら記録した達成を返す
+    /// 確かめ方ごとの記録の中身
+    enum Evidence {
+        /// 自己申告の一言(5文字以上)
+        case note(String)
+        /// 集中タイマーで数えた秒
+        case timer(seconds: Int)
+        /// アプリ内のカメラで撮った証拠写真
+        case photo(fileName: String, note: String)
+
+        var method: VerificationMethod {
+            switch self {
+            case .note: return .selfReport
+            case .timer: return .timer
+            case .photo: return .photo
+            }
+        }
+    }
+
+    /// 自己申告で達成を記録する(画面・通知・Siri から)
     @discardableResult
     func checkIn(habit: HabitSnapshot, minimum: Bool, note: String) -> Achievement? {
-        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 5 else {
-            show("一言が短すぎます", "「やったこと」を5文字以上で書いてください。")
-            return nil
+        checkIn(habit: habit, minimum: minimum, evidence: .note(note))
+    }
+
+    /// 達成を記録する。成功したら記録した達成を返す
+    @discardableResult
+    func checkIn(habit: HabitSnapshot, minimum: Bool, evidence: Evidence) -> Achievement? {
+        var noteText = ""
+        switch evidence {
+        case .note(let text):
+            noteText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard noteText.count >= 5 else {
+                show("一言が短すぎます", "「やったこと」を5文字以上で書いてください。")
+                return nil
+            }
+            guard !isEarnMode else {
+                show("稼働型では使えません", "稼働型のチェックインは、タイマー・写真・使用時間など計れる方法だけです(何度でも押せてしまうため)。")
+                return nil
+            }
+        case .timer(let seconds):
+            noteText = "集中タイマー \(max(1, seconds / 60))分"
+        case .photo(_, let note):
+            noteText = note.trimmingCharacters(in: .whitespacesAndNewlines)
+            if noteText.isEmpty { noteText = "写真で記録" }
         }
         if minimum && !canUseMinimum() {
             show("最小版の上限です", "最小版は週\(settings.minimumWeeklyQuota)回までです。")
             return nil
         }
         do {
+            let wasSatisfied = decision?.todaySatisfied == true
             let achievement = try actions.checkIn(habitID: habit.id, kind: minimum ? .minimum : .full)
             let title = minimum ? (habit.minimumTitle ?? habit.title) : habit.title
-            context.insert(CheckIn(achievement: achievement, habitTitle: title, method: habit.method, note: trimmed))
-            log("checkin", "「\(habit.title)」\(minimum ? "を最小版で" : "を")達成")
+            let record = CheckIn(achievement: achievement, habitTitle: title, method: evidence.method, note: noteText)
+            switch evidence {
+            case .timer(let seconds): record.timerSeconds = seconds
+            case .photo(let fileName, _): record.evidenceFileName = fileName
+            case .note: break
+            }
+            context.insert(record)
+            log("checkin", "「\(habit.title)」\(minimum ? "を最小版で" : "を")達成(\(Self.methodName(evidence.method)))")
             syncEmergencyRecord()
             save()
             reload()
-            if decision?.todaySatisfied == true {
+            if let minutes = achievement.grantsMinutes {
+                // 稼働型:解除枠の残りを Live Activity に出す
+                LiveActivities.show(.init(kind: .earn, title: "解除中", startsAt: achievement.at,
+                                          endsAt: achievement.at.addingTimeInterval(TimeInterval(minutes * 60))))
+            }
+            if let e = state?.emergency, e.cancelledAt != nil {
+                LiveActivities.end(.emergency)   // 待機中に達成したので取り消された
+            }
+            if decision?.todaySatisfied == true && !wasSatisfied {
                 log("unlock", "今日の必須コミットをすべて達成")
+                celebrateIfMilestone()
                 save()
             }
             rebuildReminders()
@@ -63,11 +116,70 @@ extension AppModel {
         }
     }
 
+    static func methodName(_ method: VerificationMethod) -> String {
+        switch method {
+        case .selfReport: return "自己申告"
+        case .photo: return "写真"
+        case .timer: return "集中タイマー"
+        case .appUsage: return "使用時間"
+        case .health: return "ヘルスケア"
+        case .placeTimer: return "場所つきタイマー"
+        case .referee: return "執行役の承認"
+        }
+    }
+
+    /// 通知の返信・Siri から、アプリを開かずに自己申告で記録する
+    func quickCheckIn(habitID: UUID?, minimum: Bool, note: String) -> QuickCheckInResult {
+        reload()
+        guard state != nil, let today else {
+            return QuickCheckInResult(ok: false, title: "記録できませんでした", message: "はじめの設定が済んでいません。アプリを開いてください。")
+        }
+        let candidates = (today.required + today.optional).filter { !today.isDone($0.id) }
+        let chosen = habitID.flatMap { id in candidates.first { $0.id == id } }
+            ?? today.pendingRequired.first ?? candidates.first
+        guard let habit = chosen else {
+            return QuickCheckInResult(ok: false, title: "記録することはありません", message: "今日のコミットはすべて記録済みです。")
+        }
+        guard habit.method == .selfReport else {
+            return QuickCheckInResult(ok: false, title: "アプリで記録してください",
+                                      message: "「\(habit.title)」は\(Self.methodName(habit.method))で確かめるコミットです。")
+        }
+        guard !isEarnMode else {
+            return QuickCheckInResult(ok: false, title: "アプリで記録してください",
+                                      message: "稼働型では、タイマー・写真など計れる方法で記録します。")
+        }
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 5 else {
+            return QuickCheckInResult(ok: false, title: "一言が短すぎます",
+                                      message: "「やったこと」を5文字以上で。通知を長押しして、もう一度どうぞ。")
+        }
+        if minimum {
+            guard habit.minimumTitle != nil else {
+                return QuickCheckInResult(ok: false, title: "最小版がありません", message: "「\(habit.title)」には最小版が決めてありません。")
+            }
+            guard canUseMinimum() else {
+                return QuickCheckInResult(ok: false, title: "最小版の上限です", message: "最小版は週\(settings.minimumWeeklyQuota)回までです。")
+            }
+        }
+        guard checkIn(habit: habit, minimum: minimum, note: trimmed) != nil else {
+            return QuickCheckInResult(ok: false, title: "記録できませんでした", message: message?.body ?? "アプリを開いて、もう一度試してください。")
+        }
+        message = nil
+        let left = self.today?.pendingRequired.count ?? 0
+        let unlocked = decision?.todaySatisfied == true
+        return QuickCheckInResult(ok: true, title: minimum ? "最小版で記録しました" : "記録しました",
+                                  message: unlocked ? "今日の必須コミットをすべて達成。ロックが外れました。"
+                                                    : "「\(habit.title)」を記録。残りの必須コミット:\(left)件")
+    }
+
     /// 押し間違いの取り消し(5分以内)
     @discardableResult
     func undoCheckIn(_ achievementID: UUID) -> Bool {
         do {
             try actions.undoCheckIn(id: achievementID)
+            if state?.achievements.first(where: { $0.id == achievementID })?.grantsMinutes != nil {
+                LiveActivities.end(.earn)
+            }
             if let record = fetchAll(CheckIn.self).first(where: { $0.achievementID == achievementID }) {
                 record.undoneAt = Date()
                 log("undo", "「\(record.habitTitle)」のチェックインを取り消した")
@@ -96,6 +208,7 @@ extension AppModel {
             let window = try actions.requestEmergency(makeWindow: maker)
             context.insert(EmergencyRecord(window: window))
             log("emergency", "申請:\(Fmt.clock(window.startsAt)) から \(Fmt.clock(window.endsAt)) まで")
+            LiveActivities.show(.init(kind: .emergency, title: "緊急解除", startsAt: window.startsAt, endsAt: window.endsAt))
             save()
             reload()
         } catch ActionError.emergencyAlreadyRequested {
@@ -109,6 +222,7 @@ extension AppModel {
         do {
             try actions.cancelEmergency()
             syncEmergencyRecord()
+            LiveActivities.end(.emergency)
             log("emergency", "緊急解除を取り消した")
             save()
             reload()
@@ -327,6 +441,8 @@ extension AppModel {
         try? context.delete(model: PendingChange.self)
         try? context.delete(model: EmergencyRecord.self)
         try? context.delete(model: AppSettings.self)
+        try? context.delete(model: WeeklyReview.self)
+        EvidenceStore.removeAll()
         try? context.save()
         cachedSettings = nil
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()

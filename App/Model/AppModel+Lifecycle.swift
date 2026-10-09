@@ -55,6 +55,15 @@ extension AppModel {
         save()
         reload()
         await updateBadge()
+        // 8. ウィジェットを更新し、終わった Live Activity を片づける
+        refreshWidgetsNow()
+        let now = Date()
+        let emergencyActive = state?.emergency.map { $0.isPending(at: now) || $0.isActive(at: now) } ?? false
+        var earnActive = false
+        if case .earnWindowActive? = decision?.reason { earnActive = true }
+        await LiveActivities.endExpired(now: now, emergencyActive: emergencyActive, earnActive: earnActive)
+        // 証拠写真は既定 90 日で消す(第15.4節)
+        EvidenceStore.removeOlderThan(days: 90)
         // 9. 次のバックグラウンド更新を予約する
         scheduleNextRefresh()
     }
@@ -169,7 +178,7 @@ extension AppModel {
             return
         }
         do {
-            try ScheduleRegistrar.registerDaily(config: state.schedule, targets: targets, usage: [])
+            try ScheduleRegistrar.registerDaily(config: state.schedule, targets: targets, usage: usageSources())
             settings.registrationFingerprint = fingerprint
             registrationError = nil
             log("schedule", "毎日の区間を登録した(\(describe(state.schedule)))")
@@ -180,7 +189,21 @@ extension AppModel {
     }
 
     private func registrationFingerprint(_ config: ScheduleConfig) -> String {
-        "\(config.dayStartMinute)|\(describeMode(config.mode))|targets#\(settings.targetsRevision)"
+        let usage = usageSources().map { "\($0.habitID.uuidString.prefix(8)):\($0.minutes)" }.sorted().joined(separator: ",")
+        return "\(config.dayStartMinute)|\(describeMode(config.mode))|targets#\(settings.targetsRevision)|usage#\(settings.usageRevision)[\(usage)]"
+    }
+
+    /// 使用時間で達成を判定するコミット(対象アプリを選んであるもの)
+    func usageSources() -> [UsageSource] {
+        guard let state else { return [] }
+        let current = currentCycle
+        return state.habits.compactMap { habit in
+            guard habit.method == .appUsage, let minutes = habit.targetMinutes, minutes > 0,
+                  !(habit.activeUntil.map { $0 <= current } ?? false),
+                  let selection = TargetsStore.loadUsageSelection(habitID: habit.id, from: store.directory)
+            else { return nil }
+            return UsageSource(habitID: habit.id, minutes: minutes, selection: selection)
+        }
     }
 
     private func describeMode(_ mode: LockMode) -> String {
@@ -224,12 +247,14 @@ extension AppModel {
         let plan = ReminderPlanner.plan(state: state, settings: settings.reminderSettings,
                                         extra: store.pendingAchievements(), now: Date())
         var titles: [CycleID: String] = [:]
+        var habitIDs: [CycleID: UUID] = [:]
         for reminder in plan where titles[reminder.cycle] == nil {
-            if let title = summary(for: reminder.cycle)?.pendingRequired.first?.title {
-                titles[reminder.cycle] = title
+            if let habit = summary(for: reminder.cycle)?.pendingRequired.first {
+                titles[reminder.cycle] = habit.title
+                habitIDs[reminder.cycle] = habit.id
             }
         }
-        ReminderScheduler.replace(with: plan, titles: titles)
+        ReminderScheduler.replace(with: plan, titles: titles, habitIDs: habitIDs)
     }
 
     /// アイコンのバッジを、まだ達成していない必須コミットの数に直す

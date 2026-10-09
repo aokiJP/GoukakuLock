@@ -1,5 +1,6 @@
 import Foundation
 import DeviceActivity
+import WidgetKit
 import GoukakuKit
 
 /// DeviceActivityMonitor 拡張(本体が起動していなくても、区間の始まり・終わり・しきい値でシステムが呼ぶ)。
@@ -22,5 +23,8 @@ final class MonitorExtension: DeviceActivityMonitor {
         super.eventDidReachThreshold(event, activity: activity)
         UsageRecorder.record(event: event)   // 使用時間の自動判定(誤発火はコアでふるい落とす)
         Reconciler.run(source: "event:\(event.rawValue)", logToInbox: true)
+        if event.usageHabitID != nil {
+            WidgetCenter.shared.reloadAllTimelines()   // 自動で達成したら、ウィジェットにもすぐ出す
+        }
     }
 }

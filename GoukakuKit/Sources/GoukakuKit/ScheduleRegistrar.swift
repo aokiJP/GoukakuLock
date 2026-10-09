@@ -3,6 +3,7 @@ import DeviceActivity
 import FamilyControls
 import ManagedSettings
 import GoukakuCore
+import GoukakuShared
 
 extension DeviceActivityName {
     public static var cycleMain: Self { Self(ActivityPlan.Name.cycleMain.rawValue) }

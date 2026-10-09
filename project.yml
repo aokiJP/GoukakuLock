@@ -18,8 +18,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "2"
     TARGETED_DEVICE_FAMILY: "1"
     IPHONEOS_DEPLOYMENT_TARGET: "18.0"
     # 自分のチームで署名するときは、ここに Team ID を入れる(Xcode の Signing & Capabilities でも可)
@@ -41,12 +41,17 @@ targets:
     platform: iOS
     sources:
       - path: App
+      - path: Shared/UI
+      - path: Widgets/Views
     dependencies:
       - package: GoukakuCore
       - package: GoukakuKit
+      - package: GoukakuKit
+        product: GoukakuShared
       - target: GoukakuMonitor
       - target: GoukakuShieldConfig
       - target: GoukakuShieldAction
+      - target: GoukakuWidget
     info:
       path: App/Info.plist
       properties:
@@ -66,6 +71,12 @@ targets:
           - com.aokijp.goukakulock.refresh
         GoukakuAppGroupID: &group group.com.aokijp.goukakulock
         ITSAppUsesNonExemptEncryption: false
+        NSSupportsLiveActivities: true
+        NSCameraUsageDescription: 証拠写真を撮るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。
+        CFBundleURLTypes:
+          - CFBundleURLName: com.aokijp.goukakulock
+            CFBundleURLSchemes:
+              - goukakulock
     entitlements:
       path: App/GoukakuLock.entitlements
       properties:
@@ -78,6 +89,7 @@ targets:
         PRODUCT_NAME: GoukakuLock
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-Sumi AppIcon-Kin AppIcon-Sakura"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
   GoukakuMonitor:
@@ -166,6 +178,40 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.shieldaction
         TARGETED_DEVICE_FAMILY: "1"
+
+  # ホーム画面・ロック画面・StandBy のウィジェット、Live Activity、コントロールセンターのボタン
+  # (Family Controls は使わないので、App Groups だけ)
+  GoukakuWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets/Extension
+      - path: Widgets/Views
+      - path: Shared/UI
+    dependencies:
+      - package: GoukakuCore
+      - package: GoukakuKit
+        product: GoukakuShared
+    info:
+      path: Widgets/Extension/Info.plist
+      properties:
+        CFBundleDisplayName: 合格ロック
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GoukakuAppGroupID: *group
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widgets/Extension/GoukakuWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - *group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.widget
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: ""
+        ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME: ""
 
   # シミュレータで画面を一通り動かしてスクリーンショットを撮る UI テスト(CI で実行)
   GoukakuLockUITests:

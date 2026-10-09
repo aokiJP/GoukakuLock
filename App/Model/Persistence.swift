@@ -27,6 +27,10 @@ final class Habit {
     var goalNote: String
     var goalDate: Date?
     var createdAt: Date
+    /// タイマー:離れたら0からやり直す(厳格モード)
+    var strictTimer: Bool = false
+    /// タイマー・最小版の分数
+    var minimumMinutes: Int = 5
 
     init(id: UUID = UUID(), title: String, criteriaNote: String = "", minimumTitle: String = "",
          weekdays: [Int] = Array(1...7), isRequired: Bool = true,
@@ -82,6 +86,10 @@ final class CheckIn {
     var note: String
     var at: Date
     var undoneAt: Date?
+    /// 証拠写真のファイル名(Application Support/evidence/)
+    var evidenceFileName: String? = nil
+    /// タイマーで数えた秒
+    var timerSeconds: Int? = nil
 
     init(achievement: Achievement, habitTitle: String, method: VerificationMethod, note: String) {
         self.achievementID = achievement.id
@@ -203,6 +211,12 @@ final class AppSettings {
     var onboardingCompletedAt: Date?
     /// デバッグ用:緊急解除を短くする(待機1分・解除15分)
     var debugShortEmergency: Bool
+    /// はなまるを出した最後のサイクル(同じ日に二度出さない)
+    var lastCelebratedCycleRaw: String? = nil
+    /// 「一段上げる」の提案を閉じた日
+    var rampDismissedAt: Date? = nil
+    /// 使用時間で判定するアプリの選び直しのたびに増やす(区間の登録し直しの指紋に使う)
+    var usageRevision: Int = 0
 
     init() {
         self.reminderMinutes = [12 * 60, 20 * 60]
@@ -230,12 +244,32 @@ final class AppSettings {
     }
 }
 
+/// 週に1回のふり返り(仕様書 第8章:3つだけ聞く)
+@Model
+final class WeeklyReview {
+    /// ふり返った週(月曜のサイクル)
+    @Attribute(.unique) var weekStartRaw: String
+    var worked: String
+    /// easy / right / hard
+    var difficulty: String
+    var change: String
+    var createdAt: Date
+
+    init(weekStart: CycleID, worked: String, difficulty: String, change: String, createdAt: Date = Date()) {
+        self.weekStartRaw = weekStart.description
+        self.worked = worked
+        self.difficulty = difficulty
+        self.change = change
+        self.createdAt = createdAt
+    }
+}
+
 enum Persistence {
     /// Schema は Sendable でないので、共有の static let にせず毎回作る
     static var schema: Schema {
         Schema([
             Habit.self, CheckIn.self, CycleRecord.self, EventLog.self,
-            PendingChange.self, EmergencyRecord.self, AppSettings.self,
+            PendingChange.self, EmergencyRecord.self, AppSettings.self, WeeklyReview.self,
         ])
     }
 

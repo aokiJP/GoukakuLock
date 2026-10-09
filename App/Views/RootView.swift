@@ -18,6 +18,16 @@ struct RootView: View {
         )) {
             CheckInPickerView()
         }
+        .overlay {
+            if let celebration = model.celebration {
+                CelebrationView(celebration: celebration)
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: model.celebration?.id)
+        .onOpenURL { url in
+            router.handle(url: url)
+        }
         .alert(model.message?.title ?? "",
                isPresented: Binding(get: { model.message != nil }, set: { if !$0 { model.message = nil } }),
                presenting: model.message) { _ in

@@ -299,6 +299,14 @@ struct OnboardingView: View {
     private var commitStep: some View {
         Form {
             Section {
+                GoalTemplatePicker { template in
+                    draft.habit.title = template.title
+                    draft.habit.minimumTitle = template.minimum
+                }
+            } header: {
+                Text("例から選ぶ(あとで書き換えられます)")
+            }
+            Section {
                 TextField("例:英単語20個を覚えて、自作テストで7割", text: $draft.habit.title, axis: .vertical)
             } header: {
                 Text("目標")
@@ -321,7 +329,7 @@ struct OnboardingView: View {
             Section {
                 InfoRow(title: "確認方法", value: "自己申告(一言メモ)")
             } footer: {
-                Text("最初の2週間は、軽い目標と自己申告で「できた」を積むのがおすすめです。")
+                Text("最初の2週間は、軽い目標と自己申告で「できた」を積むのがおすすめです。集中タイマー・写真・学習アプリの使用時間で確かめる方法は、あとからコミットの編集で選べます。")
             }
         }
         .safeAreaInset(edge: .bottom) {

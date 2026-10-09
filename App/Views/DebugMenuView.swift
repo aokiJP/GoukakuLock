@@ -5,6 +5,7 @@ import DeviceActivity
 import ManagedSettings
 import GoukakuCore
 import GoukakuKit
+import GoukakuShared
 
 /// デバッグメニュー(DEBUG ビルドだけ。第14章・第19.3節の実機テスト用)
 struct DebugMenuView: View {
@@ -59,6 +60,9 @@ struct DebugMenuView: View {
                     model.ensureDailyRegistration(force: true)
                     output = model.registrationError.map { "失敗:\($0)" } ?? "登録しました。"
                 }
+            }
+            Section("見本") {
+                NavigationLink("ウィジェット・Live Activity・お祝い") { DebugGalleryView() }
             }
             Section("中身を見る") {
                 Button("state.json") { output = stateJSON() }
@@ -127,6 +131,105 @@ struct DebugMenuView: View {
         let text = events.map { "\(Fmt.dateTime($0.at))\t\($0.kind)\t\($0.detail)" }.joined(separator: "\n")
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("goukakulock-log.txt")
         return (try? text.write(to: url, atomically: true, encoding: .utf8)).map { url }
+    }
+}
+
+/// ウィジェット・Live Activity・お祝いの見本(シミュレータの画面確認用)
+struct DebugGalleryView: View {
+    @Environment(AppModel.self) private var model
+    @State private var showReview = false
+
+    var body: some View {
+        let now = Date()
+        let current = model.widgetPreviewEntry(now: now)
+        let sample = StatusEntry.sample(date: now)
+        List {
+            Section("ウィジェット(いまの状態)") {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        WidgetPreviewFrame(entry: current, family: .systemSmall)
+                        WidgetPreviewFrame(entry: current, family: .systemMedium)
+                    }
+                }
+                HStack(spacing: 12) {
+                    WidgetPreviewFrame(entry: current, family: .accessoryCircular)
+                    WidgetPreviewFrame(entry: current, family: .accessoryRectangular)
+                }
+                WidgetPreviewFrame(entry: current, family: .accessoryInline)
+            }
+            Section("ウィジェット(見本:ロック中)") {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        WidgetPreviewFrame(entry: sample, family: .systemSmall)
+                        WidgetPreviewFrame(entry: sample, family: .systemMedium)
+                    }
+                }
+                HStack(spacing: 12) {
+                    WidgetPreviewFrame(entry: sample, family: .accessoryCircular)
+                    WidgetPreviewFrame(entry: sample, family: .accessoryRectangular)
+                }
+            }
+            Section("Live Activity") {
+                ForEach(Self.activityStates(now: now), id: \.self) { state in
+                    LiveActivityContentView(state: state)
+                        .background(Theme.paperSunken, in: RoundedRectangle(cornerRadius: 18))
+                        .listRowInsets(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
+                }
+            }
+            Section("記録の画面(見本)") {
+                NavigationLink("集中タイマー(見本)") {
+                    FocusTimerView(habit: Self.sampleHabit(.timer), fullMinutes: 25, minimumMinutes: 5, strict: false)
+                }
+                NavigationLink("写真で記録(見本)") {
+                    PhotoCheckInView(habit: Self.sampleHabit(.photo))
+                }
+                NavigationLink("使用時間(見本)") {
+                    UsageInfoView(habit: Self.sampleHabit(.appUsage))
+                }
+            }
+            Section("お祝い・合格証・ふり返り") {
+                Button("はなまるを出す(7日連続)") {
+                    model.celebration = Celebration(streak: 7, total: 12, first: false)
+                }
+                Button("はじめての合格を出す") {
+                    model.celebration = Celebration(streak: 1, total: 1, first: true)
+                }
+                Button("週のふり返りを開く") { showReview = true }
+                CertificateCard(streak: 30, total: 41, goal: "英単語20個を覚えて、自作テストで7割", date: now)
+                    .scaleEffect(0.8)
+                    .frame(width: 288, height: 360)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .navigationTitle("見本")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showReview) {
+            NavigationStack {
+                WeeklyReviewView(week: model.cycleCalendar.cycle(model.cycleCalendar.weekStart(of: model.currentCycle), offsetBy: -7))
+            }
+        }
+    }
+
+    static func sampleHabit(_ method: VerificationMethod) -> HabitSnapshot {
+        let title: String
+        switch method {
+        case .timer: title = "テキストを25分集中して進める"
+        case .photo: title = "自主メニューをこなす"
+        default: title = "語学アプリで15分学ぶ"
+        }
+        return HabitSnapshot(title: title, minimumTitle: method == .appUsage ? nil : "5分だけ",
+                             method: method, targetMinutes: method == .photo ? nil : (method == .timer ? 25 : 15),
+                             activeFrom: CycleID(year: 2026, month: 1, day: 1))
+    }
+
+    static func activityStates(now: Date) -> [GoukakuActivityAttributes.ContentState] {
+        [
+            .init(kind: .emergency, title: "緊急解除", startsAt: now.addingTimeInterval(600), endsAt: now.addingTimeInterval(600 + 7200)),
+            .init(kind: .emergency, title: "緊急解除", startsAt: now.addingTimeInterval(-1800), endsAt: now.addingTimeInterval(5400)),
+            .init(kind: .focus, title: "テキストを25分集中して進める", startsAt: now.addingTimeInterval(-420), endsAt: now.addingTimeInterval(1080)),
+            .init(kind: .focus, title: "テキストを25分集中して進める", startsAt: now.addingTimeInterval(-420), endsAt: now.addingTimeInterval(1080), pausedRemaining: 1080),
+            .init(kind: .earn, title: "解除中", startsAt: now.addingTimeInterval(-600), endsAt: now.addingTimeInterval(10200)),
+        ]
     }
 }
 

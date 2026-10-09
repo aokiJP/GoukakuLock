@@ -30,6 +30,20 @@ struct SettingsView: View {
                 Section("通知") {
                     NavigationLink("リマインド") { ReminderSettingsView() }
                 }
+                Section {
+                    NavigationLink {
+                        TipsView()
+                    } label: {
+                        Label("ウィジェット・Siri・通知から記録する", systemImage: "sparkles")
+                    }
+                    NavigationLink {
+                        AppIconView()
+                    } label: {
+                        Label("アイコン", systemImage: "app.badge")
+                    }
+                } header: {
+                    Text("使いこなす")
+                }
                 Section("非常口") {
                     NavigationLink("緊急解除") { EmergencyView() }
                     NavigationLink("一時停止・見守りモード") { PauseView() }
@@ -201,9 +215,18 @@ struct ScheduleSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var modeKind: LockMode.Kind = .morning
     @State private var lockStart = 21 * 60
+    @State private var earnWindow = 180
     @State private var loaded = false
 
     private var dayStart: Int { model.state?.schedule.dayStartMinute ?? 240 }
+
+    private var mode: LockMode {
+        switch modeKind {
+        case .morning: return .morning
+        case .evening: return .evening(lockStartMinute: lockStart)
+        case .earn: return .earn(windowMinutes: earnWindow)
+        }
+    }
 
     var body: some View {
         Form {
@@ -211,15 +234,25 @@ struct ScheduleSettingsView: View {
                 Picker("ロックモード", selection: $modeKind) {
                     Text("朝からロック").tag(LockMode.Kind.morning)
                     Text("夕方からロック").tag(LockMode.Kind.evening)
+                    Text("稼働型(勉強で時間を稼ぐ)").tag(LockMode.Kind.earn)
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-                if modeKind == .evening {
+                switch modeKind {
+                case .evening:
                     MinuteChoicePicker(title: "ロック開始", choices: MinuteChoicePicker.lockStartChoices(dayStart: dayStart),
                                        minute: $lockStart)
+                case .earn:
+                    Picker("1回で使える時間", selection: $earnWindow) {
+                        ForEach(Array(stride(from: 30, through: 360, by: 30)), id: \.self) { m in
+                            Text(Fmt.duration(minutes: m)).tag(m)
+                        }
+                    }
+                case .morning:
+                    EmptyView()
                 }
             } footer: {
-                Text("モードの変更は翌日から。ロック開始を早めるのはすぐ効き、遅らせるのは「ゆるめる変更」です。稼働型はフェーズ2で追加予定です。")
+                Text(footer)
             }
         }
         .navigationTitle("ロックモード")
@@ -227,7 +260,6 @@ struct ScheduleSettingsView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("保存") {
-                    let mode: LockMode = modeKind == .evening ? .evening(lockStartMinute: lockStart) : .morning
                     let result = model.updateSchedule(ScheduleConfig(dayStartMinute: dayStart, mode: mode))
                     model.report(result)
                     if case .rejected = result { return }
@@ -238,15 +270,30 @@ struct ScheduleSettingsView: View {
         .onAppear {
             guard !loaded, let schedule = model.state?.schedule else { return }
             loaded = true
+            lockStart = MinuteChoicePicker.lockStartChoices(dayStart: schedule.dayStartMinute)
+                .first { $0 == 21 * 60 } ?? MinuteChoicePicker.lockStartChoices(dayStart: schedule.dayStartMinute).last ?? 21 * 60
             switch schedule.mode {
+            case .morning:
+                modeKind = .morning
             case .evening(let m):
                 modeKind = .evening
                 lockStart = m
-            default:
-                modeKind = .morning
-                lockStart = MinuteChoicePicker.lockStartChoices(dayStart: schedule.dayStartMinute)
-                    .first { $0 == 21 * 60 } ?? MinuteChoicePicker.lockStartChoices(dayStart: schedule.dayStartMinute).last ?? 21 * 60
+            case .earn(let w):
+                modeKind = .earn
+                earnWindow = w
             }
+        }
+    }
+
+    private var footer: String {
+        let rule = "モードの変更は翌日から。ロック開始を早めるのはすぐ効き、遅らせるのは「ゆるめる変更」です。"
+        switch modeKind {
+        case .morning:
+            return "日付切替と同時にロックし、達成したら次の日付切替まで外れます。\n" + rule
+        case .evening:
+            return "ロック開始までに達成していなければ、その時刻からロック。前の日が未達成なら、朝からロックします。\n" + rule
+        case .earn:
+            return "いつもはロックしておき、チェックインするたびに決めた時間だけ外れます(バイト感覚)。チェックインはタイマー・写真・使用時間など計れる方法だけ。その日の最初の1回で、連続記録は達成になります。\n" + rule
         }
     }
 }

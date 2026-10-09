@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import GoukakuCore
 
 /// 見た目の芯:「答案用紙と赤ペン」。
 /// 白い紙・紺の墨・朱の印。達成は朱の ◯、最小版は △、未達成は ✕(採点の赤ペンと同じ記号)。
@@ -156,4 +157,22 @@ struct RuledBox<Content: View>: View {
                     .strokeBorder(Theme.rule, lineWidth: 1)
             )
     }
+}
+
+// MARK: - 状態の色
+
+extension StatusSummary.Tone {
+    /// 印と強調に使う色
+    var color: Color {
+        switch self {
+        case .locked, .grace: return Theme.ink
+        case .achieved, .earn: return Theme.seal
+        case .emergency: return Theme.amber
+        case .rest: return Theme.rest
+        case .idle: return Theme.muted
+        }
+    }
+
+    /// 朱肉で押したように塗る(達成だけ)
+    var filled: Bool { self == .achieved }
 }

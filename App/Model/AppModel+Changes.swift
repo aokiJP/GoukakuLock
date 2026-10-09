@@ -5,7 +5,7 @@ import GoukakuCore
 import GoukakuKit
 
 /// コミットの編集内容
-struct HabitDraft: Codable, Equatable {
+struct HabitDraft: Codable {
     var id: UUID?
     var title = ""
     var criteriaNote = ""
@@ -13,13 +13,20 @@ struct HabitDraft: Codable, Equatable {
     var weekdays: Set<Int> = Set(1...7)
     var isRequired = true
     var method: VerificationMethod = .selfReport
+    /// タイマー・使用時間の分数
     var targetMinutes: Int?
+    /// タイマーの最小版の分数
+    var minimumMinutes = 5
+    /// タイマーの厳格モード(離れたら0から)
+    var strictTimer = false
+    /// 使用時間で判定するアプリ(使用時間のときだけ)
+    var usageSelection: FamilyActivitySelection?
     var goalNote = ""
     var goalDate: Date?
 
     init() {}
 
-    init(habit: Habit) {
+    init(habit: Habit, usageSelection: FamilyActivitySelection? = nil) {
         id = habit.id
         title = habit.title
         criteriaNote = habit.criteriaNote
@@ -28,8 +35,24 @@ struct HabitDraft: Codable, Equatable {
         isRequired = habit.isRequired
         method = habit.method
         targetMinutes = habit.targetMinutes
+        minimumMinutes = habit.minimumMinutes
+        strictTimer = habit.strictTimer
+        self.usageSelection = usageSelection
         goalNote = habit.goalNote
         goalDate = habit.goalDate
+    }
+
+    /// 選べる確認方法(フェーズ1〜2)
+    static let selectableMethods: [VerificationMethod] = [.selfReport, .timer, .photo, .appUsage]
+
+    /// 計れる方法か(稼働型で使える)
+    static func isMeasurable(_ method: VerificationMethod) -> Bool {
+        method == .timer || method == .photo || method == .appUsage
+    }
+
+    var usageAppCount: Int {
+        guard let s = usageSelection else { return 0 }
+        return s.applicationTokens.count + s.categoryTokens.count + s.webDomainTokens.count
     }
 }
 
@@ -167,6 +190,24 @@ extension AppModel {
         guard !draft.title.isEmpty else { return .rejected("目標を入力してください。") }
         guard !draft.weekdays.isEmpty else { return .rejected("曜日を1つ以上選んでください。") }
         guard let state else { return .rejected("はじめの設定が済んでいません。") }
+        switch draft.method {
+        case .timer:
+            let minutes = draft.targetMinutes ?? 25
+            guard (5...180).contains(minutes) else { return .rejected("タイマーは5〜180分で決めてください。") }
+            draft.targetMinutes = minutes
+            draft.minimumMinutes = min(max(1, draft.minimumMinutes), minutes)
+        case .appUsage:
+            let minutes = draft.targetMinutes ?? 15
+            guard (5...240).contains(minutes) else { return .rejected("使用時間は5〜240分で決めてください。") }
+            guard draft.usageAppCount > 0 else { return .rejected("使用時間で確かめるアプリ(学習アプリなど)を選んでください。") }
+            guard draft.usageAppCount <= LockTargets.maxItemsPerKind else { return .rejected("アプリは\(LockTargets.maxItemsPerKind)個までです。") }
+            draft.targetMinutes = minutes
+        default:
+            draft.targetMinutes = nil
+        }
+        if isEarnMode && draft.isRequired && !HabitDraft.isMeasurable(draft.method) {
+            return .rejected("稼働型では、必須のコミットはタイマー・写真・使用時間のどれかで確かめます(自己申告は何度でも押せてしまうため)。")
+        }
 
         if let id = draft.id, let existing = self.habit(id) {
             if draft.isRequired && !existing.isRequired && requiredCount(excluding: id) >= 3 {
@@ -183,10 +224,22 @@ extension AppModel {
             if added + removed > 0 { changes.append(.habitWeekdaysChanged(added: added, removed: removed)) }
             if existing.isRequired != draft.isRequired { changes.append(draft.isRequired ? .habitAdded : .habitRemoved) }
             if existing.method != draft.method { changes.append(.methodChanged(from: existing.method, to: draft.method)) }
+            if existing.method == draft.method, let oldMinutes = existing.targetMinutes,
+               let newMinutes = draft.targetMinutes, oldMinutes != newMinutes {
+                // 分数を減らすのは緩める変更、増やすのは今すぐ効く厳しくする変更
+                if newMinutes < oldMinutes { changes.append(.habitTextEdited) }
+            }
+            if existing.strictTimer && !draft.strictTimer { changes.append(.habitTextEdited) }
+            if draft.method == .appUsage && draft.usageSelection != nil && existing.method == .appUsage {
+                changes.append(.habitTextEdited)   // 対象アプリの選び直しは、緩める変更として扱う
+            }
             // 目標のメモはロックに関係しないので、すぐ反映する
             existing.goalNote = draft.goalNote
             existing.goalDate = draft.goalDate
+            let tightenedOnly = existing.targetMinutes != draft.targetMinutes || existing.strictTimer != draft.strictTimer
+                || existing.minimumMinutes != draft.minimumMinutes
             guard !changes.isEmpty else {
+                if tightenedOnly { writeHabit(draft, to: existing) }
                 save()
                 return .applied
             }
@@ -221,13 +274,20 @@ extension AppModel {
                           weekdays: draft.weekdays.sorted(), isRequired: draft.isRequired, method: draft.method,
                           targetMinutes: draft.targetMinutes, activeFrom: from, sortOrder: order,
                           goalNote: draft.goalNote, goalDate: draft.goalDate)
+        habit.strictTimer = draft.strictTimer
+        habit.minimumMinutes = draft.minimumMinutes
         context.insert(habit)
         do {
+            if draft.method == .appUsage, let selection = draft.usageSelection {
+                try TargetsStore.saveUsageSelection(selection, habitID: habit.id, to: store.directory)
+                settings.usageRevision += 1
+            }
             try actions.upsertHabit(habit.snapshot)
         } catch {
             context.delete(habit)
             return .rejected("保存できませんでした:\(error.localizedDescription)")
         }
+        if draft.method == .appUsage { ensureDailyRegistration(force: true) }
         log("settings", "コミット「\(draft.title)」を追加(\(Fmt.cycle(from, dayStartMinute: cycleCalendar.dayStartMinute))から)")
         save()
         reconcile(source: "habitAdded")
@@ -267,10 +327,17 @@ extension AppModel {
         habit.isRequired = draft.isRequired
         habit.methodRaw = draft.method.rawValue
         habit.targetMinutes = draft.targetMinutes
+        habit.minimumMinutes = draft.minimumMinutes
+        habit.strictTimer = draft.strictTimer
         habit.goalNote = draft.goalNote
         habit.goalDate = draft.goalDate
+        if draft.method == .appUsage, let selection = draft.usageSelection {
+            try? TargetsStore.saveUsageSelection(selection, habitID: habit.id, to: store.directory)
+            settings.usageRevision += 1
+        }
         try? actions.upsertHabit(habit.snapshot)
         save()
+        ensureDailyRegistration(force: false)
         reconcile(source: "habitEdited")
         rebuildReminders()
     }
@@ -280,6 +347,13 @@ extension AppModel {
     func updateSchedule(_ new: ScheduleConfig) -> ChangeResult {
         guard let state else { return .rejected("はじめの設定が済んでいません。") }
         guard SchedulePlanner.isValid(new) else { return .rejected("その時刻は選べません(ロック開始は日付切替の30分後〜20時間後)。") }
+        if case .earn = new.mode {
+            let next = nextCycle
+            let required = state.habits.filter { $0.isRequired && !($0.activeUntil.map { $0 <= next } ?? false) }
+            guard !required.isEmpty, required.allSatisfy({ HabitDraft.isMeasurable($0.method) }) else {
+                return .rejected("稼働型にするには、必須のコミットをすべて、タイマー・写真・使用時間のどれかで確かめるようにしてください(自己申告は何度でも押せてしまうため)。")
+            }
+        }
         let old = state.schedule
         var changes: [SettingsChange] = []
         if old.dayStartMinute != new.dayStartMinute { changes.append(.dayStartChanged) }

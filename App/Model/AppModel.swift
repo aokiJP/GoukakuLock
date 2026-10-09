@@ -3,6 +3,7 @@ import Observation
 import SwiftData
 import FamilyControls
 import UserNotifications
+import WidgetKit
 import GoukakuCore
 import GoukakuKit
 
@@ -39,10 +40,38 @@ struct HabitStats {
     var total = 0
 }
 
+/// 1日分の結果(この2週間の帯・ウィジェット)
+struct RecentDay: Identifiable {
+    var cycle: CycleID
+    var outcome: CycleOutcome
+    var id: CycleID { cycle }
+}
+
+/// 節目のお祝い(はなまる)
+struct Celebration: Identifiable, Equatable {
+    let id = UUID()
+    var streak: Int
+    var total: Int
+    var first: Bool
+
+    /// お祝いする連続日数
+    static let milestones: Set<Int> = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 250, 300, 365, 500, 730, 1000]
+}
+
+/// 通知・Siri から記録した結果
+struct QuickCheckInResult {
+    var ok: Bool
+    var title: String
+    var message: String
+}
+
 /// 本体アプリの中心。state.json・targets.json・SwiftData をまとめて扱う。
 /// state.json を書くのは AppActions だけで、ここはそれを呼び、結果を画面へ出す。
 @MainActor @Observable
 final class AppModel {
+    /// アプリ・通知・Siri(App Intents)・バックグラウンド更新で同じものを使う
+    static let shared = AppModel(container: Persistence.makeContainer())
+
     let container: ModelContainer
     let store: SharedStateStore
     /// App Group が使えているか(使えないと拡張と状態を共有できない=署名の問題)
@@ -60,6 +89,8 @@ final class AppModel {
     var reinstallDetectedAt: Date?
     var registrationError: String?
     var message: UserMessage?
+    /// 節目のお祝い(出ているあいだ RootView が重ねて表示する)
+    var celebration: Celebration?
     /// 画面の再計算のきっかけ(SwiftData から作る値は自動で追えないため)
     private(set) var revision = 0
 
@@ -68,6 +99,7 @@ final class AppModel {
     @ObservationIgnored var lastMark: InstallMarker.Mark?
     @ObservationIgnored var cachedSettings: AppSettings?
     @ObservationIgnored var checkedReinstall = false
+    @ObservationIgnored var widgetTask: Task<Void, Never>?
 
     init(container: ModelContainer) {
         self.container = container
@@ -102,6 +134,17 @@ final class AppModel {
     // MARK: 状態の読み直し
 
     var needsOnboarding: Bool { state == nil }
+
+    /// いまの状態の言い方(ホーム・ウィジェット・Siri で共通)
+    func statusSummary(now: Date = Date()) -> StatusSummary? {
+        state.map { StatusSummary.make(state: $0, extra: store.pendingAchievements(), now: now) }
+    }
+
+    /// 稼働型(チェックインのたびに一定時間だけ解除)か
+    var isEarnMode: Bool {
+        if case .earn? = state?.schedule.mode { return true }
+        return false
+    }
 
     /// state.json・targets.json を読み直し、判定を計算する(ロックの適用はしない)
     func reload() {
@@ -309,6 +352,66 @@ final class AppModel {
     func save() {
         try? context.save()
         revision &+= 1
+        scheduleWidgetRefresh()
+    }
+
+    // MARK: ウィジェット
+
+    /// まとめて1回だけ(連続した保存でウィジェットの更新を何度も頼まない)
+    func scheduleWidgetRefresh() {
+        widgetTask?.cancel()
+        widgetTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(600))
+            guard !Task.isCancelled else { return }
+            self?.refreshWidgetsNow()
+        }
+    }
+
+    /// 連続・通算などを widget.json に書き、ウィジェットに描き直しを頼む
+    func refreshWidgetsNow() {
+        guard state != nil else {
+            WidgetCenter.shared.reloadAllTimelines()
+            return
+        }
+        let stats = stats()
+        let snapshot = WidgetSnapshot(streak: stats.streak, total: stats.total, longest: stats.longest,
+                                      emergencyThisWeek: emergencyCountThisWeek(),
+                                      recent: recentOutcomes(days: 7).map { $0.outcome.rawValue }, updatedAt: Date())
+        try? snapshot.save(to: store.directory)
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    /// 直近 days サイクルの結果(古い順。今日を含む)
+    func recentOutcomes(days: Int) -> [RecentDay] {
+        guard state != nil else { return [] }
+        let map = outcomeMap()
+        let cal = cycleCalendar
+        var cycle = cal.cycle(currentCycle, offsetBy: -(days - 1))
+        var result: [RecentDay] = []
+        for _ in 0..<days {
+            result.append(RecentDay(cycle: cycle, outcome: map[cycle] ?? .notStarted))
+            cycle = cal.cycle(cycle, offsetBy: 1)
+        }
+        return result
+    }
+
+    /// 稼働型の解除枠(分)
+    var earnWindowMinutes: Int? {
+        if case .earn(let minutes)? = state?.schedule.mode { return minutes }
+        return nil
+    }
+
+    // MARK: 節目のお祝い
+
+    /// 今日の必須がそろったときに呼ぶ。節目(連続 3・7・14・30…日、はじめての達成)なら、はなまるを出す
+    func celebrateIfMilestone() {
+        let stats = stats()
+        let cycle = currentCycle.description
+        guard settings.lastCelebratedCycleRaw != cycle else { return }
+        let first = stats.total == 1
+        guard first || Celebration.milestones.contains(stats.streak) else { return }
+        settings.lastCelebratedCycleRaw = cycle
+        celebration = Celebration(streak: stats.streak, total: stats.total, first: first)
     }
 
     func show(_ title: String, _ body: String) {

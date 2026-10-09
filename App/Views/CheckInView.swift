@@ -159,7 +159,7 @@ struct CheckInPickerView: View {
                                     .foregroundStyle(Theme.muted)
                             } else {
                                 NavigationLink {
-                                    CheckInView(habit: habit)
+                                    CheckInDestination(habit: habit)
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(habit.title).foregroundStyle(Theme.ink)

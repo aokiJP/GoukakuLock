@@ -1,0 +1,8 @@
+run=23
+sha=84b9f1fa80688c5648cbfbf5ee87e018fe96fec1
+ref=refs/heads/main
+model=lfm2.5-1.2b-jp
+status=success
+gpu=success
+cpu=skipped
+time=2026-10-09T18:00:24Z

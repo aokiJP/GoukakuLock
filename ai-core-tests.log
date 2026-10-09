@@ -1,0 +1,173 @@
+Building for debugging...
+[0/8] /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuAI/.build/arm64-apple-macosx/debug/GoukakuAIPackageTests.derived/runner.swift
+[1/8] Write sources
+[5/8] Write swift-version-7974D3F7F03D5E95.txt
+[7/17] Emitting module GoukakuAI
+[8/17] Compiling GoukakuAI Environment.swift
+[9/17] Compiling GoukakuAI Experience.swift
+[10/17] Compiling GoukakuAI Growth.swift
+[11/17] Compiling GoukakuAI Library.swift
+[12/17] Compiling GoukakuAI Brain.swift
+[13/17] Compiling GoukakuAI Catalog.swift
+[14/17] Compiling GoukakuAI Context.swift
+[15/17] Compiling GoukakuAI Engine.swift
+[16/20] Compiling GoukakuAI Parsing.swift
+[17/20] Compiling GoukakuAI Prompts.swift
+[18/20] Compiling GoukakuAI Safetensors.swift
+[19/27] Compiling GoukakuAITests ParsingTests.swift
+[20/27] Compiling GoukakuAITests RouterTests.swift
+[21/28] Compiling GoukakuAIAPITests PublicAPITests.swift
+[22/28] Emitting module GoukakuAIAPITests
+[23/28] Emitting module GoukakuAITests
+[24/28] Compiling GoukakuAITests BrainTests.swift
+[25/28] Compiling GoukakuAITests LibraryAndGrowthTests.swift
+[26/28] Compiling GoukakuAITests SafetensorsTests.swift
+[27/30] Compiling GoukakuAIPackageTests runner.swift
+[28/30] Emitting module GoukakuAIPackageTests
+[28/30] Write Objects.LinkFileList
+[29/30] Linking GoukakuAIPackageTests
+Build complete! (19.88s)
+Test Suite 'All tests' started at 2026-10-09 17:51:21.373.
+Test Suite 'GoukakuAIPackageTests.xctest' started at 2026-10-09 17:51:21.377.
+Test Suite 'BrainTests' started at 2026-10-09 17:51:21.377.
+Test Case '-[GoukakuAITests.BrainTests testAIReflectionAndChat]' started.
+Test Case '-[GoukakuAITests.BrainTests testAIReflectionAndChat]' passed (0.008 seconds).
+Test Case '-[GoukakuAITests.BrainTests testAISuggestionsStreamThreeIdeas]' started.
+Test Case '-[GoukakuAITests.BrainTests testAISuggestionsStreamThreeIdeas]' passed (0.004 seconds).
+Test Case '-[GoukakuAITests.BrainTests testAnglesAreDistinctAndNothingIsShutOut]' started.
+Test Case '-[GoukakuAITests.BrainTests testAnglesAreDistinctAndNothingIsShutOut]' passed (0.004 seconds).
+Test Case '-[GoukakuAITests.BrainTests testAnyIdeaIsKeptAsTheAIWroteIt]' started.
+Test Case '-[GoukakuAITests.BrainTests testAnyIdeaIsKeptAsTheAIWroteIt]' passed (0.005 seconds).
+Test Case '-[GoukakuAITests.BrainTests testChatHistoryIsTrimmedForSmallModels]' started.
+Test Case '-[GoukakuAITests.BrainTests testChatHistoryIsTrimmedForSmallModels]' passed (0.002 seconds).
+Test Case '-[GoukakuAITests.BrainTests testChatStopsWhenTheModelLoops]' started.
+Test Case '-[GoukakuAITests.BrainTests testChatStopsWhenTheModelLoops]' passed (0.002 seconds).
+Test Case '-[GoukakuAITests.BrainTests testContextBlockReadsNaturally]' started.
+Test Case '-[GoukakuAITests.BrainTests testContextBlockReadsNaturally]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.BrainTests testDuplicateAIIdeasAreNotRepeated]' started.
+Test Case '-[GoukakuAITests.BrainTests testDuplicateAIIdeasAreNotRepeated]' passed (0.006 seconds).
+Test Case '-[GoukakuAITests.BrainTests testEngineErrorFallsBackWithNotice]' started.
+Test Case '-[GoukakuAITests.BrainTests testEngineErrorFallsBackWithNotice]' passed (0.002 seconds).
+Test Case '-[GoukakuAITests.BrainTests testInsightFromExperiences]' started.
+Test Case '-[GoukakuAITests.BrainTests testInsightFromExperiences]' passed (0.003 seconds).
+Test Case '-[GoukakuAITests.BrainTests testLibraryNeverRunsDryAfterManyRounds]' started.
+Test Case '-[GoukakuAITests.BrainTests testLibraryNeverRunsDryAfterManyRounds]' passed (0.008 seconds).
+Test Case '-[GoukakuAITests.BrainTests testPromptsCarryNoProhibitions]' started.
+Test Case '-[GoukakuAITests.BrainTests testPromptsCarryNoProhibitions]' passed (0.004 seconds).
+Test Case '-[GoukakuAITests.BrainTests testRulesBrainAnswersEverythingButChat]' started.
+Test Case '-[GoukakuAITests.BrainTests testRulesBrainAnswersEverythingButChat]' passed (0.002 seconds).
+Test Case '-[GoukakuAITests.BrainTests testSmallModelsGetNoHintWords]' started.
+Test Case '-[GoukakuAITests.BrainTests testSmallModelsGetNoHintWords]' passed (0.002 seconds).
+Test Case '-[GoukakuAITests.BrainTests testSmallModelsThinkFreelyToo]' started.
+Test Case '-[GoukakuAITests.BrainTests testSmallModelsThinkFreelyToo]' passed (0.004 seconds).
+Test Case '-[GoukakuAITests.BrainTests testSuggestionRequestUsesOneShotExample]' started.
+Test Case '-[GoukakuAITests.BrainTests testSuggestionRequestUsesOneShotExample]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.BrainTests testUnformattedAIOutputIsRetriedThenUsedAsWritten]' started.
+Test Case '-[GoukakuAITests.BrainTests testUnformattedAIOutputIsRetriedThenUsedAsWritten]' passed (0.004 seconds).
+Test Suite 'BrainTests' passed at 2026-10-09 17:51:21.440.
+	 Executed 17 tests, with 0 failures (0 unexpected) in 0.059 (0.062) seconds
+Test Suite 'LibraryAndGrowthTests' started at 2026-10-09 17:51:21.440.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testGrowthLevels]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testGrowthLevels]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testLibraryIsCompleteAndSafe]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testLibraryIsCompleteAndSafe]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testLibraryPicksAlwaysFitThePlace]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testLibraryPicksAlwaysFitThePlace]' passed (0.271 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testMemoryDedupe]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testMemoryDedupe]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testPickPrefersInterestsAndAvoidsSeen]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testPickPrefersInterestsAndAvoidsSeen]' passed (0.028 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testPickRespectsContext]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testPickRespectsContext]' passed (0.023 seconds).
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testRuleReflectionIsStableAndQuotesTheNote]' started.
+Test Case '-[GoukakuAITests.LibraryAndGrowthTests testRuleReflectionIsStableAndQuotesTheNote]' passed (0.001 seconds).
+Test Suite 'LibraryAndGrowthTests' passed at 2026-10-09 17:51:21.765.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.323 (0.325) seconds
+Test Suite 'ParsingTests' started at 2026-10-09 17:51:21.765.
+Test Case '-[GoukakuAITests.ParsingTests testCategoryMapping]' started.
+Test Case '-[GoukakuAITests.ParsingTests testCategoryMapping]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testDashQuestionAndMemoAreDropped]' started.
+Test Case '-[GoukakuAITests.ParsingTests testDashQuestionAndMemoAreDropped]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testDoesNotMistakeSentenceForKey]' started.
+Test Case '-[GoukakuAITests.ParsingTests testDoesNotMistakeSentenceForKey]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testDurationParsing]' started.
+Test Case '-[GoukakuAITests.ParsingTests testDurationParsing]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testFullWidthColonsAndSpacedMinutes]' started.
+Test Case '-[GoukakuAITests.ParsingTests testFullWidthColonsAndSpacedMinutes]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testGemmaReflection]' started.
+Test Case '-[GoukakuAITests.ParsingTests testGemmaReflection]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testGemmaSuggestion]' started.
+Test Case '-[GoukakuAITests.ParsingTests testGemmaSuggestion]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testKeepsWhateverTheAIWrote]' started.
+Test Case '-[GoukakuAITests.ParsingTests testKeepsWhateverTheAIWrote]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testLooseSuggestionKeepsTheAIWords]' started.
+Test Case '-[GoukakuAITests.ParsingTests testLooseSuggestionKeepsTheAIWords]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testMarkdownDecorationAndNumbering]' started.
+Test Case '-[GoukakuAITests.ParsingTests testMarkdownDecorationAndNumbering]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testMissingColonsAndOddCategory]' started.
+Test Case '-[GoukakuAITests.ParsingTests testMissingColonsAndOddCategory]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testProse]' started.
+Test Case '-[GoukakuAITests.ParsingTests testProse]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testReflectionThatOnlyEchoesTheNoteIsRejected]' started.
+Test Case '-[GoukakuAITests.ParsingTests testReflectionThatOnlyEchoesTheNoteIsRejected]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testReflectionWithNestedOrOtherLabel]' started.
+Test Case '-[GoukakuAITests.ParsingTests testReflectionWithNestedOrOtherLabel]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testReflectionWithoutKeysAndBadMemo]' started.
+Test Case '-[GoukakuAITests.ParsingTests testReflectionWithoutKeysAndBadMemo]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testRepeatedBlocksTakeFirstAndAnnotationsAreRemoved]' started.
+Test Case '-[GoukakuAITests.ParsingTests testRepeatedBlocksTakeFirstAndAnnotationsAreRemoved]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testRepetitionGuardCutsLoops]' started.
+Test Case '-[GoukakuAITests.ParsingTests testRepetitionGuardCutsLoops]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.ParsingTests testThinkBlocksAndSpecialTokensAreRemoved]' started.
+Test Case '-[GoukakuAITests.ParsingTests testThinkBlocksAndSpecialTokensAreRemoved]' passed (0.000 seconds).
+Test Suite 'ParsingTests' passed at 2026-10-09 17:51:21.780.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 0.013 (0.016) seconds
+Test Suite 'PublicAPITests' started at 2026-10-09 17:51:21.780.
+Test Case '-[GoukakuAIAPITests.PublicAPITests testAppFacingSurfaceCompiles]' started.
+Test Case '-[GoukakuAIAPITests.PublicAPITests testAppFacingSurfaceCompiles]' passed (0.003 seconds).
+Test Suite 'PublicAPITests' passed at 2026-10-09 17:51:21.783.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'RouterTests' started at 2026-10-09 17:51:21.783.
+Test Case '-[GoukakuAITests.RouterTests testCatalogFileDecodesAndIsConsistent]' started.
+Test Case '-[GoukakuAITests.RouterTests testCatalogFileDecodesAndIsConsistent]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.RouterTests testFallsBackToAppleThenRules]' started.
+Test Case '-[GoukakuAITests.RouterTests testFallsBackToAppleThenRules]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testHeatAndLowPowerAdapt]' started.
+Test Case '-[GoukakuAITests.RouterTests testHeatAndLowPowerAdapt]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testOldGPUSkipsMLX]' started.
+Test Case '-[GoukakuAITests.RouterTests testOldGPUSkipsMLX]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testPicksMostNaturalJapaneseThatFits]' started.
+Test Case '-[GoukakuAITests.RouterTests testPicksMostNaturalJapaneseThatFits]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testPreferenceIsHonoredWhenPossible]' started.
+Test Case '-[GoukakuAITests.RouterTests testPreferenceIsHonoredWhenPossible]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testPreferenceRawValueRoundTrip]' started.
+Test Case '-[GoukakuAITests.RouterTests testPreferenceRawValueRoundTrip]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testSimulatorNeverRunsMLX]' started.
+Test Case '-[GoukakuAITests.RouterTests testSimulatorNeverRunsMLX]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testSkipsModelsThatDoNotFitInMemory]' started.
+Test Case '-[GoukakuAITests.RouterTests testSkipsModelsThatDoNotFitInMemory]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testTuningFollowsSizeOnly]' started.
+Test Case '-[GoukakuAITests.RouterTests testTuningFollowsSizeOnly]' passed (0.000 seconds).
+Test Case '-[GoukakuAITests.RouterTests testUnknownMemoryUsesHalfOfRAM]' started.
+Test Case '-[GoukakuAITests.RouterTests testUnknownMemoryUsesHalfOfRAM]' passed (0.000 seconds).
+Test Suite 'RouterTests' passed at 2026-10-09 17:51:21.788.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.003 (0.005) seconds
+Test Suite 'SafetensorsTests' started at 2026-10-09 17:51:21.788.
+Test Case '-[GoukakuAITests.SafetensorsTests testDirectorySlimmingRewritesIndexAndRemovesEmptyShards]' started.
+Test Case '-[GoukakuAITests.SafetensorsTests testDirectorySlimmingRewritesIndexAndRemovesEmptyShards]' passed (0.018 seconds).
+Test Case '-[GoukakuAITests.SafetensorsTests testDropsVisionTensorsAndKeepsBytesIntact]' started.
+Test Case '-[GoukakuAITests.SafetensorsTests testDropsVisionTensorsAndKeepsBytesIntact]' passed (0.003 seconds).
+Test Case '-[GoukakuAITests.SafetensorsTests testMalformedFileThrows]' started.
+Test Case '-[GoukakuAITests.SafetensorsTests testMalformedFileThrows]' passed (0.001 seconds).
+Test Case '-[GoukakuAITests.SafetensorsTests testNothingToDropLeavesFileUntouched]' started.
+Test Case '-[GoukakuAITests.SafetensorsTests testNothingToDropLeavesFileUntouched]' passed (0.003 seconds).
+Test Suite 'SafetensorsTests' passed at 2026-10-09 17:51:21.815.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.025 (0.027) seconds
+Test Suite 'GoukakuAIPackageTests.xctest' passed at 2026-10-09 17:51:21.815.
+	 Executed 58 tests, with 0 failures (0 unexpected) in 0.426 (0.438) seconds
+Test Suite 'All tests' passed at 2026-10-09 17:51:21.815.
+	 Executed 58 tests, with 0 failures (0 unexpected) in 0.426 (0.442) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

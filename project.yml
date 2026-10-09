@@ -1,0 +1,174 @@
+# 合格ロック — Xcode プロジェクトの定義(XcodeGen)。
+#   brew install xcodegen && xcodegen generate   →   GoukakuLock.xcodeproj ができる
+#
+# Bundle ID と App Group を変えるときは、下の 3 つの値(&bundle / &group / refresh)をまとめて書き換える。
+# 有料の Apple Developer Program では、4 つの Bundle ID(本体・monitor・shieldconfig・shieldaction)すべてに
+# Family Controls と App Groups(同じ ID)を付ける。
+
+name: GoukakuLock
+
+options:
+  bundleIdPrefix: com.aokijp
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: ja
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    # 自分のチームで署名するときは、ここに Team ID を入れる(Xcode の Signing & Capabilities でも可)
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: "YES"
+    # 拡張は別スレッドから呼ばれるので、既定のアクター分離は nonisolated のまま(第16.3節)
+    SWIFT_STRICT_CONCURRENCY: complete
+
+packages:
+  GoukakuCore:
+    path: GoukakuCore
+  GoukakuKit:
+    path: GoukakuKit
+
+targets:
+  GoukakuLock:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - package: GoukakuCore
+      - package: GoukakuKit
+      - target: GoukakuMonitor
+      - target: GoukakuShieldConfig
+      - target: GoukakuShieldAction
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: 合格ロック
+        CFBundleDevelopmentRegion: ja
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIBackgroundModes:
+          - fetch
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.aokijp.goukakulock.refresh
+        GoukakuAppGroupID: &group group.com.aokijp.goukakulock
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: App/GoukakuLock.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - *group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: &bundle com.aokijp.goukakulock
+        PRODUCT_NAME: GoukakuLock
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  GoukakuMonitor:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/Monitor
+    dependencies:
+      - package: GoukakuCore
+      - package: GoukakuKit
+    info:
+      path: Extensions/Monitor/Info.plist
+      properties:
+        CFBundleDisplayName: GoukakuMonitor
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GoukakuAppGroupID: *group
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.deviceactivity.monitor-extension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).MonitorExtension
+    entitlements:
+      path: Extensions/Monitor/GoukakuMonitor.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - *group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.monitor
+
+  GoukakuShieldConfig:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/ShieldConfig
+    dependencies:
+      - package: GoukakuCore
+      - package: GoukakuKit
+    info:
+      path: Extensions/ShieldConfig/Info.plist
+      properties:
+        CFBundleDisplayName: GoukakuShieldConfig
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GoukakuAppGroupID: *group
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettingsUI.shield-configuration-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShieldConfigExtension
+    entitlements:
+      path: Extensions/ShieldConfig/GoukakuShieldConfig.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - *group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.shieldconfig
+
+  GoukakuShieldAction:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Extensions/ShieldAction
+    dependencies:
+      - package: GoukakuCore
+      - package: GoukakuKit
+    info:
+      path: Extensions/ShieldAction/Info.plist
+      properties:
+        CFBundleDisplayName: GoukakuShieldAction
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GoukakuAppGroupID: *group
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettings.shield-action-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShieldActionExtension
+    entitlements:
+      path: Extensions/ShieldAction/GoukakuShieldAction.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups:
+          - *group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.shieldaction
+
+schemes:
+  GoukakuLock:
+    build:
+      targets:
+        GoukakuLock: all
+    run:
+      config: Debug
+    archive:
+      config: Release

@@ -1,0 +1,124 @@
+name: Build IPA
+
+# main に push するたびに、Mac(Xcode)で未署名の IPA を作る。
+# - GoukakuCore の単体テスト → XcodeGen でプロジェクト生成 → Debug と Release をビルド → アドホック署名して .ipa に包む
+# - 成果物は Actions の Artifacts に置く。タグ v* を push したときは Releases にも載せる
+# - 結果(IPA・ログ・エラーの抜き出し)は ci-output ブランチにも置く(どこからでも取り出せるように)
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths-ignore: ["**.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Versions
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+
+      - name: Core unit tests (GoukakuCore)
+        run: |
+          mkdir -p build
+          set -o pipefail
+          swift test --package-path GoukakuCore 2>&1 | tee build/core-tests.log | tail -n 30
+
+      - name: Generate Xcode project (XcodeGen)
+        run: |
+          brew install xcodegen
+          xcodegen generate --spec project.yml
+
+      - name: Build Debug and Release (unsigned)
+        run: |
+          set -o pipefail
+          for CONF in Debug Release; do
+            echo "::group::xcodebuild $CONF"
+            xcodebuild build \
+              -project GoukakuLock.xcodeproj \
+              -scheme GoukakuLock \
+              -configuration "$CONF" \
+              -destination 'generic/platform=iOS' \
+              -derivedDataPath "build/DerivedData-$CONF" \
+              CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+              2>&1 | tee "build/xcodebuild-$CONF.log" | xcbeautify --renderer github-actions
+            echo "::endgroup::"
+          done
+
+      - name: Package IPA
+        run: |
+          mkdir -p dist
+          for CONF in Debug Release; do
+            scripts/package-ipa.sh "build/DerivedData-$CONF/Build/Products/$CONF-iphoneos/GoukakuLock.app" "dist/GoukakuLock-$CONF.ipa"
+          done
+          cd dist && shasum -a 256 *.ipa | tee SHA256SUMS.txt
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v6
+        with:
+          name: GoukakuLock-ipa-${{ github.run_number }}
+          path: |
+            dist/*.ipa
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          name: 合格ロック ${{ github.ref_name }}
+          files: |
+            dist/*.ipa
+            dist/SHA256SUMS.txt
+          body: |
+            未署名(アドホック署名)の IPA です。実機に入れるには、有料の Apple Developer Program の証明書と、
+            4つの Bundle ID(本体・monitor・shieldconfig・shieldaction)それぞれに Family Controls と App Groups を付けた
+            プロビジョニングプロファイルで署名し直してください。手順は README の「インストール」を見てください。
+
+            - GoukakuLock-Release.ipa:ふだん使う版
+            - GoukakuLock-Debug.ipa:デバッグメニューつき(実機テスト T-01〜T-12 用)
+
+      - name: Save output to ci-output branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUT="$RUNNER_TEMP/ci-output"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp dist/*.ipa dist/SHA256SUMS.txt "$OUT/" 2>/dev/null || true
+          cp build/*.log "$OUT/" 2>/dev/null || true
+          for f in build/xcodebuild-*.log; do
+            [ -f "$f" ] && grep -nE "error:|warning: .*(Sendable|actor|isolated|deprecated)" "$f" | head -n 300 > "$OUT/$(basename "$f" .log)-errors.txt" || true
+          done
+          {
+            echo "run=${{ github.run_number }}"
+            echo "sha=${{ github.sha }}"
+            echo "ref=${{ github.ref }}"
+            echo "status=${{ job.status }}"
+            date -u +"time=%Y-%m-%dT%H:%M:%SZ"
+          } > "$OUT/status.txt"
+          cd "$OUT"
+          git init -q
+          git checkout -q -b ci-output
+          git add -A
+          git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "CI output: run ${{ github.run_number }} (${{ job.status }}) for ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-output

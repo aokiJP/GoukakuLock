@@ -1,0 +1,929 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02B457220D88687899DD4B3E /* GoukakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 59EB0DD4391EA77D54698A6E /* GoukakuKit */; };
+		0BCF00B72162397D35CEBF64 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 418506AD8FB7B21282C3149F /* PrivacyInfo.xcprivacy */; };
+		0FA5B72A8563AED729C74006 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B744ABBA103D1EE5E4D623 /* Theme.swift */; };
+		176574B8C3801F54B98D6BC5 /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF2D715A9AC16EADA50013F /* Format.swift */; };
+		19C8922BBB635CEDC25697DD /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F77295BDB3BA0405525F2A /* Persistence.swift */; };
+		1C55680910D73BEFE7545394 /* CommitViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0C0CEAB0B46FF96FC3D9AF /* CommitViews.swift */; };
+		270A415F0348F336ED8CC15B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E6687F4A81A3EAF2A88D1132 /* PrivacyInfo.xcprivacy */; };
+		2AACB7EBE01ACC5E7DCE2DDB /* ShieldActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3A556C22BE8DA0E2C1D521 /* ShieldActionExtension.swift */; };
+		325E96A3FCC5EDD62F19ECFC /* DeviceSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EF5F5FD7F54494DC5DBB59 /* DeviceSupport.swift */; };
+		3E253FE6F9E3B6CA4BCDE449 /* ShieldConfigExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DB06F59904BB33A6B490EB /* ShieldConfigExtension.swift */; };
+		40F225C6CCAEA86CA565E68F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B1B01661737E08FDB9973D /* OnboardingView.swift */; };
+		434E9363638469ECFF45E14D /* AppActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A40D82DC0E1C445223D964 /* AppActions.swift */; };
+		43B5F1E89C55B846BED48200 /* GoukakuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56DEF683AB17CB7D2AB357F7 /* GoukakuCore */; };
+		5961111B4D0395D92911589A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7CC050F479BBE5BD15E12186 /* PrivacyInfo.xcprivacy */; };
+		59EEDC2079DFF271A0A270C5 /* GoukakuLockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AEBC5C9F8AAE722276A01F /* GoukakuLockApp.swift */; };
+		611C70FD8484E2A9A509F9AF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81AA773E9E63DE100166498 /* AppModel.swift */; };
+		6B0F49F57F22C722566FB1AC /* GoukakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 421FA4A9FAE174F1CFEC88B7 /* GoukakuKit */; };
+		7801E947734114BB90921095 /* AppActions+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F73281A81B0178D0FFAF9ED /* AppActions+Settings.swift */; };
+		87143B384EC5F77D2EC78B5E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F0DB3DEF725AC59FC082C2 /* Components.swift */; };
+		87B538A5EE5B1C847F192D5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FB973A9E93C56741C75BD42 /* Assets.xcassets */; };
+		98336D30590D15C3D22D5486 /* GoukakuCore in Frameworks */ = {isa = PBXBuildFile; productRef = FC33093BFA16EF1911A2F9F5 /* GoukakuCore */; };
+		99AFBF7AEC299F5D7A099E3A /* AppModel+Lifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C267EDE29E974982347E0138 /* AppModel+Lifecycle.swift */; };
+		9C2C150C8BC89109455283A8 /* DebugMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76D0F2F1EE1A825F4240D3E /* DebugMenuView.swift */; };
+		A13E18CFE5C537DF2BBC9A2B /* MonitorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEB7A95473517B0E45C3990 /* MonitorExtension.swift */; };
+		A751D606F89AF21EB516292E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7383EB061A1A2EF65767079 /* HomeView.swift */; };
+		ABFB78558664B8BCE5E856BB /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C1EE2985AEDA4174ED9918 /* NotificationRouter.swift */; };
+		AF0FF189D10216922A40FEC6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3DEB097A6AEF784855E5B4 /* SettingsView.swift */; };
+		B5AC57981BB5803BDBFE5371 /* GoukakuShieldAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D826A5042F75EE84C6786046 /* GoukakuShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BB8B360F099D7D7210250725 /* EmergencyPauseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F73608CCD2BC7E33044AAB /* EmergencyPauseViews.swift */; };
+		C561E87952ABD88869A9329B /* GoukakuShieldConfig.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CAF4A49BA2B1502D0E72E8C3 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983F854EC81E2C5CAD58EB6F /* HistoryView.swift */; };
+		CC05A86ACD29AA22B20B4891 /* AppModel+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDEC76969649338255088EB9 /* AppModel+Actions.swift */; };
+		CD668CCF9BA9DA10D69557DC /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA487A03DE26134FCA2A5274 /* RootView.swift */; };
+		CFBF1870148EB574BB63BE63 /* GoukakuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 9783967D1C1307266F7719CD /* GoukakuCore */; };
+		D186333BEB54B521C69565D9 /* AppModel+Changes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70CB4F31531AC9C649AF51EB /* AppModel+Changes.swift */; };
+		DBFCEAF82E701710045A3B5E /* GoukakuMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DD25675B677E4DC268783FB9 /* GoukakuCore in Frameworks */ = {isa = PBXBuildFile; productRef = EC590EB456CE986EA926FC5A /* GoukakuCore */; };
+		E124168318447121533027B0 /* GoukakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5AD13C7E004FB60F00AC7344 /* GoukakuKit */; };
+		EB6B23CCD1A2EC4A82A5BCE1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2FFDC68E4A77514B9AB11A37 /* PrivacyInfo.xcprivacy */; };
+		EF362FB0034AF8854F65FBB7 /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BD9FA3B1975797D038A764 /* CheckInView.swift */; };
+		F810E6CCD94856731D923413 /* GoukakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4C3477060F8A6BD2C81AE56F /* GoukakuKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		34794115390EB3CAEEBD0C65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 58F0C9FD64FF796E4BE08636 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B916F91BADA5279B78C6BDDF;
+			remoteInfo = GoukakuShieldConfig;
+		};
+		A5C9B3473B5FB16F8AF2C810 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 58F0C9FD64FF796E4BE08636 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0EB70D539AF3A6141E55390E;
+			remoteInfo = GoukakuMonitor;
+		};
+		D4EC7D872A802EA1EDBD1AD0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 58F0C9FD64FF796E4BE08636 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EE92F51893CD543E1BD2C14B;
+			remoteInfo = GoukakuShieldAction;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F3E90C0E77F507D1B85E54D4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DBFCEAF82E701710045A3B5E /* GoukakuMonitor.appex in Embed Foundation Extensions */,
+				C561E87952ABD88869A9329B /* GoukakuShieldConfig.appex in Embed Foundation Extensions */,
+				B5AC57981BB5803BDBFE5371 /* GoukakuShieldAction.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		05B744ABBA103D1EE5E4D623 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		0F3DEB097A6AEF784855E5B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		138E644E125CB78FD056B01D /* GoukakuKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GoukakuKit; path = GoukakuKit; sourceTree = SOURCE_ROOT; };
+		16A4FE1470BBEB6D5A48EF1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		17281C7A93176EF2292304DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		192E4307339D1FB635A20F6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		19AEBC5C9F8AAE722276A01F /* GoukakuLockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoukakuLockApp.swift; sourceTree = "<group>"; };
+		27BD9FA3B1975797D038A764 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
+		27DB06F59904BB33A6B490EB /* ShieldConfigExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldConfigExtension.swift; sourceTree = "<group>"; };
+		2FFDC68E4A77514B9AB11A37 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3EEB7A95473517B0E45C3990 /* MonitorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorExtension.swift; sourceTree = "<group>"; };
+		418506AD8FB7B21282C3149F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4FB973A9E93C56741C75BD42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5F73281A81B0178D0FFAF9ED /* AppActions+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppActions+Settings.swift"; sourceTree = "<group>"; };
+		60605C60403A737346EACF40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		60F73608CCD2BC7E33044AAB /* EmergencyPauseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyPauseViews.swift; sourceTree = "<group>"; };
+		63DEACC7A9BD5D109BC9A8EF /* GoukakuShieldConfig.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuShieldConfig.entitlements; sourceTree = "<group>"; };
+		6E3A556C22BE8DA0E2C1D521 /* ShieldActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldActionExtension.swift; sourceTree = "<group>"; };
+		70CB4F31531AC9C649AF51EB /* AppModel+Changes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppModel+Changes.swift"; sourceTree = "<group>"; };
+		75F77295BDB3BA0405525F2A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		7901229356B07DD04EE8691D /* GoukakuLock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GoukakuLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AA69AA087B933F44FDEDC62 /* GoukakuShieldAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuShieldAction.entitlements; sourceTree = "<group>"; };
+		7CC050F479BBE5BD15E12186 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GoukakuShieldConfig.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		95C1EE2985AEDA4174ED9918 /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRouter.swift; sourceTree = "<group>"; };
+		983F854EC81E2C5CAD58EB6F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GoukakuMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7383EB061A1A2EF65767079 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		B7F0DB3DEF725AC59FC082C2 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		BA0C0CEAB0B46FF96FC3D9AF /* CommitViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommitViews.swift; sourceTree = "<group>"; };
+		BAF2D715A9AC16EADA50013F /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
+		BDEC76969649338255088EB9 /* AppModel+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppModel+Actions.swift"; sourceTree = "<group>"; };
+		C267EDE29E974982347E0138 /* AppModel+Lifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppModel+Lifecycle.swift"; sourceTree = "<group>"; };
+		CB2CAC9068BEB1B7E59D5FBB /* GoukakuMonitor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuMonitor.entitlements; sourceTree = "<group>"; };
+		D826A5042F75EE84C6786046 /* GoukakuShieldAction.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GoukakuShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E53C85F3E7FA283DFA1CD8C9 /* GoukakuLock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuLock.entitlements; sourceTree = "<group>"; };
+		E6687F4A81A3EAF2A88D1132 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E81AA773E9E63DE100166498 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		E8B1B01661737E08FDB9973D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		E8EF5F5FD7F54494DC5DBB59 /* DeviceSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSupport.swift; sourceTree = "<group>"; };
+		EA487A03DE26134FCA2A5274 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		F2A40D82DC0E1C445223D964 /* AppActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppActions.swift; sourceTree = "<group>"; };
+		F76D0F2F1EE1A825F4240D3E /* DebugMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenuView.swift; sourceTree = "<group>"; };
+		FBE78DDB9BA65AAFEF849C0A /* GoukakuCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GoukakuCore; path = GoukakuCore; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3AAA09C92637745AC1E9C17F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD25675B677E4DC268783FB9 /* GoukakuCore in Frameworks */,
+				E124168318447121533027B0 /* GoukakuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		45F97B093A3CF4C6EAA11083 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43B5F1E89C55B846BED48200 /* GoukakuCore in Frameworks */,
+				02B457220D88687899DD4B3E /* GoukakuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9007ACC218D99BA374A13048 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98336D30590D15C3D22D5486 /* GoukakuCore in Frameworks */,
+				F810E6CCD94856731D923413 /* GoukakuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F308298A402CA09D312C9615 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFBF1870148EB574BB63BE63 /* GoukakuCore in Frameworks */,
+				6B0F49F57F22C722566FB1AC /* GoukakuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11E79F45C98F1E341CEE3D81 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				FBE78DDB9BA65AAFEF849C0A /* GoukakuCore */,
+				138E644E125CB78FD056B01D /* GoukakuKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		22640298C936A9DD20501E27 /* ShieldAction */ = {
+			isa = PBXGroup;
+			children = (
+				7AA69AA087B933F44FDEDC62 /* GoukakuShieldAction.entitlements */,
+				16A4FE1470BBEB6D5A48EF1B /* Info.plist */,
+				418506AD8FB7B21282C3149F /* PrivacyInfo.xcprivacy */,
+				6E3A556C22BE8DA0E2C1D521 /* ShieldActionExtension.swift */,
+			);
+			path = ShieldAction;
+			sourceTree = "<group>";
+		};
+		60F2B6194E064DB12DEBB026 /* ShieldConfig */ = {
+			isa = PBXGroup;
+			children = (
+				63DEACC7A9BD5D109BC9A8EF /* GoukakuShieldConfig.entitlements */,
+				60605C60403A737346EACF40 /* Info.plist */,
+				E6687F4A81A3EAF2A88D1132 /* PrivacyInfo.xcprivacy */,
+				27DB06F59904BB33A6B490EB /* ShieldConfigExtension.swift */,
+			);
+			path = ShieldConfig;
+			sourceTree = "<group>";
+		};
+		68711FEF49052EBD3D7A044B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9DB69C050861C3620F35AD5B /* Model */,
+				6CD8E5ACA64AF9B7926A8C84 /* Support */,
+				93E266974AB9989EE6DDEEE3 /* Views */,
+				F2A40D82DC0E1C445223D964 /* AppActions.swift */,
+				5F73281A81B0178D0FFAF9ED /* AppActions+Settings.swift */,
+				4FB973A9E93C56741C75BD42 /* Assets.xcassets */,
+				E53C85F3E7FA283DFA1CD8C9 /* GoukakuLock.entitlements */,
+				19AEBC5C9F8AAE722276A01F /* GoukakuLockApp.swift */,
+				192E4307339D1FB635A20F6C /* Info.plist */,
+				2FFDC68E4A77514B9AB11A37 /* PrivacyInfo.xcprivacy */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		6CD8E5ACA64AF9B7926A8C84 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				E8EF5F5FD7F54494DC5DBB59 /* DeviceSupport.swift */,
+				BAF2D715A9AC16EADA50013F /* Format.swift */,
+				95C1EE2985AEDA4174ED9918 /* NotificationRouter.swift */,
+				05B744ABBA103D1EE5E4D623 /* Theme.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		723DAB278299D0C72BA29B72 = {
+			isa = PBXGroup;
+			children = (
+				68711FEF49052EBD3D7A044B /* App */,
+				72F0EEB09AF435453E79538F /* Extensions */,
+				11E79F45C98F1E341CEE3D81 /* Packages */,
+				B41394D76D683B91F343A4F5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		72F0EEB09AF435453E79538F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				820E544880393189AB5FF113 /* Monitor */,
+				22640298C936A9DD20501E27 /* ShieldAction */,
+				60F2B6194E064DB12DEBB026 /* ShieldConfig */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		820E544880393189AB5FF113 /* Monitor */ = {
+			isa = PBXGroup;
+			children = (
+				CB2CAC9068BEB1B7E59D5FBB /* GoukakuMonitor.entitlements */,
+				17281C7A93176EF2292304DA /* Info.plist */,
+				3EEB7A95473517B0E45C3990 /* MonitorExtension.swift */,
+				7CC050F479BBE5BD15E12186 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Monitor;
+			sourceTree = "<group>";
+		};
+		93E266974AB9989EE6DDEEE3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				27BD9FA3B1975797D038A764 /* CheckInView.swift */,
+				BA0C0CEAB0B46FF96FC3D9AF /* CommitViews.swift */,
+				B7F0DB3DEF725AC59FC082C2 /* Components.swift */,
+				F76D0F2F1EE1A825F4240D3E /* DebugMenuView.swift */,
+				60F73608CCD2BC7E33044AAB /* EmergencyPauseViews.swift */,
+				983F854EC81E2C5CAD58EB6F /* HistoryView.swift */,
+				B7383EB061A1A2EF65767079 /* HomeView.swift */,
+				E8B1B01661737E08FDB9973D /* OnboardingView.swift */,
+				EA487A03DE26134FCA2A5274 /* RootView.swift */,
+				0F3DEB097A6AEF784855E5B4 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9DB69C050861C3620F35AD5B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E81AA773E9E63DE100166498 /* AppModel.swift */,
+				BDEC76969649338255088EB9 /* AppModel+Actions.swift */,
+				70CB4F31531AC9C649AF51EB /* AppModel+Changes.swift */,
+				C267EDE29E974982347E0138 /* AppModel+Lifecycle.swift */,
+				75F77295BDB3BA0405525F2A /* Persistence.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B41394D76D683B91F343A4F5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7901229356B07DD04EE8691D /* GoukakuLock.app */,
+				ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */,
+				D826A5042F75EE84C6786046 /* GoukakuShieldAction.appex */,
+				8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0EB70D539AF3A6141E55390E /* GoukakuMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7249543360A03FC1F872E53 /* Build configuration list for PBXNativeTarget "GoukakuMonitor" */;
+			buildPhases = (
+				B74BA1626F20C8F509C4B55D /* Sources */,
+				F6B5D69C5EF2C014D73E74FE /* Resources */,
+				3AAA09C92637745AC1E9C17F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GoukakuMonitor;
+			packageProductDependencies = (
+				EC590EB456CE986EA926FC5A /* GoukakuCore */,
+				5AD13C7E004FB60F00AC7344 /* GoukakuKit */,
+			);
+			productName = GoukakuMonitor;
+			productReference = ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A09CD8C8962EEC8E77FF478 /* Build configuration list for PBXNativeTarget "GoukakuShieldConfig" */;
+			buildPhases = (
+				2A035568EDD0182BAF020146 /* Sources */,
+				312F98E363C921372CCC8961 /* Resources */,
+				F308298A402CA09D312C9615 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GoukakuShieldConfig;
+			packageProductDependencies = (
+				9783967D1C1307266F7719CD /* GoukakuCore */,
+				421FA4A9FAE174F1CFEC88B7 /* GoukakuKit */,
+			);
+			productName = GoukakuShieldConfig;
+			productReference = 8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C3270B222FDCF6E31D36A02B /* GoukakuLock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD6B2A9A71CDD7A21DB87AE5 /* Build configuration list for PBXNativeTarget "GoukakuLock" */;
+			buildPhases = (
+				352749B141469A7FD0D1D60C /* Sources */,
+				A8C28065FCC7251FDD476072 /* Resources */,
+				45F97B093A3CF4C6EAA11083 /* Frameworks */,
+				F3E90C0E77F507D1B85E54D4 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E9ECA9DDC5080258496D0E91 /* PBXTargetDependency */,
+				AFE6FFC13C4E80746B8AFEED /* PBXTargetDependency */,
+				F279C4D66324B9BEB0545B33 /* PBXTargetDependency */,
+			);
+			name = GoukakuLock;
+			packageProductDependencies = (
+				56DEF683AB17CB7D2AB357F7 /* GoukakuCore */,
+				59EB0DD4391EA77D54698A6E /* GoukakuKit */,
+			);
+			productName = GoukakuLock;
+			productReference = 7901229356B07DD04EE8691D /* GoukakuLock.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EE92F51893CD543E1BD2C14B /* GoukakuShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 57CDCBF408B906EA507DA69D /* Build configuration list for PBXNativeTarget "GoukakuShieldAction" */;
+			buildPhases = (
+				BAEFF7857E1DF798BB93DD9C /* Sources */,
+				24851D17047E6135E4CEFEB2 /* Resources */,
+				9007ACC218D99BA374A13048 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GoukakuShieldAction;
+			packageProductDependencies = (
+				FC33093BFA16EF1911A2F9F5 /* GoukakuCore */,
+				4C3477060F8A6BD2C81AE56F /* GoukakuKit */,
+			);
+			productName = GoukakuShieldAction;
+			productReference = D826A5042F75EE84C6786046 /* GoukakuShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		58F0C9FD64FF796E4BE08636 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0EB70D539AF3A6141E55390E = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					B916F91BADA5279B78C6BDDF = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					C3270B222FDCF6E31D36A02B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					EE92F51893CD543E1BD2C14B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C7709BAD2A2B23060C899927 /* Build configuration list for PBXProject "GoukakuLock" */;
+			developmentRegion = ja;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				ja,
+			);
+			mainGroup = 723DAB278299D0C72BA29B72;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				02AB9E250E985F437BB7795C /* XCLocalSwiftPackageReference "GoukakuCore" */,
+				57B345923D3BAE67DB73B978 /* XCLocalSwiftPackageReference "GoukakuKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B41394D76D683B91F343A4F5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C3270B222FDCF6E31D36A02B /* GoukakuLock */,
+				0EB70D539AF3A6141E55390E /* GoukakuMonitor */,
+				B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */,
+				EE92F51893CD543E1BD2C14B /* GoukakuShieldAction */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		24851D17047E6135E4CEFEB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BCF00B72162397D35CEBF64 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		312F98E363C921372CCC8961 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				270A415F0348F336ED8CC15B /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A8C28065FCC7251FDD476072 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				87B538A5EE5B1C847F192D5E /* Assets.xcassets in Resources */,
+				EB6B23CCD1A2EC4A82A5BCE1 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6B5D69C5EF2C014D73E74FE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5961111B4D0395D92911589A /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2A035568EDD0182BAF020146 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E253FE6F9E3B6CA4BCDE449 /* ShieldConfigExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		352749B141469A7FD0D1D60C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7801E947734114BB90921095 /* AppActions+Settings.swift in Sources */,
+				434E9363638469ECFF45E14D /* AppActions.swift in Sources */,
+				CC05A86ACD29AA22B20B4891 /* AppModel+Actions.swift in Sources */,
+				D186333BEB54B521C69565D9 /* AppModel+Changes.swift in Sources */,
+				99AFBF7AEC299F5D7A099E3A /* AppModel+Lifecycle.swift in Sources */,
+				611C70FD8484E2A9A509F9AF /* AppModel.swift in Sources */,
+				EF362FB0034AF8854F65FBB7 /* CheckInView.swift in Sources */,
+				1C55680910D73BEFE7545394 /* CommitViews.swift in Sources */,
+				87143B384EC5F77D2EC78B5E /* Components.swift in Sources */,
+				9C2C150C8BC89109455283A8 /* DebugMenuView.swift in Sources */,
+				325E96A3FCC5EDD62F19ECFC /* DeviceSupport.swift in Sources */,
+				BB8B360F099D7D7210250725 /* EmergencyPauseViews.swift in Sources */,
+				176574B8C3801F54B98D6BC5 /* Format.swift in Sources */,
+				59EEDC2079DFF271A0A270C5 /* GoukakuLockApp.swift in Sources */,
+				CAF4A49BA2B1502D0E72E8C3 /* HistoryView.swift in Sources */,
+				A751D606F89AF21EB516292E /* HomeView.swift in Sources */,
+				ABFB78558664B8BCE5E856BB /* NotificationRouter.swift in Sources */,
+				40F225C6CCAEA86CA565E68F /* OnboardingView.swift in Sources */,
+				19C8922BBB635CEDC25697DD /* Persistence.swift in Sources */,
+				CD668CCF9BA9DA10D69557DC /* RootView.swift in Sources */,
+				AF0FF189D10216922A40FEC6 /* SettingsView.swift in Sources */,
+				0FA5B72A8563AED729C74006 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B74BA1626F20C8F509C4B55D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A13E18CFE5C537DF2BBC9A2B /* MonitorExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BAEFF7857E1DF798BB93DD9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2AACB7EBE01ACC5E7DCE2DDB /* ShieldActionExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AFE6FFC13C4E80746B8AFEED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */;
+			targetProxy = 34794115390EB3CAEEBD0C65 /* PBXContainerItemProxy */;
+		};
+		E9ECA9DDC5080258496D0E91 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0EB70D539AF3A6141E55390E /* GoukakuMonitor */;
+			targetProxy = A5C9B3473B5FB16F8AF2C810 /* PBXContainerItemProxy */;
+		};
+		F279C4D66324B9BEB0545B33 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EE92F51893CD543E1BD2C14B /* GoukakuShieldAction */;
+			targetProxy = D4EC7D872A802EA1EDBD1AD0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		05DA02C2DF990BB97675D787 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/GoukakuLock.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock;
+				PRODUCT_NAME = GoukakuLock;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		0F64E42B4AAD32D84C520E98 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		24C95DC852C5908298B439A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/GoukakuLock.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock;
+				PRODUCT_NAME = GoukakuLock;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		49CCF9D9682B0E6575898EB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShieldAction/GoukakuShieldAction.entitlements;
+				INFOPLIST_FILE = Extensions/ShieldAction/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldaction;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		54685CBD84150E2A786F336B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShieldConfig/GoukakuShieldConfig.entitlements;
+				INFOPLIST_FILE = Extensions/ShieldConfig/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldconfig;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		76689ACA3F0C09A975D86251 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		76D786F921FE93A20188D12B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/Monitor/GoukakuMonitor.entitlements;
+				INFOPLIST_FILE = Extensions/Monitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.monitor;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9D82553F359F8BBC40746519 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShieldAction/GoukakuShieldAction.entitlements;
+				INFOPLIST_FILE = Extensions/ShieldAction/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldaction;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AC9246589BB20B88A454508B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/Monitor/GoukakuMonitor.entitlements;
+				INFOPLIST_FILE = Extensions/Monitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.monitor;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F0FC0B3A885F387206186F62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShieldConfig/GoukakuShieldConfig.entitlements;
+				INFOPLIST_FILE = Extensions/ShieldConfig/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldconfig;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		57CDCBF408B906EA507DA69D /* Build configuration list for PBXNativeTarget "GoukakuShieldAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49CCF9D9682B0E6575898EB8 /* Debug */,
+				9D82553F359F8BBC40746519 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5A09CD8C8962EEC8E77FF478 /* Build configuration list for PBXNativeTarget "GoukakuShieldConfig" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54685CBD84150E2A786F336B /* Debug */,
+				F0FC0B3A885F387206186F62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C7709BAD2A2B23060C899927 /* Build configuration list for PBXProject "GoukakuLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0F64E42B4AAD32D84C520E98 /* Debug */,
+				76689ACA3F0C09A975D86251 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CD6B2A9A71CDD7A21DB87AE5 /* Build configuration list for PBXNativeTarget "GoukakuLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24C95DC852C5908298B439A9 /* Debug */,
+				05DA02C2DF990BB97675D787 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D7249543360A03FC1F872E53 /* Build configuration list for PBXNativeTarget "GoukakuMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				76D786F921FE93A20188D12B /* Debug */,
+				AC9246589BB20B88A454508B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		02AB9E250E985F437BB7795C /* XCLocalSwiftPackageReference "GoukakuCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GoukakuCore;
+		};
+		57B345923D3BAE67DB73B978 /* XCLocalSwiftPackageReference "GoukakuKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GoukakuKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		421FA4A9FAE174F1CFEC88B7 /* GoukakuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuKit;
+		};
+		4C3477060F8A6BD2C81AE56F /* GoukakuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuKit;
+		};
+		56DEF683AB17CB7D2AB357F7 /* GoukakuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuCore;
+		};
+		59EB0DD4391EA77D54698A6E /* GoukakuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuKit;
+		};
+		5AD13C7E004FB60F00AC7344 /* GoukakuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuKit;
+		};
+		9783967D1C1307266F7719CD /* GoukakuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuCore;
+		};
+		EC590EB456CE986EA926FC5A /* GoukakuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuCore;
+		};
+		FC33093BFA16EF1911A2F9F5 /* GoukakuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoukakuCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 58F0C9FD64FF796E4BE08636 /* Project object */;
+}

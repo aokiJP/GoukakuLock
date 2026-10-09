@@ -23,6 +23,7 @@
 		5961111B4D0395D92911589A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7CC050F479BBE5BD15E12186 /* PrivacyInfo.xcprivacy */; };
 		59EEDC2079DFF271A0A270C5 /* GoukakuLockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AEBC5C9F8AAE722276A01F /* GoukakuLockApp.swift */; };
 		611C70FD8484E2A9A509F9AF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81AA773E9E63DE100166498 /* AppModel.swift */; };
+		67F3FC323BECA6C00866C8AA /* WalkthroughUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD1867EDFAA48E2E5D2C3AF /* WalkthroughUITests.swift */; };
 		6B0F49F57F22C722566FB1AC /* GoukakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 421FA4A9FAE174F1CFEC88B7 /* GoukakuKit */; };
 		7801E947734114BB90921095 /* AppActions+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F73281A81B0178D0FFAF9ED /* AppActions+Settings.swift */; };
 		87143B384EC5F77D2EC78B5E /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F0DB3DEF725AC59FC082C2 /* Components.swift */; };
@@ -57,6 +58,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = B916F91BADA5279B78C6BDDF;
 			remoteInfo = GoukakuShieldConfig;
+		};
+		3EBF95B2E4324E04B5EB922A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 58F0C9FD64FF796E4BE08636 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C3270B222FDCF6E31D36A02B;
+			remoteInfo = GoukakuLock;
 		};
 		A5C9B3473B5FB16F8AF2C810 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -105,6 +113,7 @@
 		418506AD8FB7B21282C3149F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		4FB973A9E93C56741C75BD42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5F73281A81B0178D0FFAF9ED /* AppActions+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppActions+Settings.swift"; sourceTree = "<group>"; };
+		5FE14F024F8A3AECA7C15E76 /* GoukakuLockUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GoukakuLockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		60605C60403A737346EACF40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		60F73608CCD2BC7E33044AAB /* EmergencyPauseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyPauseViews.swift; sourceTree = "<group>"; };
 		63DEACC7A9BD5D109BC9A8EF /* GoukakuShieldConfig.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuShieldConfig.entitlements; sourceTree = "<group>"; };
@@ -114,6 +123,7 @@
 		7901229356B07DD04EE8691D /* GoukakuLock.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GoukakuLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AA69AA087B933F44FDEDC62 /* GoukakuShieldAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GoukakuShieldAction.entitlements; sourceTree = "<group>"; };
 		7CC050F479BBE5BD15E12186 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7FD1867EDFAA48E2E5D2C3AF /* WalkthroughUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkthroughUITests.swift; sourceTree = "<group>"; };
 		8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GoukakuShieldConfig.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		95C1EE2985AEDA4174ED9918 /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRouter.swift; sourceTree = "<group>"; };
 		983F854EC81E2C5CAD58EB6F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -242,6 +252,7 @@
 				68711FEF49052EBD3D7A044B /* App */,
 				72F0EEB09AF435453E79538F /* Extensions */,
 				11E79F45C98F1E341CEE3D81 /* Packages */,
+				C10B941145F11B26E6F402B0 /* UITests */,
 				B41394D76D683B91F343A4F5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -300,11 +311,20 @@
 			isa = PBXGroup;
 			children = (
 				7901229356B07DD04EE8691D /* GoukakuLock.app */,
+				5FE14F024F8A3AECA7C15E76 /* GoukakuLockUITests.xctest */,
 				ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */,
 				D826A5042F75EE84C6786046 /* GoukakuShieldAction.appex */,
 				8FDC10255F257EF2710AFBBA /* GoukakuShieldConfig.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C10B941145F11B26E6F402B0 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				7FD1867EDFAA48E2E5D2C3AF /* WalkthroughUITests.swift */,
+			);
+			path = UITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -330,6 +350,24 @@
 			productName = GoukakuMonitor;
 			productReference = ACDF3F7DE0EC4BFC6709D5DE /* GoukakuMonitor.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		55730D2246D09153E47CBC3D /* GoukakuLockUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0803C204022A3D03D6830FDA /* Build configuration list for PBXNativeTarget "GoukakuLockUITests" */;
+			buildPhases = (
+				E4325990C0FF690DAD89EB1E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2DF44C68B01D3D9CD0718AA9 /* PBXTargetDependency */,
+			);
+			name = GoukakuLockUITests;
+			packageProductDependencies = (
+			);
+			productName = GoukakuLockUITests;
+			productReference = 5FE14F024F8A3AECA7C15E76 /* GoukakuLockUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */ = {
 			isa = PBXNativeTarget;
@@ -411,6 +449,11 @@
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
+					55730D2246D09153E47CBC3D = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = C3270B222FDCF6E31D36A02B;
+					};
 					B916F91BADA5279B78C6BDDF = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -447,6 +490,7 @@
 				0EB70D539AF3A6141E55390E /* GoukakuMonitor */,
 				B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */,
 				EE92F51893CD543E1BD2C14B /* GoukakuShieldAction */,
+				55730D2246D09153E47CBC3D /* GoukakuLockUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -541,9 +585,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4325990C0FF690DAD89EB1E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				67F3FC323BECA6C00866C8AA /* WalkthroughUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		2DF44C68B01D3D9CD0718AA9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C3270B222FDCF6E31D36A02B /* GoukakuLock */;
+			targetProxy = 3EBF95B2E4324E04B5EB922A /* PBXContainerItemProxy */;
+		};
 		AFE6FFC13C4E80746B8AFEED /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B916F91BADA5279B78C6BDDF /* GoukakuShieldConfig */;
@@ -577,7 +634,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock;
 				PRODUCT_NAME = GoukakuLock;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -666,7 +723,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock;
 				PRODUCT_NAME = GoukakuLock;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -682,7 +739,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldaction;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -698,9 +755,27 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldconfig;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		667C1F8AEB46029C7E3EF880 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = GoukakuLock;
+			};
+			name = Release;
 		};
 		76689ACA3F0C09A975D86251 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -777,7 +852,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.monitor;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -793,7 +868,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldaction;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -809,9 +884,27 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.monitor;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		D5E4B86F8D3EE6D811BB2CF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = GoukakuLock;
+			};
+			name = Debug;
 		};
 		F0FC0B3A885F387206186F62 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -825,13 +918,22 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aokijp.goukakulock.shieldconfig;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0803C204022A3D03D6830FDA /* Build configuration list for PBXNativeTarget "GoukakuLockUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E4B86F8D3EE6D811BB2CF8 /* Debug */,
+				667C1F8AEB46029C7E3EF880 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		57CDCBF408B906EA507DA69D /* Build configuration list for PBXNativeTarget "GoukakuShieldAction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

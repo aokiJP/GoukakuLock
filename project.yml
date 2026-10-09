@@ -76,6 +76,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: &bundle com.aokijp.goukakulock
         PRODUCT_NAME: GoukakuLock
+        TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
@@ -106,6 +107,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.monitor
+        TARGETED_DEVICE_FAMILY: "1"
 
   GoukakuShieldConfig:
     type: app-extension
@@ -134,6 +136,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.shieldconfig
+        TARGETED_DEVICE_FAMILY: "1"
 
   GoukakuShieldAction:
     type: app-extension
@@ -162,6 +165,22 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.shieldaction
+        TARGETED_DEVICE_FAMILY: "1"
+
+  # シミュレータで画面を一通り動かしてスクリーンショットを撮る UI テスト(CI で実行)
+  GoukakuLockUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: GoukakuLock
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aokijp.goukakulock.uitests
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: "YES"
 
 schemes:
   GoukakuLock:
@@ -170,5 +189,9 @@ schemes:
         GoukakuLock: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - GoukakuLockUITests
     archive:
       config: Release

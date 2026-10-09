@@ -17,6 +17,8 @@ struct OnboardingDraft {
     var denyInAppPurchases = true
     var habit = HabitDraft()
     var startNow = false
+    /// デバッグ:Screen Time の許可もロック対象もなしで、画面の確認だけをする(DEBUG ビルドの画面からだけ立つ)
+    var debugUIOnly = false
 
     var schedule: ScheduleConfig {
         ScheduleConfig(dayStartMinute: dayStartMinute,
@@ -202,9 +204,11 @@ extension AppModel {
     func completeOnboarding(_ draft: OnboardingDraft) -> String? {
         let config = draft.schedule
         guard SchedulePlanner.isValid(config) else { return "ロック開始の時刻が、選べる範囲の外です。" }
-        let problems = draft.targets.problems
-        guard problems.isEmpty else { return problems.joined(separator: "\n") }
-        guard draft.confirmedSafety else { return "安全の確認にチェックしてください。" }
+        if !draft.debugUIOnly {
+            let problems = draft.targets.problems
+            guard problems.isEmpty else { return problems.joined(separator: "\n") }
+            guard draft.confirmedSafety else { return "安全の確認にチェックしてください。" }
+        }
         let title = draft.habit.title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { return "最初のコミット(目標)を入力してください。" }
         guard !draft.habit.weekdays.isEmpty else { return "曜日を1つ以上選んでください。" }

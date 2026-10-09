@@ -30,7 +30,8 @@ final class ShieldActionExtension: ShieldActionDelegate {
             return .close
         case .secondaryButtonPressed:
             return .close
-        @unknown default:
+        default:
+            // iOS 26 で増えたサブメニューの項目など(このアプリでは使わない)
             return .close
         }
     }

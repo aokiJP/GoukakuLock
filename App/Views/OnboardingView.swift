@@ -7,7 +7,18 @@ import GoukakuKit
 struct OnboardingView: View {
     @Environment(AppModel.self) private var model
     @State private var step = Step.intro
-    @State private var draft = OnboardingDraft()
+    @State private var draft: OnboardingDraft = {
+        var draft = OnboardingDraft()
+        #if DEBUG
+        // UI テスト(シミュレータでのスクリーンショット)用に、最初のコミットを埋めておく
+        if ProcessInfo.processInfo.arguments.contains("-uiTesting") {
+            draft.habit.title = "英単語20個を覚えて、自作テストで7割"
+            draft.habit.criteriaNote = "自作テストで7割"
+            draft.habit.minimumTitle = "単語5個"
+        }
+        #endif
+        return draft
+    }()
     @State private var authMessage: String?
     @State private var authorizing = false
     @State private var notificationAnswered = false
@@ -221,6 +232,18 @@ struct OnboardingView: View {
     private var targetsStep: some View {
         Form {
             TargetsEditor(targets: $draft.targets, confirmed: $draft.confirmedSafety)
+            #if DEBUG
+            if skippedAuthorization {
+                Section {
+                    Button("対象を選ばずに進む(デバッグ)") {
+                        draft.debugUIOnly = true
+                        move(1)
+                    }
+                } footer: {
+                    Text("Screen Time の許可がないと対象を選べません。画面の確認だけをするときに使います。")
+                }
+            }
+            #endif
         }
         .safeAreaInset(edge: .bottom) {
             primaryButton("次へ", enabled: draft.targets.problems.isEmpty && draft.confirmedSafety) { move(1) }
@@ -324,6 +347,7 @@ struct OnboardingView: View {
                             .font(.footnote).foregroundStyle(Theme.muted)
                     }
                 }
+                .accessibilityIdentifier("start.tomorrow")
                 Button {
                     confirmStartNow = true
                 } label: {
@@ -332,6 +356,7 @@ struct OnboardingView: View {
                         Text("すぐにロックがかかります。").font(.footnote).foregroundStyle(Theme.muted)
                     }
                 }
+                .accessibilityIdentifier("start.now")
             }
         }
     }
@@ -355,7 +380,7 @@ struct OnboardingView: View {
             #if DEBUG
             if skippedAuthorization {
                 Section {
-                    Text("Screen Time の許可がないので、記録だけが動き、ロックはかかりません(デバッグ)。")
+                    Text("Screen Time の許可がないので、記録と画面だけが動き、ロックはかかりません(デバッグ)。")
                         .font(.footnote)
                 }
             }

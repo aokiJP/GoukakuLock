@@ -108,6 +108,9 @@ public struct ModelManifest: Codable, Sendable, Equatable {
         case downloaded
         /// ファイル App・Finder から取り込み
         case imported
+        /// IPA に同梱されていたものを、アプリの外にも残したもの(APFS のクローンなので容量は増えない。
+        /// あとで AIなし版を上書きでインストールしても消えない)
+        case kept
     }
 
     public static let fileName = "goukaku-model.json"

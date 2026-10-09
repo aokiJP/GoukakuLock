@@ -16,7 +16,7 @@
       "recommendedRAMGB": 8,
       "japanese": 5,
       "speed": 4,
-      "speedNote": "iPhone 17 Pro で毎秒約50トークン(MLX の実測)",
+      "speedNote": "iPhone 17 Pro で毎秒約48トークン(MLX の実測)",
       "license": "Apache 2.0(Gemma 4)",
       "licenseURL": "https://ai.google.dev/gemma/docs/gemma_4_license",
       "extraEOSTokens": ["<turn|>"],
@@ -26,7 +26,7 @@
     {
       "id": "qwen3.5-4b",
       "name": "Qwen3.5 4B",
-      "summary": "落ち着いた日本語で、話がそれにくい。少しゆっくり",
+      "summary": "話のまとまりはよいが、言い回しが少し硬い。ゆっくりめ",
       "family": "qwen3_5",
       "repo": "mlx-community/Qwen3.5-4B-4bit",
       "revision": "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",

@@ -69,6 +69,13 @@ final class AIRuntime {
         }
         observe()
         refresh()
+        // IPA に同梱のモデルを、アプリの外にも残す(APFS のクローンで容量は増えない)。
+        // こうしておくと、あとで AIなし版を上書きでインストールしても、モデルが消えない
+        let catalog = self.catalog
+        Task.detached(priority: .utility) { [weak self] in
+            guard ModelStore.keepBundledModels(catalog: catalog) else { return }
+            await self?.refresh()
+        }
     }
 
     // MARK: 状態
@@ -225,7 +232,7 @@ final class AIRuntime {
 
     /// ファイル App で選んだフォルダを取り込む
     func importFolder(_ url: URL) async {
-        let catalog = catalog
+        let catalog = self.catalog
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         do {
@@ -241,7 +248,7 @@ final class AIRuntime {
 
     /// 受け取り口(ファイル App の 合格ロック › AIModels)に置かれたモデルを取り込む
     func importInbox() async {
-        let catalog = catalog
+        let catalog = self.catalog
         let result = await Task.detached(priority: .utility) {
             ModelStore.importInbox(catalog: catalog)
         }.value

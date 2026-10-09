@@ -62,7 +62,7 @@ struct AISettingsView: View {
         .alert(runtime.message ?? "", isPresented: Binding(get: { runtime.message != nil }, set: { if !$0 { runtime.message = nil } })) {
             Button("OK", role: .cancel) {}
         }
-        .refreshable { runtime.refresh() }
+        .refreshable { await runtime.refresh() }
         .onAppear { runtime.refresh() }
     }
 
@@ -149,6 +149,13 @@ struct AISettingsView: View {
                     Text("\(DeviceProbe.gb(m.manifest.bytes))・動かすのに約 \(DeviceProbe.gb(m.runtimeBytes))")
                         .font(.caption)
                         .foregroundStyle(Theme.muted)
+                    if m.manifest.source == .bundled {
+                        Text(ModelStore.hasKeptCopy(of: m.id)
+                             ? "アプリの外にも残してあります。AIなし版で上書きしても消えません(容量は増えません)"
+                             : "AIなし版で上書きすると、アプリといっしょに消えます")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.muted)
+                    }
                     if runtime.crashedModels.contains(m.id) {
                         Button("休ませているのをやめる(もう一度試す)") { runtime.retry(m) }
                             .font(.footnote)
@@ -170,6 +177,7 @@ struct AISettingsView: View {
         case .bundled: return "IPA に同梱"
         case .downloaded: return "ダウンロード"
         case .imported: return "取り込み"
+        case .kept: return "IPA から残したもの"
         }
     }
 

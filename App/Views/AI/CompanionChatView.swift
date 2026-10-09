@@ -39,7 +39,8 @@ struct CompanionChatView: View {
                     .padding()
                 }
                 .onChange(of: companion.messages.count) { _, _ in
-                    withAnimation { proxy.scrollTo(companion.messages.last?.id, anchor: .bottom) }
+                    guard let last = companion.messages.last?.id else { return }
+                    withAnimation { proxy.scrollTo(last, anchor: .bottom) }
                 }
                 .onChange(of: companion.chatPreview) { _, _ in
                     proxy.scrollTo("writing", anchor: .bottom)

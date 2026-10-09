@@ -2,6 +2,7 @@ import SwiftUI
 import FamilyControls
 import GoukakuCore
 import GoukakuKit
+import GoukakuAI
 
 /// S-01 はじめの設定
 struct OnboardingView: View {

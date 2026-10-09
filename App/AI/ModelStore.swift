@@ -2,7 +2,8 @@ import Foundation
 import GoukakuAI
 
 /// 端末に入っているモデルの置き場所と、取り込み・削除。
-/// - 同梱:GoukakuLock.app/AIModels/<id>/(IPA に入っている。消せない)
+/// - 同梱:GoukakuLock.app/AIModels/<id>/(IPA に入っている。消せない)。
+///   起動したら Application Support にクローンして残す(容量は増えない。AIなし版で上書きしても消えない)
 /// - ダウンロード・取り込み:Application Support/AIModels/<id>/(上書きインストールでも消えない・iCloud にバックアップしない)
 /// - 受け取り口:Documents/AIModels/(ファイル App・Finder から置くと、次に開いたときに取り込む)
 enum ModelStore {
@@ -34,7 +35,8 @@ enum ModelStore {
         var seen = Set<String>()
         for root in [bundledRoot, installedRoot].compactMap({ $0 }) {
             guard let dirs = try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) else { continue }
-            for dir in dirs.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+            // 「.」で始まるのは作業中のフォルダ(ダウンロード・取り込み・クローンの途中)
+            for dir in dirs.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) where !dir.lastPathComponent.hasPrefix(".") {
                 guard let model = read(dir, catalog: catalog), !seen.contains(model.id) else { continue }
                 seen.insert(model.id)
                 found.append(model)
@@ -167,6 +169,90 @@ enum ModelStore {
         取り込んだあとは、このフォルダから消えます(アプリの中に移ります)。
         """
         try? text.write(to: readme, atomically: true, encoding: .utf8)
+    }
+
+    // MARK: 同梱のモデルを、アプリの外にも残す
+
+    /// 残したコピーにつける印(どの同梱から作ったか)
+    static let keptMarkerName = ".kept-from"
+
+    /// IPA に同梱されたモデルを、Application Support にも置く(APFS のクローン)。
+    /// クローンはデータを共有するので容量は増えず、あとで AIなし版を上書きでインストールしても、
+    /// こちらは消えずに残る(「モデル入り IPA は最初の1回だけ」で済む)。
+    /// クローンが使えない(別のボリューム・権限など)ときは、何もしない(2倍の容量を使わないため、ふつうのコピーはしない)。
+    /// 何か変えたら true。起動のたびに裏で呼ぶ(同じ同梱から作ったものがあれば何もしない)
+    @discardableResult
+    static func keepBundledModels(catalog: ModelCatalog) -> Bool {
+        let fm = FileManager.default
+        guard let bundledRoot,
+              let dirs = try? fm.contentsOfDirectory(at: bundledRoot, includingPropertiesForKeys: nil) else { return false }
+        var changed = false
+        for dir in dirs {
+            guard let bundled = read(dir, catalog: catalog) else { continue }
+            let destination = installedRoot.appendingPathComponent(bundled.id, isDirectory: true)
+            let stamp = keptStamp(for: dir)
+            let current = try? String(contentsOf: destination.appendingPathComponent(keptMarkerName), encoding: .utf8)
+            if current == stamp, fm.fileExists(atPath: destination.appendingPathComponent("config.json").path) { continue }
+            do {
+                try cloneModel(from: dir, to: destination, manifest: bundled.manifest, stamp: stamp)
+                changed = true
+            } catch {
+                // クローンできない端末では、同梱のまま使う(動きは変わらない)
+                continue
+            }
+        }
+        return changed
+    }
+
+    /// 同梱のモデルに、アプリの外の(上書きでも消えない)コピーがあるか
+    static func hasKeptCopy(of id: String) -> Bool {
+        let dir = installedRoot.appendingPathComponent(id, isDirectory: true)
+        return FileManager.default.fileExists(atPath: dir.appendingPathComponent(keptMarkerName).path)
+    }
+
+    /// どの同梱から作ったかの印(インストールし直すと場所と作成日時が変わる)
+    private static func keptStamp(for bundledDir: URL) -> String {
+        let weights = (try? FileManager.default.contentsOfDirectory(atPath: bundledDir.path))?
+            .filter { $0.hasSuffix(".safetensors") }.sorted() ?? []
+        let dates = weights.map { name -> String in
+            let url = bundledDir.appendingPathComponent(name)
+            let date = (try? url.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? .distantPast
+            return "\(name)=\(Int(date.timeIntervalSince1970))"
+        }
+        return ([bundledDir.path] + dates).joined(separator: "\n")
+    }
+
+    /// フォルダごとクローンする(clonefile)。印を書いてから、置き場所に移す
+    private static func cloneModel(from source: URL, to destination: URL, manifest: ModelManifest, stamp: String) throws {
+        let fm = FileManager.default
+        try fm.createDirectory(at: installedRoot, withIntermediateDirectories: true)
+        let staging = installedRoot.appendingPathComponent(".keep-\(manifest.id)", isDirectory: true)
+        try? fm.removeItem(at: staging)
+        // CLONE_NOFOLLOW(0x1)| CLONE_NOOWNERCOPY(0x2):持ち主はこのアプリにする(あとで消せるように)
+        let (result, code): (Int32, Int32) = source.withUnsafeFileSystemRepresentation { src in
+            staging.withUnsafeFileSystemRepresentation { dst in
+                guard let src, let dst else { return (-1, EINVAL) }
+                let r = clonefile(src, dst, UInt32(0x0001 | 0x0002))
+                return (r, r == 0 ? 0 : errno)
+            }
+        }
+        guard result == 0 else {
+            try? fm.removeItem(at: staging)
+            throw ImportError.copyFailed("クローンできません(errno \(code))")
+        }
+        do {
+            var kept = manifest
+            kept.source = .kept
+            kept.installedAt = Date()
+            try kept.encoded().write(to: staging.appendingPathComponent(ModelManifest.fileName), options: .atomic)
+            try stamp.write(to: staging.appendingPathComponent(keptMarkerName), atomically: true, encoding: .utf8)
+            try? fm.removeItem(at: destination)
+            try fm.moveItem(at: staging, to: destination)
+        } catch {
+            try? fm.removeItem(at: staging)
+            throw error
+        }
+        excludeFromBackup(destination)
     }
 
     /// ダウンロード・取り込んだモデルを消す(同梱のモデルは消せない)

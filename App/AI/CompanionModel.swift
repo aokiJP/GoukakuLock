@@ -45,6 +45,8 @@ final class CompanionModel {
 
     @ObservationIgnored private var suggestTask: Task<Void, Never>?
     @ObservationIgnored private var chatTask: Task<Void, Never>?
+    /// 保存してある「いまの自分」を読み戻している間は、書き戻さない
+    @ObservationIgnored private var restoring = false
 
     init(app: AppModel, runtime: AIRuntime) {
         self.app = app
@@ -64,12 +66,15 @@ final class CompanionModel {
     private func loadContext() {
         let parts = app.settings.companionContextRaw.split(separator: "|").map(String.init)
         guard parts.count == 3 else { return }
+        restoring = true
+        defer { restoring = false }
         if let minutes = Int(parts[0]), let b = TimeBudget(rawValue: minutes) { budget = b }
         if let p = Place(rawValue: parts[1]) { place = p }
         if let m = Mood(rawValue: parts[2]) { mood = m }
     }
 
     private func saveContext() {
+        guard !restoring else { return }
         let raw = "\(budget.rawValue)|\(place.rawValue)|\(mood.rawValue)"
         guard app.settings.companionContextRaw != raw else { return }
         app.settings.companionContextRaw = raw
@@ -110,9 +115,9 @@ final class CompanionModel {
 
     /// 体験の地図とAIの理解
     var growth: GrowthSnapshot {
-        let logs = logs
-        let ideas = ideas
-        let notes = notes
+        let logs = self.logs
+        let ideas = self.ideas
+        let notes = self.notes
         let firstDates = [logs.last?.at, notes.last?.createdAt, ideas.last?.createdAt, app.settings.companionStartedAt].compactMap { $0 }
         return GrowthSnapshot.make(experienceCategories: logs.filter { $0.source == .experience }.map(\.category),
                                    notes: notes.count, liked: ideas.filter(\.liked).count,
@@ -121,7 +126,7 @@ final class CompanionModel {
 
     /// AIに渡す文脈(すべて端末の中のデータ)
     func makeContext(now: Date = Date()) -> CompanionContext {
-        let ideas = ideas
+        let ideas = self.ideas
         var affinity: [ExperienceCategory: Int] = [:]
         for idea in ideas {
             if idea.liked { affinity[idea.category, default: 0] += 1 }
@@ -501,7 +506,7 @@ final class CompanionModel {
         let achieved = days.filter { [.achieved, .minimum].contains($0.outcome) }.count
         let planned = days.filter { [.achieved, .minimum, .missed].contains($0.outcome) }.count
         let experiences = weekLogs.map { (title: $0.title, category: $0.category) }
-        let notes = notes.map(\.text)
+        let notes = self.notes.map(\.text)
         Task {
             await runtime.ensureReady()
             let brain = runtime.brain

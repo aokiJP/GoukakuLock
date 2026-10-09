@@ -7,7 +7,7 @@ name: Build IPA
 #           Hugging Face から固定リビジョンで取得 → 画像・音声の部分を取り除く
 #           → MLX で実際に読み込んで日本語が返るかを確かめる → Release の .app に同梱して IPA に包む
 # 成果物は Actions の Artifacts に置く。タグ v* か「Run workflow」の release_tag で Releases にも載せる
-# (GitHub の Releases は 1 ファイル 2GiB まで。超えるモデルの IPA は Artifacts だけ)。
+# (GitHub の Releases は 1 ファイル 2GiB まで。超えるモデルの IPA は、Releases には分けて載せる)。
 
 on:
   push:
@@ -287,10 +287,13 @@ jobs:
         id: ipa
         run: |
           set -euo pipefail
+          # 数GBを何度も置くので、要らなくなったものから片づける
+          rm -rf build/DD-mlx
+          df -h . | tail -n 1
           tar -xzf build/GoukakuLock-Release-app.tar.gz -C build
           APP=build/GoukakuLock.app
           mkdir -p "$APP/AIModels"
-          cp -R "$RUNNER_TEMP/models/${{ matrix.model }}" "$APP/AIModels/"
+          mv "$RUNNER_TEMP/models/${{ matrix.model }}" "$APP/AIModels/"
           mkdir -p dist
           IPA="dist/GoukakuLock-AI-${{ matrix.model }}.ipa"
           scripts/package-ipa.sh "$APP" "$IPA"
@@ -312,15 +315,37 @@ jobs:
             dist/*.ipa
             dist/SHA256-*.txt
           compression-level: 0
-          retention-days: 30
+          retention-days: 90
           if-no-files-found: error
 
-      - name: Attach to release (2GiB 未満だけ)
+      - name: Attach to release (2GiB 未満)
         if: env.RELEASE_TAG != '' && fromJSON(steps.ipa.outputs.size) < 2147483648
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          files: dist/GoukakuLock-AI-${{ matrix.model }}.ipa
+          files: |
+            dist/GoukakuLock-AI-${{ matrix.model }}.ipa
+            dist/SHA256-${{ matrix.model }}.txt
+
+      # Releases は 1 ファイル 2GiB まで。超える IPA は 1.9GiB ずつに分けて載せる
+      # (つなぎ方:cat GoukakuLock-AI-<id>.ipa.part-* > GoukakuLock-AI-<id>.ipa)
+      - name: Split large IPA for the release (2GiB 以上)
+        if: env.RELEASE_TAG != '' && fromJSON(steps.ipa.outputs.size) >= 2147483648
+        run: |
+          set -euo pipefail
+          cd dist
+          split -b 1900m "GoukakuLock-AI-${{ matrix.model }}.ipa" "GoukakuLock-AI-${{ matrix.model }}.ipa.part-"
+          ls -la
+          cat GoukakuLock-AI-${{ matrix.model }}.ipa.part-* | shasum -a 256
+
+      - name: Attach split IPA to release (2GiB 以上)
+        if: env.RELEASE_TAG != '' && fromJSON(steps.ipa.outputs.size) >= 2147483648
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: |
+            dist/GoukakuLock-AI-${{ matrix.model }}.ipa.part-*
+            dist/SHA256-${{ matrix.model }}.txt
 
       - name: Logs
         if: always()

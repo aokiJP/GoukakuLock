@@ -1,4 +1,5 @@
 import Foundation
+import Metal
 import GoukakuAI
 import MLX
 import MLXLLM
@@ -28,12 +29,14 @@ public final class MLXEngine: LanguageEngine {
     let useCPU: Bool
     private let box = ContainerBox()
 
-    /// この端末で MLX を動かせるか(シミュレータでは Metal の機能が足りず動かない)
+    /// この端末で MLX を動かせるか(シミュレータでは Metal の機能が足りず動かない。
+    /// 実機は Metal 3 の GPU が要る:A13 以降・M1 以降)
     public static var isSupported: Bool {
         #if targetEnvironment(simulator)
         return false
         #else
-        return true
+        guard let device = MTLCreateSystemDefaultDevice() else { return false }
+        return device.supportsFamily(.metal3)
         #endif
     }
 

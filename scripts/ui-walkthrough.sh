@@ -49,6 +49,5 @@ xcodebuild test-without-building \
   -destination "id=$UDID" \
   -derivedDataPath build/DerivedData-Sim \
   -resultBundlePath build/UITests.xcresult \
-  -retry-tests-on-failure -test-iterations 2 \
   -skipPackagePluginValidation -skipMacroValidation \
   2>&1 | tee build/uitest.log | beautify

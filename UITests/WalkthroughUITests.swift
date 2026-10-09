@@ -115,12 +115,14 @@ final class WalkthroughUITests: XCTestCase {
         snap("21-体験-見つけた")
         app.swipeUp()
         snap("22-体験-見つけた-下")
-        tap(app.buttons["やってみる"].firstMatch)
+        // 画面の中に見えている「やってみる」を押す(上に隠れかけたものを押すと、ナビゲーションバーに当たる)
+        tap(visible(app.buttons.matching(NSPredicate(format: "label == 'やってみる'"))))
         scrollTo(app.buttons["やってみた"].firstMatch)
         snap("23-体験-やってみる")
         tap(app.buttons["やってみた"].firstMatch)
         // 気持ちを先に選ぶ(キーボードが出たあとだと、下の欄が隠れる)
-        tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
+        // 気持ちの「おだやか」(いまの調子の「おだやかに」とまちがえない)
+        tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか' AND NOT (label CONTAINS 'おだやかに')")).firstMatch)
         let logNote = textInput()
         waitFor(logNote)
         XCTAssertTrue(focus(logNote), "体験の一言の欄に入れられない")
@@ -287,6 +289,17 @@ final class WalkthroughUITests: XCTestCase {
         quickCheckIn.tap()
         waitFor(app.navigationBars["チェックイン"], timeout: 15)
         snap("57-クイックアクションから")
+    }
+
+    /// 画面の中(ナビゲーションバーとタブバーのあいだ)に、まるごと見えている最初の要素
+    @MainActor
+    private func visible(_ query: XCUIElementQuery) -> XCUIElement {
+        let top = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame.maxY : app.frame.minY
+        let bottom = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.maxY
+        for element in query.allElementsBoundByIndex where element.exists && element.isHittable {
+            if element.frame.minY >= top && element.frame.maxY <= bottom { return element }
+        }
+        return query.firstMatch
     }
 
     /// 文字を入れる欄(縦に伸びる TextField は、TextField としても TextView としても見えることがあるので両方を探す)。

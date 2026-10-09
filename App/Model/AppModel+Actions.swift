@@ -379,7 +379,7 @@ extension AppModel {
         struct ExperienceRow: Encodable {
             var title: String, note: String, feeling: String?, category: String, at: Date, reply: String?, question: String?, source: String
         }
-        struct IdeaRow: Encodable { var title: String, line: String, firstStep: String, category: String, status: String, kind: String, createdAt: Date }
+        struct IdeaRow: Encodable { var title: String, line: String, firstStep: String, category: String, status: String, kind: String, origin: String, engine: String, createdAt: Date }
         struct NoteRow: Encodable { var text: String, source: String, createdAt: Date }
         struct MessageRow: Encodable { var role: String, text: String, at: Date }
         struct ExportBundle: Encodable {
@@ -422,7 +422,8 @@ extension AppModel {
             },
             experienceIdeas: fetchAll(ExperienceIdea.self).filter { $0.statusRaw != "dismissed" }.sorted { $0.createdAt < $1.createdAt }.map {
                 IdeaRow(title: $0.title, line: $0.line, firstStep: $0.firstStep, category: $0.categoryRaw,
-                        status: $0.statusRaw, kind: $0.kindRaw, createdAt: $0.createdAt)
+                        status: $0.statusRaw, kind: $0.kindRaw, origin: $0.originRaw, engine: $0.engineName,
+                        createdAt: $0.createdAt)
             },
             companionNotes: fetchAll(CompanionNote.self).sorted { $0.createdAt < $1.createdAt }.map {
                 NoteRow(text: $0.text, source: $0.sourceRaw, createdAt: $0.createdAt)

@@ -177,6 +177,18 @@ final class BrainTests: XCTestCase {
         XCTAssertTrue(recorder.all.contains { $0.prompt.contains("いま気になっていること: 旅") })
     }
 
+    /// 体験帳の体験を出しつくしても、提案は3つそろう(小さいモデルは体験帳が土台なので大事)
+    func testLibraryNeverRunsDryAfterManyRounds() async throws {
+        let brain = CompanionBrain(engine: nil)
+        var shown: [String] = []
+        for round in 0..<12 {
+            let r = try await collect(brain.suggestions(context: nightAtHome, avoid: Array(shown.suffix(24)), seed: UInt64(round)))
+            XCTAssertEqual(r.values.count, 3, "\(round) 回目")
+            XCTAssertEqual(Set(r.values.map(\.title)).count, 3, "同じ回の中では重ならない")
+            shown += r.values.map(\.title)
+        }
+    }
+
     func testDuplicateAIIdeasAreNotRepeated() async throws {
         let engine = ScriptedEngine { _ in "体験: 好きな音楽を聴く\nひとこと: 心が緩むかも\nはじめ方: 1曲選ぶ\n時間: 5分\n種類: こころ" }
         let brain = CompanionBrain(engine: engine)

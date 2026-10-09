@@ -56,10 +56,12 @@ public struct DeviceProfile: Sendable, Equatable {
     public var thermal: ThermalLevel
     public var lowPowerMode: Bool
     public var appleIntelligence: AppleIntelligenceState
+    /// GPU が MLX に足りるか(Metal 3:A13 以降)
+    public var supportsMLX: Bool
 
     public init(physicalMemory: UInt64, availableMemory: UInt64?, osMajor: Int, osMinor: Int, model: String,
                 isSimulator: Bool, thermal: ThermalLevel, lowPowerMode: Bool,
-                appleIntelligence: AppleIntelligenceState) {
+                appleIntelligence: AppleIntelligenceState, supportsMLX: Bool = true) {
         self.physicalMemory = physicalMemory
         self.availableMemory = availableMemory
         self.osMajor = osMajor
@@ -69,6 +71,7 @@ public struct DeviceProfile: Sendable, Equatable {
         self.thermal = thermal
         self.lowPowerMode = lowPowerMode
         self.appleIntelligence = appleIntelligence
+        self.supportsMLX = supportsMLX
     }
 
     public var physicalMemoryGB: Double { Double(physicalMemory) / 1_073_741_824 }
@@ -220,6 +223,10 @@ public enum EngineRouter {
         for model in installed {
             if profile.isSimulator {
                 skipped.append(.init(name: model.name, reason: "シミュレータでは MLX が動かない"))
+                continue
+            }
+            if !profile.supportsMLX {
+                skipped.append(.init(name: model.name, reason: "この iPhone の GPU では MLX が動かない(A13 以降が必要)"))
                 continue
             }
             if Double(model.runtimeBytes) > budget {

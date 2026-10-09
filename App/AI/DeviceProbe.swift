@@ -1,4 +1,5 @@
 import Foundation
+import Metal
 import os
 import GoukakuAI
 #if canImport(FoundationModels)
@@ -27,7 +28,14 @@ enum DeviceProbe {
                              isSimulator: isSimulator,
                              thermal: thermal(info.thermalState),
                              lowPowerMode: info.isLowPowerModeEnabled,
-                             appleIntelligence: appleIntelligence())
+                             appleIntelligence: appleIntelligence(),
+                             supportsMLX: supportsMLX())
+    }
+
+    /// GPU が MLX に足りるか(Metal 3:A13 以降。シミュレータは別に見る)
+    static func supportsMLX() -> Bool {
+        guard let device = MTLCreateSystemDefaultDevice() else { return false }
+        return device.supportsFamily(.metal3)
     }
 
     /// このアプリがあと使えるメモリ(iOS が教えてくれる値。シミュレータでは使えない)

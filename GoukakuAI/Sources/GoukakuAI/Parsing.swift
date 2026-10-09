@@ -254,8 +254,10 @@ public enum ExperienceParser {
                                fromAI: true)
     }
 
-    /// 体験帳の体験に添えるひとことを読む(短く・日本語で・安全なもの。体験の名前をくり返しただけのものは使わない)
-    public static func tailoredLine(from raw: String, title: String) -> String? {
+    /// 体験帳の体験に添えるひとことを読む(短く・日本語で・安全なもの。体験の名前をくり返しただけのものは使わない)。
+    /// 頼んだとおり「〜かも」で終わる1文だけを使う(CI で、だらだら続く文や「日曜の朝に」のずれが出たため)。
+    /// context があれば、ちがう曜日を書いたものも使わない
+    public static func tailoredLine(from raw: String, title: String, context: CompanionContext? = nil) -> String? {
         let text = OutputCleaner.clean(raw)
         guard !text.isEmpty else { return nil }
         let lines = text.components(separatedBy: .newlines)
@@ -274,8 +276,21 @@ public enum ExperienceParser {
         }
         guard var value = found else { return nil }
         value = value.trimmingCharacters(in: CharacterSet(charactersIn: "「」『』\"' \u{3000}"))
-        value = trimSentence(value, limit: 70)
-        guard value.count >= 8, TextCheck.hasJapanese(value), ContentGuard.isAcceptable(text: value) else { return nil }
+        // 「〜かも」までで切る(「かもしれません」「かもね」も)。なければ使わない
+        guard let kamo = value.range(of: "かも") else { return nil }
+        var end = kamo.upperBound
+        for tail in ["しれません", "しれない", "ね"] where value[end...].hasPrefix(tail) {
+            end = value.index(end, offsetBy: tail.count)
+            break
+        }
+        value = String(value[..<end])
+        guard value.count >= 8, value.count <= 80, TextCheck.hasJapanese(value),
+              ContentGuard.isAcceptable(text: value) else { return nil }
+        if let context {
+            let days = ["日曜", "月曜", "火曜", "水曜", "木曜", "金曜", "土曜"]
+            let today = days[(context.weekday - 1 + 7) % 7]
+            if days.contains(where: { $0 != today && value.contains($0) }) { return nil }
+        }
         let squash = { (s: String) in s.filter { !$0.isWhitespace && !"「」『』、。・".contains($0) } }
         guard squash(value) != squash(title) else { return nil }
         return value

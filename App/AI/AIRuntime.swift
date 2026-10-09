@@ -160,8 +160,8 @@ final class AIRuntime {
         guard let mlx = engine as? MLXEngine else { return }
         if await mlx.isLoaded() { phase = .ready; return }
         guard phase != .loading else {
-            // ほかで読み込み中なら、終わるまで待つ
-            while phase == .loading { try? await Task.sleep(for: .milliseconds(150)) }
+            // ほかで読み込み中なら、終わるまで待つ(止められたら、待つのをやめる)
+            while phase == .loading && !Task.isCancelled { try? await Task.sleep(for: .milliseconds(150)) }
             return
         }
         phase = .loading

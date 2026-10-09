@@ -5,7 +5,8 @@ import GoukakuAI
 
 /// モデルを Hugging Face からダウンロードして、端末に入れる(初回だけ。以降は通信なしで動く)。
 /// 目録で固定したリビジョンのファイルだけを取り、画像・音声の部分を取り除いてから入れる。
-/// 途中で止まっても、取り終えたファイルは残して続きから取る
+/// 途中で止まっても、取り終えたファイルは残して続きから取る。通信が切れたら、そのファイルも
+/// 途中から(resume data で)最大3回つなぎ直す。取り終えたら合計の大きさを目録と照らし合わせる
 @MainActor @Observable
 final class ModelDownloader {
     struct Job: Equatable {
@@ -99,12 +100,36 @@ final class ModelDownloader {
             guard let url = spec.url(for: file) else { throw AIError.unavailable("URL が作れません:\(file)") }
             jobs[spec.id]?.phase = .downloading(file)
             let base = finishedBytes
-            let written = try await transfer.download(url, to: destination, allowCellular: allowCellular) { [weak self] received in
-                Task { @MainActor in self?.jobs[spec.id]?.received = base + received }
+            var resumeData: Data?
+            var retries = 0
+            var written: Int64 = 0
+            while true {
+                do {
+                    written = try await transfer.download(url, to: destination, allowCellular: allowCellular,
+                                                          resumeData: resumeData) { [weak self] received in
+                        Task { @MainActor in self?.jobs[spec.id]?.received = base + received }
+                    }
+                    break
+                } catch let interrupted as FileTransfer.Interrupted where retries < 3 && !Task.isCancelled {
+                    // 通信が切れた:少し待って、途中から取り直す
+                    retries += 1
+                    resumeData = interrupted.resumeData
+                    jobs[spec.id]?.phase = .downloading("\(file)(つなぎ直し \(retries)/3)")
+                    try await Task.sleep(for: .seconds(Double(retries) * 3))
+                    jobs[spec.id]?.phase = .downloading(file)
+                } catch let interrupted as FileTransfer.Interrupted {
+                    throw interrupted.underlying
+                }
             }
             finishedBytes += written
             jobs[spec.id]?.received = finishedBytes
             fm.createFile(atPath: marker.path, contents: Data())
+        }
+
+        // 取ったものが目録と同じ大きさか(途中で切れたファイルを入れないため)
+        guard finishedBytes == spec.downloadBytes else {
+            try? fm.removeItem(at: staging)
+            throw AIError.unavailable("ダウンロードした大きさが目録と合いません(\(finishedBytes) / \(spec.downloadBytes) バイト)。もう一度ダウンロードしてください")
         }
 
         // 画像・音声の部分を取り除く(重いので裏で)
@@ -138,6 +163,12 @@ final class ModelDownloader {
 
 /// 大きなファイルを1つずつダウンロードする(URLSession の download タスク。進み具合を知らせる)
 final class FileTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+    /// 通信が切れて止まった(続きから取るための resume data があれば添える)
+    struct Interrupted: Error {
+        var resumeData: Data?
+        var underlying: Error
+    }
+
     private struct Handler {
         var destination: URL
         var progress: @Sendable (Int64) -> Void
@@ -167,10 +198,11 @@ final class FileTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Senda
         return created
     }
 
-    /// url を destination に保存する。書いたバイト数を返す
-    func download(_ url: URL, to destination: URL, allowCellular: Bool,
+    /// url を destination に保存する。書いたバイト数を返す。resumeData があれば、その続きから取る
+    func download(_ url: URL, to destination: URL, allowCellular: Bool, resumeData: Data? = nil,
                   progress: @escaping @Sendable (Int64) -> Void) async throws -> Int64 {
-        let task = session(allowCellular: allowCellular).downloadTask(with: url)
+        let urlSession = self.session(allowCellular: allowCellular)
+        let task = resumeData.map { urlSession.downloadTask(withResumeData: $0) } ?? urlSession.downloadTask(with: url)
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Int64, Error>) in
                 lock.lock()
@@ -225,7 +257,13 @@ final class FileTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Senda
         guard let handler = handlers.removeValue(forKey: task.taskIdentifier) else { lock.unlock(); return }
         lock.unlock()
         if let error {
-            handler.continuation.resume(throwing: error)
+            let nsError = error as NSError
+            if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
+                handler.continuation.resume(throwing: error)   // 本人がやめた
+            } else {
+                let resume = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data
+                handler.continuation.resume(throwing: Interrupted(resumeData: resume, underlying: error))
+            }
         } else if let moveError = handler.moveError {
             handler.continuation.resume(throwing: moveError)
         } else {

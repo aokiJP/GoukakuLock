@@ -124,6 +124,19 @@ final class ParsingTests: XCTestCase {
         XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: Listening may help you relax tonight", title: title))
         XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 夕食を抜いて音楽に集中すると、気分が変わるかも", title: title))
         XCTAssertNil(ExperienceParser.tailoredLine(from: "<think></think>", title: title))
+        // 「〜かも」までの1文だけ。かもで終わらないものは使わない(CI の LFM2.5 の出力)
+        XCTAssertEqual(ExperienceParser.tailoredLine(from: "ひとこと: 夜の静けさの中なら、音が近く感じられるかもしれません。ゆっくりどうぞ。", title: title),
+                       "夜の静けさの中なら、音が近く感じられるかもしれません")
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 今日の出来事を紙に書き留めながら、散歩をしながら空を見上げてみると、夕焼けがゆっくりと色づいていきますね", title: "今日の出来事を4コマにする"))
+        // 手本を写した「日曜の朝」は、金曜の夜には使わない
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+        let friday = CompanionContext(now: cal.date(from: DateComponents(year: 2026, month: 10, day: 9, hour: 21))!,
+                                      timeZone: cal.timeZone)
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: おだやかな日曜の朝に、新しい発見が待ってるかも", title: "地図で歩く",
+                                                   context: friday))
+        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 金曜の夜のごほうびに、知らない街を歩いてみるのも楽しいかも", title: "地図で歩く",
+                                                      context: friday))
     }
 
     /// CI で LFM2.5 が返した「問い: -」「メモ: -」は、ないものとして扱う

@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import SwiftData
+import UIKit
 import GoukakuCore
 import GoukakuAI
 
@@ -45,6 +46,9 @@ final class CompanionModel {
 
     @ObservationIgnored private var suggestTask: Task<Void, Never>?
     @ObservationIgnored private var chatTask: Task<Void, Never>?
+    /// そのほかのAIの仕事(ふり返り・いつか・工夫・手紙)。アプリが前から外れるときに止める
+    @ObservationIgnored private var aiTasks: [UUID: Task<Void, Never>] = [:]
+    @ObservationIgnored private var observers: [NSObjectProtocol] = []
     /// 保存してある「いまの自分」を読み戻している間は、書き戻さない
     @ObservationIgnored private var restoring = false
 
@@ -52,6 +56,32 @@ final class CompanionModel {
         self.app = app
         self.runtime = runtime
         loadContext()
+        // iOS ではアプリが裏に回ると GPU を使えない(使うと MLX が止まる)ので、前から外れる前に生成を止める
+        observers.append(NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification,
+                                                                object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.pauseAI() }
+        })
+    }
+
+    /// AIの仕事を始める(前から外れるときに止められるよう、覚えておく)
+    private func startAI(_ body: @escaping @MainActor () async -> Void) {
+        let id = UUID()
+        aiTasks[id] = Task { [weak self] in
+            await body()
+            self?.aiTasks[id] = nil
+        }
+    }
+
+    /// 生成中のAIを止める(アプリが前から外れるとき)。止めたものは、体験帳で補うか、もう一度押せば続きを作れる
+    func pauseAI() {
+        let running = isSuggesting || isChatting || isDreaming || reframing != nil || reflecting != nil || !aiTasks.isEmpty
+        guard running else { return }
+        suggestTask?.cancel()
+        chatTask?.cancel()
+        for task in aiTasks.values { task.cancel() }
+        if isSuggesting || isDreaming || isChatting {
+            notice = "アプリを離れたので、相棒の考えごとを途中で止めました。もう一度押すと続きを考えます"
+        }
     }
 
     var context: ModelContext { app.context }
@@ -288,7 +318,7 @@ final class CompanionModel {
         reflecting = id
         reflectionPreview = ""
         let title = log.title, note = log.note, feeling = log.feeling, category = log.category
-        Task {
+        startAI { [self] in
             await runtime.ensureReady()
             let brain = runtime.brain
             do {
@@ -311,6 +341,16 @@ final class CompanionModel {
                     case .notice(let text):
                         notice = text
                     }
+                }
+            } catch is CancellationError {
+                // 途中で止めた:体験帳の短い返事を残す(返事のない記録にしない)
+                if let target = logs.first(where: { $0.id == id }), target.reply == nil {
+                    let fallback = ExperienceLibrary.reflection(title: title, note: note, feeling: feeling, category: category)
+                    target.reply = fallback.reply
+                    target.question = fallback.question
+                    target.replyFromAI = false
+                    target.engineName = "体験帳"
+                    touch()
                 }
             } catch {
                 notice = error.localizedDescription
@@ -376,7 +416,7 @@ final class CompanionModel {
         somedayPreview = ""
         notice = nil
         markStarted()
-        Task {
+        startAI { [self] in
             await runtime.ensureReady()
             let brain = runtime.brain
             do {
@@ -393,6 +433,7 @@ final class CompanionModel {
                     case .notice(let text): notice = text
                     }
                 }
+            } catch is CancellationError {
             } catch {
                 notice = error.localizedDescription
             }
@@ -433,7 +474,7 @@ final class CompanionModel {
         reframing = habit.id
         notice = nil
         let avoid = (reframes[habit.id] ?? []).map(\.title) + recentTitles
-        Task {
+        startAI { [self] in
             await runtime.ensureReady()
             let brain = runtime.brain
             var made: [ExperienceIdea] = []
@@ -450,6 +491,7 @@ final class CompanionModel {
                         notice = text
                     }
                 }
+            } catch is CancellationError {
             } catch {
                 notice = error.localizedDescription
             }
@@ -481,6 +523,7 @@ final class CompanionModel {
                     case .notice(let text): notice = text
                     }
                 }
+            } catch is CancellationError {
             } catch {
                 notice = error.localizedDescription
             }
@@ -514,7 +557,7 @@ final class CompanionModel {
         let planned = days.filter { [.achieved, .minimum, .missed].contains($0.outcome) }.count
         let experiences = weekLogs.map { (title: $0.title, category: $0.category) }
         let notes = self.notes.map(\.text)
-        Task {
+        startAI { [self] in
             await runtime.ensureReady()
             let brain = runtime.brain
             do {
@@ -526,6 +569,10 @@ final class CompanionModel {
                     case .notice: break
                     }
                 }
+            } catch is CancellationError {
+                // 途中で止めた:体験帳で書いた手紙にする
+                onUpdate(ExperienceLibrary.letter(experiences: experiences, achievedDays: achieved,
+                                                  context: makeContext(), seed: UInt64(week.day)), true)
             } catch {
                 onUpdate(error.localizedDescription, true)
             }
@@ -538,6 +585,8 @@ final class CompanionModel {
     func resetInMemoryState() {
         suggestTask?.cancel()
         chatTask?.cancel()
+        for task in aiTasks.values { task.cancel() }
+        aiTasks = [:]
         batch = []
         reframes = [:]
         isSuggesting = false

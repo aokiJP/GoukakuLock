@@ -86,6 +86,15 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(lowPower.tuning.tokens(100), 80)
     }
 
+    func testOldGPUSkipsMLX() {
+        let lfm = installed(spec("lfm", runtimeGB: 1.0, japanese: 3))
+        var old = profile(ramGB: 4, availableGB: 2.5)
+        old.supportsMLX = false
+        let d = EngineRouter.decide(profile: old, installed: [lfm], preference: .automatic)
+        XCTAssertEqual(d.choice, .rules)
+        XCTAssertTrue(d.skipped.first?.reason.contains("GPU") == true)
+    }
+
     func testSimulatorNeverRunsMLX() {
         let lfm = installed(spec("lfm", runtimeGB: 1.0, japanese: 3))
         let d = EngineRouter.decide(profile: profile(simulator: true), installed: [lfm], preference: .automatic)

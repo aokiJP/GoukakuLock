@@ -52,7 +52,8 @@ public struct CompanionBrain: Sendable {
                             } accept: { d in
                                 !Self.isDuplicate(d.title, of: avoid + produced) && ContextFit.fits(d, context: context)
                             }
-                        } else if let base = Self.libraryPick(context: context, angle: angle, avoid: avoid + produced, seed: pickSeed) {
+                        } else if let base = Self.libraryPick(context: context, angle: angle, avoid: avoid, produced: produced,
+                                                              seed: pickSeed) {
                             // 体験帳の確かな体験に、AIがこの人向けのひとことを添える(小さいモデル)
                             draft = try await self.tailored(base, engine: engine, context: context, purpose: nil, emit: emit)
                         }
@@ -64,7 +65,7 @@ public struct CompanionBrain: Sendable {
                     }
                 }
                 if draft == nil {
-                    draft = Self.libraryPick(context: context, angle: angle, avoid: avoid + produced, seed: pickSeed)
+                    draft = Self.libraryPick(context: context, angle: angle, avoid: avoid, produced: produced, seed: pickSeed)
                 }
                 if let draft {
                     produced.append(draft.title)
@@ -276,7 +277,7 @@ public struct CompanionBrain: Sendable {
             if attempt > 0 { request.temperature = 0.5 }
             var raw = ""
             for try await piece in engine.generate(request) { raw += piece }
-            if let line = ExperienceParser.tailoredLine(from: raw, title: base.title) {
+            if let line = ExperienceParser.tailoredLine(from: raw, title: base.title, context: context) {
                 var draft = base
                 draft.line = line
                 if case .library(let id) = base.origin {
@@ -290,11 +291,17 @@ public struct CompanionBrain: Sendable {
         return base
     }
 
-    /// 体験帳から、その種類の体験を1つ(なければ種類を問わず)
-    static func libraryPick(context: CompanionContext, angle: ExperienceCategory, avoid: [String],
+    /// 体験帳から、その種類の体験を1つ(なければ種類を問わず)。
+    /// 最近出したものを避けると何も残らないときは、今回まだ出していないものから選ぶ(提案が欠けないように)
+    static func libraryPick(context: CompanionContext, angle: ExperienceCategory, avoid: [String], produced: [String],
                             seed: UInt64) -> ExperienceDraft? {
-        ExperienceLibrary.pick(for: context, count: 1, avoid: Set(avoid), seed: seed, angles: [angle]).first
-            ?? ExperienceLibrary.pick(for: context, count: 1, avoid: Set(avoid), seed: seed &+ 99).first
+        for excluded in [Set(avoid + produced), Set(produced)] {
+            if let found = ExperienceLibrary.pick(for: context, count: 1, avoid: excluded, seed: seed, angles: [angle]).first
+                ?? ExperienceLibrary.pick(for: context, count: 1, avoid: excluded, seed: seed &+ 99).first {
+                return found
+            }
+        }
+        return nil
     }
 
     /// 似た体験か(同じ名前・頭の6文字が同じ)

@@ -28,7 +28,7 @@ final class ExperienceIdea {
     var firstStep: String
     var minutes: Int
     var categoryRaw: String
-    /// ai / library / user
+    /// ai / tailored(体験帳の体験に相棒がひとことを添えた) / library / user
     var originRaw: String
     /// 出したAIの名前(体験帳なら「体験帳」)
     var engineName: String
@@ -52,6 +52,7 @@ final class ExperienceIdea {
         self.categoryRaw = draft.category.rawValue
         switch draft.origin {
         case .ai: self.originRaw = "ai"
+        case .tailored: self.originRaw = "tailored"
         case .library: self.originRaw = "library"
         case .user: self.originRaw = "user"
         }
@@ -70,7 +71,10 @@ final class ExperienceIdea {
         set { statusRaw = newValue.rawValue }
     }
     var kind: Kind { Kind(rawValue: kindRaw) ?? .today }
+    /// 相棒が考えた体験か
     var isFromAI: Bool { originRaw == "ai" }
+    /// 体験帳の体験に、相棒がひとことを添えたものか
+    var isTailored: Bool { originRaw == "tailored" }
     var liked: Bool { feedbackRaw == "liked" }
     var disliked: Bool { feedbackRaw == "disliked" }
 }

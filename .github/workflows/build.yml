@@ -1,11 +1,13 @@
 name: Build IPA
 
 # Mac(Xcode)で未署名の IPA を作る。相棒AIのモデルごとの IPA も、ここで一括で作る。
-# 1. build:単体テスト(判定の芯・相棒AIの芯)→ XcodeGen → Debug と Release をビルド → AIなし版の IPA
-#           → シミュレータで画面を一通り動かしてスクリーンショット(AIは見本のAI)
-# 2. model-ipa:AI/models.json のモデルごとに(並べて)
-#           Hugging Face から固定リビジョンで取得 → 画像・音声の部分を取り除く
-#           → MLX で実際に読み込んで日本語が返るかを確かめる → Release の .app に同梱して IPA に包む
+# 3 つの仕事を並べて走らせる:
+#   build    :単体テスト(判定の芯・相棒AIの芯)→ XcodeGen → Debug と Release をビルド → AIなし版の IPA
+#   ui       :シミュレータで画面を一通り動かしてスクリーンショット(AIは見本のAI)。build と同時に走る
+#   model-ipa:build が終わりしだい、AI/models.json のモデルごとに(並べて)
+#              Hugging Face から固定リビジョンで取得 → 画像・音声の部分を取り除く
+#              → MLX で実際に読み込んで日本語が返るかを確かめる → Release の .app に同梱して IPA に包む
+#   report   :ログ・スクリーンショットを ci-output ブランチにまとめる
 # 成果物は Actions の Artifacts に置く。タグ v* か「Run workflow」の release_tag で Releases にも載せる
 # (GitHub の Releases は 1 ファイル 2GiB まで。超えるモデルの IPA は、Releases には分けて載せる)。
 
@@ -138,55 +140,6 @@ jobs:
             dist/SHA256SUMS.txt
           if-no-files-found: error
 
-      - name: UI walkthrough on simulator (screenshots)
-        id: uitest
-        continue-on-error: true
-        run: |
-          UDID=$(xcrun simctl list devices available -j | python3 -c '
-          import json, sys
-          data = json.load(sys.stdin)["devices"]
-          runtimes = sorted((k for k in data if "iOS" in k), reverse=True)
-          for rt in runtimes:
-              for d in data[rt]:
-                  if d["name"] == "iPhone 17":
-                      print(d["udid"]); sys.exit()
-          ')
-          echo "simulator: $UDID"
-          xcrun simctl boot "$UDID" || true
-          xcrun simctl bootstatus "$UDID" -b
-          xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
-          set -o pipefail
-          xcodebuild build-for-testing \
-            -project GoukakuLock.xcodeproj \
-            -scheme GoukakuLock \
-            -configuration Debug \
-            -destination "id=$UDID" \
-            -derivedDataPath build/DerivedData-Sim \
-            -skipPackagePluginValidation -skipMacroValidation \
-            2>&1 | tee build/uitest-build.log | xcbeautify --renderer github-actions
-          # 一度起動して温める(初回起動が遅いと UI テストの起動待ちが切れる)。起動の様子も残す
-          bash scripts/launch-probe.sh "$UDID" build/DerivedData-Sim/Build/Products/Debug-iphonesimulator/GoukakuLock.app build/launch-probe
-          xcodebuild test-without-building \
-            -project GoukakuLock.xcodeproj \
-            -scheme GoukakuLock \
-            -configuration Debug \
-            -destination "id=$UDID" \
-            -derivedDataPath build/DerivedData-Sim \
-            -resultBundlePath build/UITests.xcresult \
-            -retry-tests-on-failure -test-iterations 2 \
-            -skipPackagePluginValidation -skipMacroValidation \
-            2>&1 | tee build/uitest.log | xcbeautify --renderer github-actions
-
-      - name: Export screenshots
-        if: always()
-        run: |
-          if [ -d build/UITests.xcresult ]; then
-            mkdir -p build/screenshots-raw build/screenshots
-            xcrun xcresulttool export attachments --path build/UITests.xcresult --output-path build/screenshots-raw || true
-            python3 scripts/rename-attachments.py build/screenshots-raw build/screenshots || true
-            ls -la build/screenshots || true
-          fi
-
       - name: Publish release (AIなし版)
         if: env.RELEASE_TAG != ''
         uses: softprops/action-gh-release@v3
@@ -212,14 +165,12 @@ jobs:
             つなげ方:`cat GoukakuLock-AI-<モデル>.ipa.part-* > GoukakuLock-AI-<モデル>.ipa`(Windows は `copy /b 1つ目 + 2つ目 GoukakuLock-AI-<モデル>.ipa`)。
             つないだら `SHA256-<モデル>.txt` と照らし合わせてください。
 
-      - name: Save output to ci-output branch
+      - name: Collect build results
         if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          OUT="$RUNNER_TEMP/ci-output"
+          OUT=ci-build
           rm -rf "$OUT" && mkdir -p "$OUT"
-          # GitHub は 100MB を超えるファイルを受け付けないので、大きな IPA はここには置かない(Artifacts にある)
+          # GitHub は 100MB を超えるファイルを受け付けないので、大きな IPA は ci-output には置かない(Artifacts にある)
           for f in dist/*.ipa; do
             [ -f "$f" ] && [ "$(stat -f%z "$f")" -lt 95000000 ] && cp "$f" "$OUT/"
           done
@@ -227,30 +178,80 @@ jobs:
           cp build/*.log "$OUT/" 2>/dev/null || true
           ls -la dist > "$OUT/dist-sizes.txt" 2>/dev/null || true
           # 生成した Xcode プロジェクト(リポジトリの GoukakuLock.xcodeproj を最新に保つため)
-          mkdir -p "$OUT/xcodeproj" && cp GoukakuLock.xcodeproj/project.pbxproj "$OUT/xcodeproj/" 2>/dev/null || true
+          mkdir -p "$OUT/xcodeproj"
+          cp GoukakuLock.xcodeproj/project.pbxproj "$OUT/xcodeproj/" 2>/dev/null || true
           cp GoukakuLock.xcodeproj/xcshareddata/xcschemes/GoukakuLock.xcscheme "$OUT/xcodeproj/" 2>/dev/null || true
-          if [ -d build/screenshots ]; then mkdir -p "$OUT/screenshots" && cp build/screenshots/* "$OUT/screenshots/" 2>/dev/null || true; fi
-          if [ -d build/launch-probe ]; then cp -R build/launch-probe "$OUT/" 2>/dev/null || true; fi
-          [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true
-          for f in build/xcodebuild-*.log build/uitest.log; do
+          for f in build/xcodebuild-*.log; do
             [ -f "$f" ] && grep -E "(error|warning):" "$f" | grep -v "appintentsmetadataprocessor" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true
           done
-          {
-            echo "run=${{ github.run_number }}"
-            echo "sha=${{ github.sha }}"
-            echo "ref=${{ github.ref }}"
-            echo "status=${{ job.status }}"
-            echo "uitest=${{ steps.uitest.outcome }}"
-            echo "models=${{ steps.models.outputs.list }}"
-            date -u +"time=%Y-%m-%dT%H:%M:%SZ"
-          } > "$OUT/status.txt"
-          cd "$OUT"
-          git init -q
-          git checkout -q -b ci-output
-          git add -A
-          git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "CI output: run ${{ github.run_number }} (${{ job.status }}) for ${{ github.sha }}"
-          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-output
+
+      - name: Upload build results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ci-build-${{ github.run_number }}
+          path: ci-build
+          retention-days: 7
+          if-no-files-found: ignore
+
+  ui:
+    runs-on: macos-26
+    timeout-minutes: 75
+    outputs:
+      outcome: ${{ steps.uitest.outcome }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Tools and Xcode project
+        run: |
+          xcodebuild -version
+          xcrun -f metal || xcodebuild -downloadComponent MetalToolchain
+          brew install xcodegen
+          xcodegen generate --spec project.yml
+
+      - name: Resolve packages
+        run: |
+          set -o pipefail
+          xcodebuild -resolvePackageDependencies -project GoukakuLock.xcodeproj -scheme GoukakuLock \
+            -skipPackagePluginValidation -skipMacroValidation 2>&1 | tail -n 30
+
+      - name: UI walkthrough on simulator (screenshots)
+        id: uitest
+        continue-on-error: true
+        run: bash scripts/ui-walkthrough.sh
+
+      - name: Export screenshots
+        if: always()
+        run: |
+          if [ -d build/UITests.xcresult ]; then
+            mkdir -p build/screenshots-raw build/screenshots
+            xcrun xcresulttool export attachments --path build/UITests.xcresult --output-path build/screenshots-raw || true
+            python3 scripts/rename-attachments.py build/screenshots-raw build/screenshots || true
+            ls -la build/screenshots || true
+          fi
+
+      - name: Collect UI results
+        if: always()
+        run: |
+          OUT=ci-ui
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          if [ -d build/screenshots ]; then cp -R build/screenshots "$OUT/"; fi
+          if [ -d build/launch-probe ]; then cp -R build/launch-probe "$OUT/"; fi
+          cp build/uitest*.log "$OUT/" 2>/dev/null || true
+          [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true
+          for f in build/uitest.log build/uitest-build.log; do
+            [ -f "$f" ] && grep -E "(error|warning):" "$f" | grep -v "appintentsmetadataprocessor" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true
+          done
+          echo "uitest=${{ steps.uitest.outcome }}" > "$OUT/uitest-status.txt"
+
+      - name: Upload UI results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ci-ui-${{ github.run_number }}
+          path: ci-ui
+          retention-days: 7
+          if-no-files-found: ignore
 
   model-ipa:
     needs: build
@@ -369,3 +370,39 @@ jobs:
         run: |
           ls -la dist build | head -n 40
           tail -n 40 "build/mlx-smoke-${{ matrix.model }}.log" 2>/dev/null || true
+
+  report:
+    needs: [build, ui]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download results
+        uses: actions/download-artifact@v6
+        with:
+          pattern: ci-*-${{ github.run_number }}
+          path: results
+          merge-multiple: true
+
+      - name: Save output to ci-output branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUT="$RUNNER_TEMP/ci-output"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          cp -R results/. "$OUT/" 2>/dev/null || true
+          {
+            echo "run=${{ github.run_number }}"
+            echo "sha=${{ github.sha }}"
+            echo "ref=${{ github.ref }}"
+            echo "status=${{ needs.build.result }}"
+            echo "uitest=${{ needs.ui.outputs.outcome }}"
+            echo "models=${{ needs.build.outputs.models }}"
+            date -u +"time=%Y-%m-%dT%H:%M:%SZ"
+          } > "$OUT/status.txt"
+          cd "$OUT"
+          git init -q
+          git checkout -q -b ci-output
+          git add -A
+          git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "CI output: run ${{ github.run_number }} (build ${{ needs.build.result }}, ui ${{ needs.ui.outputs.outcome }}) for ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-output

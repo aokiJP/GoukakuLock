@@ -45,6 +45,16 @@ final class PublicAPITests: XCTestCase {
         XCTAssertEqual(drafts.first?.isFromAI, true)
         let own = ExperienceDraft(title: "t", line: "", firstStep: "", duration: .nearest(minutes: 12), category: .first, origin: .user)
         XCTAssertEqual(own.duration, .fifteen)
+        // 小さいモデル向け:体験帳の体験にひとことを添える
+        let tailoredOrigin = ExperienceDraft.Origin.tailored("S", "id")
+        let tailored = ExperienceDraft(title: "t", line: "l", firstStep: "", duration: .five, category: .mind, origin: tailoredOrigin)
+        XCTAssertTrue(tailored.isTailored && tailored.isFromAI)
+        var small = GenerationTuning(freeSuggestions: false)
+        small.apply(for: installed)
+        _ = (small.freeSuggestions, small.useHints, small.suggestionTemperature, spec.freeSuggestions)
+        _ = ExperienceParser.tailoredLine(from: "ひとこと: 静かな夜に、小さな発見があるかも", title: "t")
+        _ = PromptBook.tailor(tailored, context: CompanionContext(), tuning: small)
+        _ = ContextFit.fits(tailored, context: CompanionContext())
         _ = (ExperienceCategory(rawValue: "outside")?.symbol, DurationBucket(rawValue: 5)?.label, Feeling.calm.symbol, Place.home.label, Mood.tired.label)
         _ = ChatTurn(.user, "やあ").role == ChatTurn.Role.user
         _ = EngineInfo.rules.name

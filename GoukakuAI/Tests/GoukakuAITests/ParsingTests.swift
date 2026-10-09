@@ -110,6 +110,22 @@ final class ParsingTests: XCTestCase {
         XCTAssertTrue(r3.reply.hasPrefix("答えが見つからなくても"), r3.reply)
     }
 
+    func testTailoredLine() {
+        let title = "好きな音楽を1曲だけ聴く"
+        XCTAssertEqual(ExperienceParser.tailoredLine(from: "ひとこと: 疲れた夜には、いつもの曲が少しちがって聞こえるかも", title: title),
+                       "疲れた夜には、いつもの曲が少しちがって聞こえるかも")
+        XCTAssertEqual(ExperienceParser.tailoredLine(from: "「静かな部屋で聴くと、音の重なりに気づけるかも」", title: title),
+                       "静かな部屋で聴くと、音の重なりに気づけるかも")
+        // 見出しのない1行目・ほかの見出しの行は使わない
+        XCTAssertEqual(ExperienceParser.tailoredLine(from: "体験: 好きな音楽\n今夜の気分にぴったりの一曲が見つかるかも", title: title),
+                       "今夜の気分にぴったりの一曲が見つかるかも")
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 好きな音楽を1曲だけ聴く", title: title), "名前のくり返しは使わない")
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: いいね", title: title), "短すぎる")
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: Listening may help you relax tonight", title: title))
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 夕食を抜いて音楽に集中すると、気分が変わるかも", title: title))
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "<think></think>", title: title))
+    }
+
     /// CI で LFM2.5 が返した「問い: -」「メモ: -」は、ないものとして扱う
     func testDashQuestionAndMemoAreDropped() throws {
         let raw = "返事: 夕焼けを見に屋上へ行くという体験は、心地よい感覚を与えてくれましたね。\n問い: -\nメモ: -"

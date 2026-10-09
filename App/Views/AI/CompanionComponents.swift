@@ -202,7 +202,7 @@ struct ExperienceCard<Actions: View>: View {
             HStack(spacing: 8) {
                 Text(idea.category.label)
                 if idea.kind != .someday { Text(idea.duration.label) }
-                Text(idea.isFromAI ? "相棒" : (idea.originRaw == "user" ? "自分で" : "体験帳"))
+                Text(originLabel)
                 Spacer(minLength: 0)
             }
             .font(.caption)
@@ -213,6 +213,13 @@ struct ExperienceCard<Actions: View>: View {
         .background(Theme.paperSunken, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Theme.rule))
         .accessibilityElement(children: .contain)
+    }
+
+    /// だれが出した体験か(相棒が考えた・体験帳に相棒がひとことを添えた・体験帳・自分で)
+    private var originLabel: String {
+        if idea.isFromAI { return "相棒" }
+        if idea.isTailored { return "体験帳+相棒" }
+        return idea.originRaw == "user" ? "自分で" : "体験帳"
     }
 }
 

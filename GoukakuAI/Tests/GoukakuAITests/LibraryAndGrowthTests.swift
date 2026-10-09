@@ -88,4 +88,34 @@ final class LibraryAndGrowthTests: XCTestCase {
         XCTAssertEqual(CompanionMemory.split(selfIntroduction: "英語を勉強中、散歩が好き。\n猫と暮らしている"),
                        ["英語を勉強中", "散歩が好き", "猫と暮らしている"])
     }
+
+    /// 体験帳の体験は、どの様子でも「いまの自分」に合い、内容の確認も通る(AIに求めることを体験帳も守る)
+    func testLibraryPicksAlwaysFitTheContextAndPassTheGuard() {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+        for hour in [2, 7, 14, 21] {
+            for place in Place.allCases {
+                for mood in Mood.allCases {
+                    let c = CompanionContext(now: cal.date(from: DateComponents(year: 2026, month: 10, day: 9, hour: hour))!,
+                                             timeZone: cal.timeZone, budget: .hourPlus, place: place, mood: mood)
+                    for seed in 0..<30 {
+                        for d in ExperienceLibrary.pick(for: c, count: 3, avoid: [], seed: UInt64(seed)) {
+                            XCTAssertTrue(ContextFit.fits(d, context: c), "\(hour)時・\(place):\(d.title)")
+                            XCTAssertTrue(ContentGuard.isAcceptable(d), d.title)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// 体験帳のすべての項目(提案・工夫・いつか)が、内容の確認を通る
+    func testEveryLibraryItemPassesTheGuard() {
+        let all = ExperienceLibrary.items + ExperienceLibrary.reframes.flatMap(\.items)
+            + ExperienceLibrary.genericReframes + ExperienceLibrary.somedayItems
+        XCTAssertGreaterThan(all.count, 100)
+        for item in all {
+            XCTAssertTrue(ContentGuard.isAcceptable(item.draft()), item.title)
+        }
+    }
 }

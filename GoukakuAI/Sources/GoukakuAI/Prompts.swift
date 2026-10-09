@@ -2,7 +2,7 @@ import Foundation
 
 /// AIへのお願いの書き方。小さなモデルでも形を守れるよう、
 /// ① 短い役割の説明 ② 手本の1往復 ③ 1回に1つだけ・決まった行だけで書く、にしている
-/// (Gemma 4 E2B・Qwen3.5・LFM2.5 で試して決めた形。リポジトリの scripts/prompt-lab を参照)。
+/// (Gemma 4 E2B・Qwen3.5・LFM2.5 で試して決めた形。CI の AI check で、実際のモデルに通して確かめている)。
 public enum PromptBook {
     /// 役割の説明(すべてのお願いで共通)
     public static let system = """
@@ -52,6 +52,28 @@ public enum PromptBook {
         return GenerationRequest(system: system,
                                  history: [ChatTurn(.user, suggestionExample.user), ChatTurn(.assistant, suggestionExample.assistant)],
                                  prompt: prompt, maxTokens: tuning.tokens(110), temperature: temperature, topP: 0.95)
+    }
+
+    // MARK: 体験帳の体験に、この人向けのひとことを添える(小さいモデル向け)
+
+    static let tailorFormat = "この体験を、この人に合わせて誘うひとことを1文で書いてください。「〜かも」で終えます。\nひとこと:"
+
+    static let tailorExample = (
+        user: "いまの様子: 日曜日の朝(9時ごろ)。使える時間は30分くらい。場所は家。元気。\nこの人について: 料理が好き。\n\n体験: 冷蔵庫の残りで名前のない一品\nはじめ方: 冷蔵庫を開けて、目についた材料を3つ選ぶ\n\n" + tailorFormat,
+        assistant: "ひとこと: 料理が好きなあなたなら、決まったレシピがないほうが思いがけない組み合わせに出会えるかも"
+    )
+
+    /// 決まった体験(体験帳)を、この人に合わせて誘うひとことを書いてもらう。purpose は体験の位置づけ(工夫・いつか)
+    public static func tailor(_ draft: ExperienceDraft, context: CompanionContext, purpose: String? = nil,
+                              tuning: GenerationTuning) -> GenerationRequest {
+        var prompt = contextBlock(context, items: tuning.contextItems)
+        if let purpose { prompt += "\n" + purpose }
+        prompt += "\n\n体験: \(draft.title)"
+        if !draft.firstStep.isEmpty { prompt += "\nはじめ方: \(draft.firstStep)" }
+        prompt += "\n\n" + tailorFormat
+        return GenerationRequest(system: system,
+                                 history: [ChatTurn(.user, tailorExample.user), ChatTurn(.assistant, tailorExample.assistant)],
+                                 prompt: prompt, maxTokens: tuning.tokens(70), temperature: 0.7, topP: 0.9)
     }
 
     /// 続けていること(コミット)を、ちょっと楽しみな体験に変える工夫を1つ

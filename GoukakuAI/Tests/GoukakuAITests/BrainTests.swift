@@ -137,6 +137,46 @@ final class BrainTests: XCTestCase {
         XCTAssertFalse(ContextFit.fits(bus, context: nightAtHome))
     }
 
+    func testSmallModelsTailorLibraryExperiences() async throws {
+        let line = "英語の勉強のあとに、耳と心が少しほどけるかも"
+        let recorder = Recorder()
+        let engine = ScriptedEngine { request in recorder.add(request); return "ひとこと: " + line }
+        let tuning = GenerationTuning(contextItems: 3, chatTurns: 3, useHints: false, suggestionTemperature: 0.7,
+                                      freeSuggestions: false)
+        let brain = CompanionBrain(engine: engine, tuning: tuning)
+        let result = try await collect(brain.suggestions(context: nightAtHome, avoid: [], seed: 1))
+        XCTAssertEqual(result.values.count, 3)
+        for v in result.values {
+            XCTAssertTrue(v.isTailored, "体験帳の体験に、相棒のひとことを添える")
+            XCTAssertTrue(v.isFromAI)
+            XCTAssertEqual(v.line, line)
+            XCTAssertTrue(TimeBudget.fifteen.allows(v.duration))
+            XCTAssertNotEqual(v.category, .outside)
+            XCTAssertTrue(ContextFit.fits(v, context: nightAtHome))
+        }
+        XCTAssertEqual(Set(result.values.map(\.title)).count, 3)
+        XCTAssertTrue(recorder.all.allSatisfy { $0.prompt.hasSuffix("「〜かも」で終えます。\nひとこと:") })
+        XCTAssertTrue(recorder.all.first?.prompt.contains("体験: \(result.values[0].title)") == true)
+        XCTAssertEqual(result.progress, 3, "書く前に体験の名前を見せる")
+
+        // ひとことが使えないときは、体験帳のまま(知らせは出さない)
+        let broken = CompanionBrain(engine: ScriptedEngine { _ in "わ" }, tuning: tuning)
+        let plain = try await collect(broken.suggestions(context: nightAtHome, avoid: [], seed: 1))
+        XCTAssertEqual(plain.values.count, 3)
+        XCTAssertTrue(plain.values.allSatisfy { !$0.isFromAI })
+        XCTAssertTrue(plain.notices.isEmpty)
+
+        // コミットの工夫・いつかの体験も同じ
+        let reframes = try await collect(brain.reframes(commit: "英単語20個", context: nightAtHome, avoid: []))
+        XCTAssertEqual(reframes.values.first?.title, "覚えた言葉で今日を1文にする")
+        XCTAssertEqual(reframes.values.first?.line, line)
+        XCTAssertTrue(recorder.all.contains { $0.prompt.contains("続けている「英単語20個」") })
+        let someday = try await collect(brain.someday(context: nightAtHome, theme: "旅", avoid: [], seed: 4))
+        XCTAssertFalse(someday.values.isEmpty)
+        XCTAssertTrue(someday.values.allSatisfy(\.isTailored))
+        XCTAssertTrue(recorder.all.contains { $0.prompt.contains("いま気になっていること: 旅") })
+    }
+
     func testDuplicateAIIdeasAreNotRepeated() async throws {
         let engine = ScriptedEngine { _ in "体験: 好きな音楽を聴く\nひとこと: 心が緩むかも\nはじめ方: 1曲選ぶ\n時間: 5分\n種類: こころ" }
         let brain = CompanionBrain(engine: engine)

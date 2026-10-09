@@ -404,9 +404,16 @@ final class CompanionModel {
     /// いつかの体験の「最初の一歩」を、今日の「やってみる」に入れる
     func planFirstStep(of idea: ExperienceIdea) {
         let step = idea.firstStep.isEmpty ? idea.title : idea.firstStep
+        // もとの体験と同じ出どころにする(相棒・体験帳+相棒・体験帳・自分で)
+        let origin: ExperienceDraft.Origin
+        switch idea.originRaw {
+        case "ai": origin = .ai(idea.engineName)
+        case "tailored": origin = .tailored(idea.engineName, "")
+        case "library": origin = .library("")
+        default: origin = .user
+        }
         let draft = ExperienceDraft(title: String(step.prefix(30)), line: "「\(idea.title)」への一歩", firstStep: "",
-                                    duration: .fifteen, category: idea.category,
-                                    origin: idea.isFromAI ? .ai(idea.engineName) : .user)
+                                    duration: .fifteen, category: idea.category, origin: origin)
         let planned = ExperienceIdea(draft: draft, engineName: idea.engineName, kind: .today, status: .planned)
         planned.plannedAt = Date()
         context.insert(planned)

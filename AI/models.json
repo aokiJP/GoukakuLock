@@ -21,12 +21,13 @@
       "licenseURL": "https://ai.google.dev/gemma/docs/gemma_4_license",
       "extraEOSTokens": ["<turn|>"],
       "templateFlags": {"enable_thinking": false},
+      "freeSuggestions": true,
       "ipa": true
     },
     {
       "id": "qwen3.5-4b",
       "name": "Qwen3.5 4B",
-      "summary": "ふり返りの返事は自然。提案はずれやすく、ゆっくりめ",
+      "summary": "ふり返りの返事は自然。ゆっくりめ(提案は体験帳にひとことを添える形)",
       "family": "qwen3_5",
       "repo": "mlx-community/Qwen3.5-4B-4bit",
       "revision": "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
@@ -44,12 +45,13 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {"enable_thinking": false},
       "repetitionPenalty": 1.05,
+      "freeSuggestions": false,
       "ipa": true
     },
     {
       "id": "lfm2.5-1.2b-jp",
       "name": "LFM2.5 1.2B JP",
-      "summary": "日本語向けに鍛えた小さなモデル。軽くて、メモリ 4〜6GB の iPhone でも動く",
+      "summary": "日本語向けに鍛えた小さなモデル。軽くて、メモリ 4〜6GB の iPhone でも動く(提案は体験帳にひとことを添える形)",
       "family": "lfm2",
       "repo": "LiquidAI/LFM2.5-1.2B-JP-MLX-4bit",
       "revision": "032f11fac33c39d2d184427780cbddfcd4699795",
@@ -67,12 +69,13 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {},
       "repetitionPenalty": 1.05,
+      "freeSuggestions": false,
       "ipa": true
     },
     {
       "id": "qwen3.5-2b",
       "name": "Qwen3.5 2B",
-      "summary": "速い。提案の日本語がずれやすい(ふり返りの返事は自然)",
+      "summary": "速い。ふり返りの返事は自然(提案は体験帳にひとことを添える形)",
       "family": "qwen3_5",
       "repo": "mlx-community/Qwen3.5-2B-4bit",
       "revision": "674aaa7240b91e8012fcad5d791b7dfe5ba90207",
@@ -90,6 +93,7 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {"enable_thinking": false},
       "repetitionPenalty": 1.05,
+      "freeSuggestions": false,
       "ipa": true
     }
   ]

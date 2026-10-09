@@ -39,6 +39,9 @@ enum SampleAI {
 
     static func reply(to request: GenerationRequest) -> String {
         let prompt = request.prompt
+        if prompt.contains("誘うひとことを1文で") {
+            return "ひとこと: 今のあなたにちょうどいい、小さな発見がありそうかも"
+        }
         if prompt.contains("いつかの体験") {
             return someday.first { prompt.contains("「\($0.key)」に近い") }?.value ?? someday["そと"]!
         }

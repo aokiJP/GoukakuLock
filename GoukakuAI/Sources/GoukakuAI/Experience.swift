@@ -250,6 +250,9 @@ public struct ExperienceDraft: Codable, Sendable, Equatable, Hashable {
         case ai(String)
         /// 体験帳(ルールで選んだ。項目の id)
         case library(String)
+        /// 体験帳の体験に、AIがこの人向けのひとことを添えた(エンジンの名前・項目の id)。
+        /// 小さいモデルは自由に考えると話がそれやすいので、確かな体験を土台にする
+        case tailored(String, String)
         /// 本人が書いた
         case user
     }
@@ -273,8 +276,17 @@ public struct ExperienceDraft: Codable, Sendable, Equatable, Hashable {
         self.origin = origin
     }
 
+    /// AIが関わったか(自分で考えた・体験帳にひとことを添えた)
     public var isFromAI: Bool {
-        if case .ai = origin { return true }
+        switch origin {
+        case .ai, .tailored: return true
+        case .library, .user: return false
+        }
+    }
+
+    /// 体験帳の体験に、AIがひとことを添えたものか
+    public var isTailored: Bool {
+        if case .tailored = origin { return true }
         return false
     }
 }

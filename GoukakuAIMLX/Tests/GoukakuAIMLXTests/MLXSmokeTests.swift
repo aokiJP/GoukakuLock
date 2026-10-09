@@ -61,14 +61,15 @@ final class MLXSmokeTests: XCTestCase {
                                        timeZone: cal.timeZone, budget: .fifteen, place: .home, mood: .tired,
                                        notes: ["英語の勉強をしている", "散歩が好き"], recentExperiences: ["夕焼けを見に屋上へ"])
         let tuning = self.tuning
-        print("[smoke] 調整: 文脈 \(tuning.contextItems)・きっかけの言葉 \(tuning.useHints ? "あり" : "なし")・温度 \(tuning.suggestionTemperature)")
+        print("[smoke] 調整: 提案 \(tuning.freeSuggestions ? "自由に考える" : "体験帳にひとことを添える")・文脈 \(tuning.contextItems)・きっかけの言葉 \(tuning.useHints ? "あり" : "なし")・温度 \(tuning.suggestionTemperature)")
         let brain = CompanionBrain(engine: engine, tuning: tuning)
         var ideas: [ExperienceDraft] = []
         for try await event in brain.suggestions(context: context, avoid: [], seed: 1) {
             switch event {
             case .value(let draft):
                 ideas.append(draft)
-                print("[smoke] 提案(\(draft.isFromAI ? "AI" : "体験帳")): \(draft.title) / \(draft.line) / \(draft.firstStep) / \(draft.duration.label) / \(draft.category.label)")
+                let kind = draft.isTailored ? "体験帳+AI" : draft.isFromAI ? "AI" : "体験帳"
+                print("[smoke] 提案(\(kind)): \(draft.title) / \(draft.line) / \(draft.firstStep) / \(draft.duration.label) / \(draft.category.label)")
             case .notice(let notice):
                 print("[smoke] 知らせ: \(notice)")
             case .progress:

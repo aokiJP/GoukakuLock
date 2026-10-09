@@ -254,6 +254,33 @@ public enum ExperienceParser {
                                fromAI: true)
     }
 
+    /// 体験帳の体験に添えるひとことを読む(短く・日本語で・安全なもの。体験の名前をくり返しただけのものは使わない)
+    public static func tailoredLine(from raw: String, title: String) -> String? {
+        let text = OutputCleaner.clean(raw)
+        guard !text.isEmpty else { return nil }
+        let lines = text.components(separatedBy: .newlines)
+        var found: String?
+        for line in lines {
+            if let (key, value) = FieldReader.split(line, keys: ["ひとこと"]), key == "ひとこと", !value.isEmpty {
+                found = value
+                break
+            }
+        }
+        if found == nil {
+            // 見出しがなければ、ほかの見出しのついていない最初の行
+            found = lines.map(OutputCleaner.stripDecoration).first { line in
+                !line.isEmpty && FieldReader.split(line, keys: ["体験", "はじめ方", "時間", "種類", "返事", "問い", "メモ"]) == nil
+            }
+        }
+        guard var value = found else { return nil }
+        value = value.trimmingCharacters(in: CharacterSet(charactersIn: "「」『』\"' \u{3000}"))
+        value = trimSentence(value, limit: 70)
+        guard value.count >= 8, TextCheck.hasJapanese(value), ContentGuard.isAcceptable(text: value) else { return nil }
+        let squash = { (s: String) in s.filter { !$0.isWhitespace && !"「」『』、。・".contains($0) } }
+        guard squash(value) != squash(title) else { return nil }
+        return value
+    }
+
     /// 覚えてよさそうなメモか(短い・問いではない・「なし」ではない)
     static func noteCandidate(_ raw: String?, title: String) -> String? {
         guard var memo = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !memo.isEmpty else { return nil }
@@ -342,7 +369,7 @@ public enum ContentGuard {
 public enum ContextFit {
     /// 出かける前提の言葉
     static let goingOut: [String] = [
-        "カフェ", "喫茶店", "公園", "散歩", "街角", "街を", "街へ", "お店", "店に", "店へ", "駅", "海へ", "海に",
+        "カフェ", "喫茶店", "公園", "散歩", "街角", "街へ", "お店", "店に", "店へ", "駅", "海へ", "海に",
         "山へ", "山に", "旅行", "旅に", "出かけ", "外出", "外に出", "映画館", "美術館", "博物館", "図書館",
         "ジム", "レストラン", "予約", "屋上", "電車", "バス", "公共交通", "地下鉄", "タクシー",
     ]

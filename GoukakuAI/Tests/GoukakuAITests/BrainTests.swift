@@ -38,7 +38,7 @@ final class BrainTests: XCTestCase {
         XCTAssertEqual(req.history[0].role, .user)
         XCTAssertTrue(req.history[1].text.hasPrefix("体験: "))
         XCTAssertTrue(req.prompt.contains("「こころ」に近い体験を1つ"))
-        XCTAssertTrue(req.prompt.contains("もう出した体験(ちがうものにする): 星を見る"))
+        XCTAssertTrue(req.prompt.contains("もう出した体験(これとはテーマのちがうものにする): 星を見る"))
         XCTAssertTrue(req.prompt.hasSuffix("体験:\nひとこと:\nはじめ方:\n時間:\n種類:"))
         XCTAssertEqual(req.system, PromptBook.system)
     }

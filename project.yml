@@ -18,8 +18,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "1.1.0"
-    CURRENT_PROJECT_VERSION: "2"
+    MARKETING_VERSION: "2.0.0"
+    CURRENT_PROJECT_VERSION: "3"
     TARGETED_DEVICE_FAMILY: "1"
     IPHONEOS_DEPLOYMENT_TARGET: "18.0"
     # 自分のチームで署名するときは、ここに Team ID を入れる(Xcode の Signing & Capabilities でも可)
@@ -34,6 +34,11 @@ packages:
     path: GoukakuCore
   GoukakuKit:
     path: GoukakuKit
+  # 相棒AI:芯(Foundation だけ)と、MLX で端末の中のモデルを動かす部分
+  GoukakuAI:
+    path: GoukakuAI
+  GoukakuAIMLX:
+    path: GoukakuAIMLX
 
 targets:
   GoukakuLock:
@@ -44,11 +49,16 @@ targets:
       - path: Shared/UI
       - path: Shared/Intents
       - path: Widgets/Views
+      # モデルの目録(ダウンロードと説明に使う。CI もこれを読んでモデルごとの IPA を作る)
+      - path: AI/models.json
+        buildPhase: resources
     dependencies:
       - package: GoukakuCore
       - package: GoukakuKit
       - package: GoukakuKit
         product: GoukakuShared
+      - package: GoukakuAI
+      - package: GoukakuAIMLX
       - target: GoukakuMonitor
       - target: GoukakuShieldConfig
       - target: GoukakuShieldAction
@@ -74,6 +84,9 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSSupportsLiveActivities: true
         NSCameraUsageDescription: 証拠写真を撮るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。
+        # ファイル App・Finder から AIModels フォルダにモデルを置けるように
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
         CFBundleURLTypes:
           - CFBundleURLName: com.aokijp.goukakulock
             CFBundleURLSchemes:
@@ -93,6 +106,8 @@ targets:
         com.apple.developer.family-controls: true
         com.apple.security.application-groups:
           - *group
+        # 相棒AI:大きなモデル(Gemma 4 E2B など)を端末の中で動かすため。App ID の「Increased Memory Limit」と対
+        com.apple.developer.kernel.increased-memory-limit: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: &bundle com.aokijp.goukakulock

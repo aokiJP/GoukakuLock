@@ -1,21 +1,29 @@
 name: Build IPA
 
-# main に push するたびに、Mac(Xcode)で未署名の IPA を作る。
-# - GoukakuCore の単体テスト → XcodeGen でプロジェクト生成 → Debug と Release をビルド → アドホック署名して .ipa に包む
-# - 成果物は Actions の Artifacts に置く。タグ v* を push したときは Releases にも載せる
-# - 結果(IPA・ログ・エラーの抜き出し)は ci-output ブランチにも置く(どこからでも取り出せるように)
+# Mac(Xcode)で未署名の IPA を作る。相棒AIのモデルごとの IPA も、ここで一括で作る。
+# 1. build:単体テスト(判定の芯・相棒AIの芯)→ XcodeGen → Debug と Release をビルド → AIなし版の IPA
+#           → シミュレータで画面を一通り動かしてスクリーンショット(AIは見本のAI)
+# 2. model-ipa:AI/models.json のモデルごとに(並べて)
+#           Hugging Face から固定リビジョンで取得 → 画像・音声の部分を取り除く
+#           → MLX で実際に読み込んで日本語が返るかを確かめる → Release の .app に同梱して IPA に包む
+# 成果物は Actions の Artifacts に置く。タグ v* か「Run workflow」の release_tag で Releases にも載せる
+# (GitHub の Releases は 1 ファイル 2GiB まで。超えるモデルの IPA は Artifacts だけ)。
 
 on:
   push:
-    branches: [main]
+    branches: [main, ai-companion]
     tags: ["v*"]
     paths-ignore: ["**.md", "docs/**"]
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Releases に載せるときのタグ(例 v1.0.0)。空なら載せない"
+        description: "Releases に載せるときのタグ(例 v2.0.0)。空なら載せない"
         required: false
         default: ""
+      models:
+        description: "同梱する AI(all / none / id をカンマ区切り。例 gemma4-e2b,qwen3.5-2b)"
+        required: false
+        default: "all"
 
 permissions:
   contents: write
@@ -24,14 +32,18 @@ concurrency:
   group: build-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+  RELEASE_TAG: ${{ inputs.release_tag || (startsWith(github.ref, 'refs/tags/v') && github.ref_name) || '' }}
+
 jobs:
   build:
     runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      HOMEBREW_NO_AUTO_UPDATE: "1"
-      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    timeout-minutes: 90
+    outputs:
+      models: ${{ steps.models.outputs.list }}
     steps:
       - uses: actions/checkout@v6
 
@@ -40,17 +52,44 @@ jobs:
           sw_vers
           xcodebuild -version
           swift --version
+          xcrun -f metal || xcodebuild -downloadComponent MetalToolchain
 
-      - name: Core unit tests (GoukakuCore)
+      - name: Decide which AI models get their own IPA
+        id: models
+        env:
+          WANT: ${{ inputs.models || (startsWith(github.ref, 'refs/tags/v') && 'all') || 'none' }}
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, os
+          want = os.environ["WANT"].strip()
+          catalog = json.load(open("AI/models.json", encoding="utf-8"))
+          ids = [m["id"] for m in catalog["models"] if m.get("ipa")]
+          if want == "none":
+              ids = []
+          elif want != "all":
+              chosen = [w.strip() for w in want.split(",") if w.strip()]
+              ids = [i for i in ids if i in chosen]
+          print("list=" + json.dumps(ids))
+          EOF
+          cat "$GITHUB_OUTPUT"
+
+      - name: Core unit tests (GoukakuCore・GoukakuAI)
         run: |
           mkdir -p build
           set -o pipefail
-          swift test --package-path GoukakuCore 2>&1 | tee build/core-tests.log | tail -n 30
+          swift test --package-path GoukakuCore 2>&1 | tee build/core-tests.log | tail -n 20
+          swift test --package-path GoukakuAI 2>&1 | tee build/ai-core-tests.log | tail -n 20
 
       - name: Generate Xcode project (XcodeGen)
         run: |
           brew install xcodegen
           xcodegen generate --spec project.yml
+
+      - name: Resolve packages
+        run: |
+          set -o pipefail
+          xcodebuild -resolvePackageDependencies -project GoukakuLock.xcodeproj -scheme GoukakuLock \
+            -skipPackagePluginValidation -skipMacroValidation 2>&1 | tail -n 30
 
       - name: Build Debug and Release (unsigned)
         run: |
@@ -63,18 +102,32 @@ jobs:
               -configuration "$CONF" \
               -destination 'generic/platform=iOS' \
               -derivedDataPath "build/DerivedData-$CONF" \
+              -skipPackagePluginValidation -skipMacroValidation \
               CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
               2>&1 | tee "build/xcodebuild-$CONF.log" | xcbeautify --renderer github-actions
             echo "::endgroup::"
           done
 
-      - name: Package IPA
+      - name: Package IPA (AIなし版。モデルはあとからダウンロード・取り込みできる)
         run: |
           mkdir -p dist
           for CONF in Debug Release; do
             scripts/package-ipa.sh "build/DerivedData-$CONF/Build/Products/$CONF-iphoneos/GoukakuLock.app" "dist/GoukakuLock-$CONF.ipa"
           done
           cd dist && shasum -a 256 *.ipa | tee SHA256SUMS.txt
+
+      - name: Keep the Release app for the model IPAs
+        run: |
+          tar -czf build/GoukakuLock-Release-app.tar.gz -C "build/DerivedData-Release/Build/Products/Release-iphoneos" GoukakuLock.app
+          ls -la build/GoukakuLock-Release-app.tar.gz
+
+      - name: Upload app (for model IPAs)
+        uses: actions/upload-artifact@v6
+        with:
+          name: app-release-${{ github.run_number }}
+          path: build/GoukakuLock-Release-app.tar.gz
+          retention-days: 3
+          if-no-files-found: error
 
       - name: Upload IPA
         uses: actions/upload-artifact@v6
@@ -110,6 +163,7 @@ jobs:
             -destination "id=$UDID" \
             -derivedDataPath build/DerivedData-Sim \
             -resultBundlePath build/UITests.xcresult \
+            -skipPackagePluginValidation -skipMacroValidation \
             2>&1 | tee build/uitest.log | xcbeautify --renderer github-actions
 
       - name: Export screenshots
@@ -122,24 +176,26 @@ jobs:
             ls -la build/screenshots || true
           fi
 
-      - name: Publish release (tags or manual)
-        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
+      - name: Publish release (AIなし版)
+        if: env.RELEASE_TAG != ''
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
           target_commitish: ${{ github.sha }}
-          name: 合格ロック ${{ inputs.release_tag || github.ref_name }}
+          name: 合格ロック ${{ env.RELEASE_TAG }}
           files: |
             dist/*.ipa
             dist/SHA256SUMS.txt
           body: |
             未署名(アドホック署名)の IPA です。実機に入れるには、有料の Apple Developer Program の証明書と、
-            5つの Bundle ID のプロビジョニングプロファイルで署名し直してください。
-            本体・monitor・shieldconfig・shieldaction の4つには Family Controls と App Groups、widget には App Groups を付けます。
-            手順は README の「インストール」を見てください。
+            5つの Bundle ID のプロビジョニングプロファイルで署名し直してください(README の「実機に入れる」)。
+            本体の App ID には Family Controls・App Groups に加えて **Increased Memory Limit** もオンにすると、大きなモデルを動かせます。
 
-            - GoukakuLock-Release.ipa:ふだん使う版
-            - GoukakuLock-Debug.ipa:デバッグメニューつき(実機テスト T-01〜T-12 用)
+            | ファイル | 相棒AI |
+            |---|---|
+            | GoukakuLock-Release.ipa | 同梱なし(Apple Intelligence があれば使う。モデルはアプリの中でダウンロード・ファイルから取り込みできる) |
+            | GoukakuLock-Debug.ipa | 同上+デバッグメニュー |
+            | GoukakuLock-AI-<モデル>.ipa | そのモデルを同梱(最初から通信なしで動く)。2GiB を超えるものは Actions の Artifacts にあります |
 
       - name: Save output to ci-output branch
         if: always()
@@ -148,11 +204,17 @@ jobs:
         run: |
           OUT="$RUNNER_TEMP/ci-output"
           rm -rf "$OUT" && mkdir -p "$OUT"
-          cp dist/*.ipa dist/SHA256SUMS.txt "$OUT/" 2>/dev/null || true
+          # GitHub は 100MB を超えるファイルを受け付けないので、大きな IPA はここには置かない(Artifacts にある)
+          for f in dist/*.ipa; do
+            [ -f "$f" ] && [ "$(stat -f%z "$f")" -lt 95000000 ] && cp "$f" "$OUT/"
+          done
+          cp dist/SHA256SUMS.txt "$OUT/" 2>/dev/null || true
           cp build/*.log "$OUT/" 2>/dev/null || true
+          ls -la dist > "$OUT/dist-sizes.txt" 2>/dev/null || true
+          # 生成した Xcode プロジェクト(リポジトリの GoukakuLock.xcodeproj を最新に保つため)
+          mkdir -p "$OUT/xcodeproj" && cp GoukakuLock.xcodeproj/project.pbxproj "$OUT/xcodeproj/" 2>/dev/null || true
           if [ -d build/screenshots ]; then mkdir -p "$OUT/screenshots" && cp build/screenshots/* "$OUT/screenshots/" 2>/dev/null || true; fi
           [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true
-          # コンパイラのエラーと警告をすべて抜き出す(appintentsmetadataprocessor の「抽出を省略」の知らせは除く)
           for f in build/xcodebuild-*.log build/uitest.log; do
             [ -f "$f" ] && grep -E "(error|warning):" "$f" | grep -v "appintentsmetadataprocessor" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true
           done
@@ -162,6 +224,7 @@ jobs:
             echo "ref=${{ github.ref }}"
             echo "status=${{ job.status }}"
             echo "uitest=${{ steps.uitest.outcome }}"
+            echo "models=${{ steps.models.outputs.list }}"
             date -u +"time=%Y-%m-%dT%H:%M:%SZ"
           } > "$OUT/status.txt"
           cd "$OUT"
@@ -171,3 +234,96 @@ jobs:
           git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "CI output: run ${{ github.run_number }} (${{ job.status }}) for ${{ github.sha }}"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-output
+
+  model-ipa:
+    needs: build
+    if: needs.build.outputs.models != '[]' && needs.build.outputs.models != ''
+    runs-on: macos-26
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ${{ fromJSON(needs.build.outputs.models) }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download the Release app
+        uses: actions/download-artifact@v6
+        with:
+          name: app-release-${{ github.run_number }}
+          path: build
+
+      - name: Fetch model (${{ matrix.model }})
+        run: |
+          mkdir -p build
+          set -o pipefail
+          python3 scripts/fetch-model.py "${{ matrix.model }}" "$RUNNER_TEMP/models/${{ matrix.model }}" 2>&1 | tee build/fetch-${{ matrix.model }}.log
+
+      - name: Check the model on MLX (load and write Japanese)
+        run: |
+          cd GoukakuAIMLX
+          xcodebuild -list > ../build/mlx-schemes.txt 2>&1 || true
+          SCHEME=$(grep -q "GoukakuAIMLX-Package" ../build/mlx-schemes.txt && echo GoukakuAIMLX-Package || echo GoukakuAIMLX)
+          LOG="../build/mlx-smoke-${{ matrix.model }}.log"
+          run_test() {
+            TEST_RUNNER_GOUKAKU_MODEL_DIR="$RUNNER_TEMP/models/${{ matrix.model }}" TEST_RUNNER_GOUKAKU_MODEL_ID="${{ matrix.model }}" \
+            TEST_RUNNER_GOUKAKU_CATALOG="$GITHUB_WORKSPACE/AI/models.json" TEST_RUNNER_GOUKAKU_MLX_CPU="$1" \
+            xcodebuild test -scheme "$SCHEME" -destination 'platform=macOS' \
+              -skipMacroValidation -skipPackagePluginValidation -derivedDataPath ../build/DD-mlx > "$LOG" 2>&1
+          }
+          STATUS=0
+          run_test 0 || { echo "GPU で失敗したので CPU で試す"; run_test 1 || STATUS=$?; }
+          grep -E "\[smoke\]" "$LOG" > "../build/smoke-${{ matrix.model }}.txt" || true
+          grep -E "\[smoke\]|error:|Test Case|Executed" "$LOG" | head -n 80 || true
+          {
+            echo "### ${{ matrix.model }}:MLX での確認"
+            echo '```'
+            cat "../build/smoke-${{ matrix.model }}.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $STATUS
+
+      - name: Package IPA with the model
+        id: ipa
+        run: |
+          set -euo pipefail
+          tar -xzf build/GoukakuLock-Release-app.tar.gz -C build
+          APP=build/GoukakuLock.app
+          mkdir -p "$APP/AIModels"
+          cp -R "$RUNNER_TEMP/models/${{ matrix.model }}" "$APP/AIModels/"
+          mkdir -p dist
+          IPA="dist/GoukakuLock-AI-${{ matrix.model }}.ipa"
+          scripts/package-ipa.sh "$APP" "$IPA"
+          echo "== 中身の確認"
+          unzip -l "$IPA" | grep -E "AIModels/${{ matrix.model }}/" | tee build/ipa-contents-${{ matrix.model }}.txt
+          for f in config.json tokenizer.json goukaku-model.json model.safetensors; do
+            grep -q "AIModels/${{ matrix.model }}/$f" build/ipa-contents-${{ matrix.model }}.txt || { echo "missing $f"; exit 1; }
+          done
+          SIZE=$(stat -f%z "$IPA")
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
+          (cd dist && shasum -a 256 *.ipa | tee "SHA256-${{ matrix.model }}.txt")
+          echo "### ${{ matrix.model }}:$(python3 -c "print(f'{$SIZE/1024**3:.2f} GiB')")" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload model IPA
+        uses: actions/upload-artifact@v6
+        with:
+          name: GoukakuLock-AI-${{ matrix.model }}-${{ github.run_number }}
+          path: |
+            dist/*.ipa
+            dist/SHA256-*.txt
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Attach to release (2GiB 未満だけ)
+        if: env.RELEASE_TAG != '' && fromJSON(steps.ipa.outputs.size) < 2147483648
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: dist/GoukakuLock-AI-${{ matrix.model }}.ipa
+
+      - name: Logs
+        if: always()
+        run: |
+          ls -la dist build | head -n 40
+          tail -n 40 "build/mlx-smoke-${{ matrix.model }}.log" 2>/dev/null || true

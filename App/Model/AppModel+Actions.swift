@@ -376,6 +376,12 @@ extension AppModel {
         struct CycleRow: Encodable { var cycle: String, outcome: String, emergencyCount: Int }
         struct EventRow: Encodable { var at: Date, kind: String, detail: String }
         struct EmergencyRow: Encodable { var requestedAt: Date, startsAt: Date, endsAt: Date, cancelledAt: Date? }
+        struct ExperienceRow: Encodable {
+            var title: String, note: String, feeling: String?, category: String, at: Date, reply: String?, question: String?, source: String
+        }
+        struct IdeaRow: Encodable { var title: String, line: String, firstStep: String, category: String, status: String, kind: String, createdAt: Date }
+        struct NoteRow: Encodable { var text: String, source: String, createdAt: Date }
+        struct MessageRow: Encodable { var role: String, text: String, at: Date }
         struct ExportBundle: Encodable {
             var exportedAt: Date
             var state: SharedState?
@@ -384,6 +390,10 @@ extension AppModel {
             var cycles: [CycleRow]
             var emergencies: [EmergencyRow]
             var events: [EventRow]
+            var experiences: [ExperienceRow]
+            var experienceIdeas: [IdeaRow]
+            var companionNotes: [NoteRow]
+            var companionMessages: [MessageRow]
         }
         let bundle = ExportBundle(
             exportedAt: Date(),
@@ -405,6 +415,20 @@ extension AppModel {
             },
             events: fetchAll(EventLog.self).sorted { $0.at < $1.at }.map {
                 EventRow(at: $0.at, kind: $0.kind, detail: $0.detail)
+            },
+            experiences: fetchAll(ExperienceLog.self).sorted { $0.at < $1.at }.map {
+                ExperienceRow(title: $0.title, note: $0.note, feeling: $0.feelingRaw, category: $0.categoryRaw,
+                              at: $0.at, reply: $0.reply, question: $0.question, source: $0.sourceRaw)
+            },
+            experienceIdeas: fetchAll(ExperienceIdea.self).filter { $0.statusRaw != "dismissed" }.sorted { $0.createdAt < $1.createdAt }.map {
+                IdeaRow(title: $0.title, line: $0.line, firstStep: $0.firstStep, category: $0.categoryRaw,
+                        status: $0.statusRaw, kind: $0.kindRaw, createdAt: $0.createdAt)
+            },
+            companionNotes: fetchAll(CompanionNote.self).sorted { $0.createdAt < $1.createdAt }.map {
+                NoteRow(text: $0.text, source: $0.sourceRaw, createdAt: $0.createdAt)
+            },
+            companionMessages: fetchAll(CompanionMessage.self).sorted { $0.at < $1.at }.map {
+                MessageRow(role: $0.roleRaw, text: $0.text, at: $0.at)
             })
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -442,6 +466,12 @@ extension AppModel {
         try? context.delete(model: EmergencyRecord.self)
         try? context.delete(model: AppSettings.self)
         try? context.delete(model: WeeklyReview.self)
+        // 相棒AIの記録(体験・覚えていること・会話)も消す。入れたモデルは消さない(設定 › AI から消せる)
+        CompanionModel.shared.resetInMemoryState()
+        try? context.delete(model: ExperienceIdea.self)
+        try? context.delete(model: ExperienceLog.self)
+        try? context.delete(model: CompanionNote.self)
+        try? context.delete(model: CompanionMessage.self)
         EvidenceStore.removeAll()
         try? context.save()
         cachedSettings = nil

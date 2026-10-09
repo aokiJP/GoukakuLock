@@ -2,6 +2,7 @@ import XCTest
 
 /// シミュレータで画面を一通り動かし、各画面のスクリーンショットを残す(DEBUG ビルドで実行)。
 /// Screen Time の許可はシミュレータでは得られないので、はじめの設定の「デバッグ」の抜け道を使う。
+/// シミュレータでは MLX が動かないので、相棒AIは「見本のAI」(実機の Gemma 4 E2B が返した文)で動かす。
 final class WalkthroughUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -12,7 +13,7 @@ final class WalkthroughUITests: XCTestCase {
     @MainActor
     func testWalkthrough() throws {
         app = XCUIApplication()
-        app.launchArguments += ["-uiTesting", "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"]
+        app.launchArguments += ["-uiTesting", "-uiTestingScriptedAI", "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"]
         app.launchEnvironment["TZ"] = "Asia/Tokyo"
         app.launch()
 
@@ -21,33 +22,43 @@ final class WalkthroughUITests: XCTestCase {
         snap("01-はじめに")
         tap(app.buttons["わかった"])
 
+        // 相棒AI(この iPhone で使うAIと、あなたのこと)
+        waitFor(app.navigationBars["相棒AI"])
+        let about = app.textViews.firstMatch.waitForExistence(timeout: 3) ? app.textViews.firstMatch : app.textFields.firstMatch
+        if about.waitForExistence(timeout: 3) {
+            about.tap()
+            about.typeText("English study. I like walking.")
+        }
+        snap("02-相棒AI")
+        tap(app.buttons["次へ"])
+
         waitFor(app.buttons["許可なしで進む(デバッグ)"])
-        snap("02-ScreenTimeの許可")
+        snap("03-ScreenTimeの許可")
         tap(app.buttons["許可なしで進む(デバッグ)"])
 
         waitFor(app.buttons["通知を許可する"])
-        snap("03-通知")
+        snap("04-通知")
         tap(app.buttons["次へ"])
 
         waitFor(app.buttons["対象を選ばずに進む(デバッグ)"])
-        snap("04-ロック対象")
+        snap("05-ロック対象")
         tap(app.buttons["対象を選ばずに進む(デバッグ)"])
 
         waitFor(app.buttons["次へ"])
-        snap("05-時刻とモード")
+        snap("06-時刻とモード")
         tap(app.buttons["次へ"])
 
         waitFor(app.buttons["次へ"])
-        snap("06-最初のコミット")
+        snap("07-最初のコミット")
         tap(app.buttons["次へ"])
 
         waitFor(app.buttons["start.now"])
-        snap("07-開始")
+        snap("08-開始")
         tap(app.buttons["start.now"])
         tap(app.alerts.buttons["今すぐ始める"])
 
         waitFor(app.buttons["はじめる"])
-        snap("08-置き場所")
+        snap("09-置き場所")
         tap(app.buttons["はじめる"])
 
         // S-02 ホーム(未達成)
@@ -55,75 +66,153 @@ final class WalkthroughUITests: XCTestCase {
         waitFor(checkIn, timeout: 15)
         snap("10-ホーム-未達成")
 
-        // S-03 チェックイン → はじめての合格(はなまる)
+        // ホームの「相棒から」:コミットを体験にする工夫
+        scrollTo(app.buttons["companion.reframe"])
+        tap(app.buttons["companion.reframe"])
+        waitFor(anyElement(containing: "覚えた単語で今日を1文に"), timeout: 20)
+        Thread.sleep(forTimeInterval: 1.5)
+        snap("11-ホーム-相棒から")
+        app.swipeDown()
+
+        // S-03 チェックイン → 相棒のひとこと → はじめての合格(はなまる)
         tap(checkIn)
         let note = app.textViews.firstMatch.waitForExistence(timeout: 5) ? app.textViews.firstMatch : app.textFields.firstMatch
         waitFor(note)
         note.tap()
         note.typeText("Did 20 words. Self test 8/10")
-        snap("11-チェックイン")
+        snap("12-チェックイン")
         tap(app.buttons["記録する"])
         waitFor(app.staticTexts["記録しました"])
-        snap("12-記録しました")
+        waitFor(anyElement(containing: "単語に向き合った時間"), timeout: 20)
+        snap("13-記録しました-相棒")
         tap(app.buttons["閉じる"].firstMatch)
         waitFor(app.staticTexts["はじめての合格"], timeout: 8)
         Thread.sleep(forTimeInterval: 1.6)   // はなまるを描き終えるまで
-        snap("13-はじめての合格")
+        snap("14-はじめての合格")
         tap(app.buttons["閉じる"].firstMatch)
 
         // S-02 ホーム(達成)
         waitFor(app.buttons["緊急解除"])
-        snap("14-ホーム-達成")
+        snap("15-ホーム-達成")
+
+        // 体験タブ:体験を3つ見つける → やってみる → やってみた → 相棒の返事
+        tap(app.tabBars.buttons["体験"])
+        waitFor(app.buttons["companion.suggest"])
+        snap("20-体験")
+        tap(app.buttons["companion.suggest"])
+        let doIt = app.buttons["やってみる"].firstMatch
+        waitFor(doIt, timeout: 30)
+        // 3つそろうまで待つ
+        let third = app.buttons.matching(NSPredicate(format: "label == 'やってみる'")).element(boundBy: 2)
+        _ = third.waitForExistence(timeout: 30)
+        Thread.sleep(forTimeInterval: 1.0)
+        snap("21-体験-見つけた")
         app.swipeUp()
-        snap("15-ホーム-下")
+        snap("22-体験-見つけた-下")
+        tap(app.buttons["やってみる"].firstMatch)
+        scrollTo(app.buttons["やってみた"].firstMatch)
+        snap("23-体験-やってみる")
+        tap(app.buttons["やってみた"].firstMatch)
+        let logNote = app.textViews.firstMatch.waitForExistence(timeout: 5) ? app.textViews.firstMatch : app.textFields.firstMatch
+        waitFor(logNote)
+        logNote.tap()
+        logNote.typeText("The sky turned orange to purple.")
+        tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
+        snap("24-やってみた")
+        tap(app.buttons["記録する"])
+        waitFor(app.staticTexts["体験の地図に、ひとつ増えました"], timeout: 10)
+        waitFor(app.buttons["覚えてもらう"], timeout: 20)
+        snap("25-相棒の返事")
+        tap(app.buttons["覚えてもらう"])
+        tap(app.buttons["閉じる"].firstMatch)
+
+        // 相棒と話す
+        scrollTo(app.buttons.matching(NSPredicate(format: "label BEGINSWITH '相棒と話す'")).firstMatch)
+        tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH '相棒と話す'")).firstMatch)
+        waitFor(app.buttons["この週末、何をしてみよう"])
+        snap("26-相棒と話す")
+        tap(app.buttons["この週末、何をしてみよう"])
+        waitFor(anyElement(containing: "外の音を3つ"), timeout: 20)
+        snap("27-相棒と話す-返事")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // いつかの体験
+        tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'いつかの体験'")).firstMatch)
+        tap(app.buttons["いつかの体験を考える"])
+        waitFor(app.buttons["とっておく"].firstMatch, timeout: 30)
+        _ = app.buttons.matching(NSPredicate(format: "label == 'とっておく'")).element(boundBy: 2).waitForExistence(timeout: 30)
+        snap("28-いつかの体験")
+        tap(app.buttons["とっておく"].firstMatch)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // 育ち(体験の地図・相棒が知っているあなた)
+        tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH '育ち'")).firstMatch)
+        waitFor(app.navigationBars["育ち"])
+        snap("29-育ち")
+        app.swipeUp()
+        snap("30-育ち-下")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // 設定 › AI
+        app.swipeDown()
+        tap(app.buttons["AI"].firstMatch)
+        waitFor(app.navigationBars["AI"])
+        snap("31-AIの設定")
+        app.swipeUp()
+        snap("32-AIの設定-モデル")
+        app.swipeUp()
+        snap("33-AIの設定-下")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
 
         // 合格証
+        tap(app.tabBars.buttons["今日"])
         scrollTo(app.buttons["合格証をつくる"])
         tap(app.buttons["合格証をつくる"])
         waitFor(app.navigationBars["合格証"])
-        snap("16-合格証")
+        snap("34-合格証")
         tap(app.buttons["閉じる"].firstMatch)
 
         // S-04 コミットの追加(例から選ぶ・確かめ方)
         app.swipeDown()
+        app.swipeDown()
         tap(app.buttons["コミット"])
         tap(app.buttons["追加"])
         tap(app.buttons["集中勉強"])
-        snap("17-コミットを追加")
+        snap("35-コミットを追加")
         app.swipeUp()
-        snap("18-確かめ方")
+        snap("36-確かめ方")
         tap(app.buttons["保存"])
         tap(app.alerts.buttons["OK"])
-        snap("19-コミット一覧")
+        snap("37-コミット一覧")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         // S-05 記録
         tap(app.tabBars.buttons["記録"])
         sleep(1)
-        snap("20-記録")
+        snap("40-記録")
 
         // S-06 設定と、使いこなす・アイコン・稼働型
         tap(app.tabBars.buttons["設定"])
         sleep(1)
-        snap("21-設定")
+        snap("41-設定")
         scrollTo(app.buttons["ウィジェット・Siri・通知から記録する"])
         tap(app.buttons["ウィジェット・Siri・通知から記録する"])
         sleep(1)
-        snap("22-使いこなす")
+        snap("42-使いこなす")
         app.swipeUp()
-        snap("23-使いこなす-下")
+        snap("43-使いこなす-下")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         scrollTo(app.buttons["アイコン"])
         tap(app.buttons["アイコン"])
         sleep(1)
-        snap("24-アイコン")
+        snap("44-アイコン")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let lockMode = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'ロックモード'")).firstMatch
         scrollBackTo(lockMode)
         tap(lockMode)
         tap(app.buttons["稼働型(勉強で時間を稼ぐ)"])
         sleep(1)
-        snap("25-稼働型")
+        snap("45-稼働型")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         // デバッグの見本(ウィジェット・Live Activity・お祝い・記録の画面)
@@ -132,44 +221,46 @@ final class WalkthroughUITests: XCTestCase {
         scrollTo(app.buttons["ウィジェット・Live Activity・お祝い"])
         tap(app.buttons["ウィジェット・Live Activity・お祝い"])
         sleep(1)
-        snap("26-見本-ウィジェット")
+        snap("46-見本-ウィジェット")
         bringToTop(app.staticTexts["ウィジェット(見本:ロック中)"])
-        snap("27-見本-ウィジェット2")
+        snap("47-見本-ウィジェット2")
         bringToTop(app.staticTexts["Live Activity"])
-        snap("28-見本-LiveActivity")
+        snap("48-見本-LiveActivity")
         scrollTo(app.buttons["集中タイマー(見本)"])
         tap(app.buttons["集中タイマー(見本)"])
         tap(app.buttons["はじめる"])
         sleep(3)
-        snap("29-集中タイマー")
+        snap("49-集中タイマー")
         tap(app.buttons["やめる"])
         tap(app.buttons["写真で記録(見本)"])
         sleep(1)
-        snap("30-写真で記録")
+        snap("50-写真で記録")
         tap(app.buttons["閉じる"].firstMatch)
         scrollTo(app.buttons["はなまるを出す(7日連続)"])
         tap(app.buttons["はなまるを出す(7日連続)"])
         waitFor(app.staticTexts["7日連続"])
         Thread.sleep(forTimeInterval: 1.8)
-        snap("31-はなまる-7日")
+        snap("51-はなまる-7日")
         tap(app.buttons["閉じる"].firstMatch)
         tap(app.buttons["週のふり返りを開く"])
-        sleep(1)
-        snap("32-週のふり返り")
+        waitFor(app.buttons["相棒に手紙を書いてもらう"])
+        tap(app.buttons["相棒に手紙を書いてもらう"])
+        waitFor(anyElement(containing: "小さな発見"), timeout: 20)
+        snap("52-週のふり返り-手紙")
         tap(app.buttons["あとで"])
         scrollTo(app.staticTexts["合 格 証"])
-        snap("33-合格証-見本")
+        snap("53-合格証-見本")
 
         // S-07 緊急解除・S-08 一時停止
         tap(app.tabBars.buttons["今日"])
         scrollTo(app.buttons["緊急解除"])
         tap(app.buttons["緊急解除"])
         waitFor(app.buttons["緊急解除を申請する"])
-        snap("34-緊急解除")
+        snap("54-緊急解除")
         tap(app.buttons["閉じる"].firstMatch)
         tap(app.buttons["一時停止"])
         sleep(1)
-        snap("35-一時停止")
+        snap("55-一時停止")
         tap(app.buttons["閉じる"].firstMatch)
 
         // ホーム画面のクイックアクション(アイコンを長押し →「チェックイン」)
@@ -185,10 +276,16 @@ final class WalkthroughUITests: XCTestCase {
         icon.press(forDuration: 1.4)
         let quickCheckIn = springboard.buttons.matching(NSPredicate(format: "label BEGINSWITH 'チェックイン'")).firstMatch
         waitFor(quickCheckIn)
-        snap("36-クイックアクション")
+        snap("56-クイックアクション")
         quickCheckIn.tap()
         waitFor(app.navigationBars["チェックイン"], timeout: 15)
-        snap("37-クイックアクションから")
+        snap("57-クイックアクションから")
+    }
+
+    /// 文を含む要素(相棒の書き込みは、まとめて読み上げる1つの要素になるので種類を問わない)
+    @MainActor
+    private func anyElement(containing text: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
     }
 
     @MainActor

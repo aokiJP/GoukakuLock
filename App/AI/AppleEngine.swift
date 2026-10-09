@@ -19,7 +19,7 @@ struct AppleEngine: LanguageEngine {
                 let task = Task {
                     do {
                         let session = LanguageModelSession(instructions: Self.instructions(for: request))
-                        let options = GenerationOptions(temperature: request.temperature,
+                        let options = GenerationOptions(sampling: nil, temperature: request.temperature,
                                                         maximumResponseTokens: request.maxTokens)
                         var sent = ""
                         for try await snapshot in session.streamResponse(to: Self.prompt(for: request), options: options) {

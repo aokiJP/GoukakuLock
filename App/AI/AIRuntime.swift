@@ -113,7 +113,7 @@ final class AIRuntime {
             next.skipped.append(.init(name: model.name, reason: "前回、読み込み中にアプリが終了したので休ませています"))
         }
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("-uiTestingScriptedAI") {
+        if ProcessInfo.processInfo.arguments.contains("-uiTestingScriptedAI") || UserDefaults.standard.bool(forKey: "debug.sampleAI") {
             next = RouteDecision(choice: .rules, tuning: GenerationTuning(),
                                  reasons: ["見本のAI(シミュレータでの画面確認用。実機の Gemma 4 E2B が返した文を使う)"], skipped: [])
             if engine?.info.id != SampleAIInfo.id { engine = SampleAI.engine }
@@ -124,7 +124,7 @@ final class AIRuntime {
         #endif
         let changed = next.choice != decision.choice
         decision = next
-        if changed || engine == nil && next.choice != .rules {
+        if changed || engine == nil && next.choice != .rules || engine?.info.id == SampleAIInfo.id {
             Task { await self.switchEngine() }
         }
     }

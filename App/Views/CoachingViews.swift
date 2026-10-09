@@ -80,11 +80,16 @@ struct WeeklyReviewCard: View {
 
 struct WeeklyReviewView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CompanionModel.self) private var companion
     @Environment(\.dismiss) private var dismiss
     let week: CycleID
     @State private var worked = ""
     @State private var difficulty = "right"
     @State private var change = ""
+    @State private var letter = ""
+    @State private var letterState = LetterState.none
+
+    enum LetterState { case none, writing, done }
 
     var body: some View {
         let days = model.weekOutcomes(week)
@@ -107,6 +112,27 @@ struct WeeklyReviewView: View {
                     .foregroundStyle(Theme.ink)
             } header: {
                 Text("\(week.month)/\(week.day) からの1週間")
+            }
+            Section {
+                switch letterState {
+                case .none:
+                    Button {
+                        letterState = .writing
+                        companion.weeklyLetter(week: week) { text, finished in
+                            letter = text
+                            if finished { letterState = .done }
+                        }
+                    } label: {
+                        Label("相棒に手紙を書いてもらう", systemImage: "envelope")
+                    }
+                    .tint(Theme.pencil)
+                case .writing:
+                    PencilNote(text: letter, caption: "相棒からの手紙", writing: true)
+                case .done:
+                    PencilNote(text: letter, caption: "相棒からの手紙")
+                }
+            } footer: {
+                Text("この週の体験から、相棒が短い手紙を書きます。数字で評価したり、比べたりはしません。")
             }
             Section("何が効いた?") {
                 TextField("例:朝いちばんにやると決めたこと", text: $worked, axis: .vertical)

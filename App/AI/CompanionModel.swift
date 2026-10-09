@@ -270,6 +270,14 @@ final class CompanionModel {
         logs.first { $0.achievementID == achievementID }
     }
 
+    /// チェックインを取り消したら、ついていた返事も消す
+    func removeCheckInLog(for achievementID: UUID) {
+        for log in logs where log.achievementID == achievementID {
+            context.delete(log)
+        }
+        touch()
+    }
+
     func reflect(_ log: ExperienceLog) {
         let id = log.id
         reflecting = id
@@ -514,13 +522,16 @@ final class CompanionModel {
 
     // MARK: 全部消す(設定の全削除から)
 
-    func deleteAll() {
-        try? context.delete(model: ExperienceIdea.self)
-        try? context.delete(model: ExperienceLog.self)
-        try? context.delete(model: CompanionNote.self)
-        try? context.delete(model: CompanionMessage.self)
+    /// 画面のために持っている体験を手放す(データの削除の前に呼ぶ)
+    func resetInMemoryState() {
+        suggestTask?.cancel()
+        chatTask?.cancel()
         batch = []
         reframes = [:]
-        touch()
+        isSuggesting = false
+        isChatting = false
+        reflecting = nil
+        notice = nil
+        revision &+= 1
     }
 }

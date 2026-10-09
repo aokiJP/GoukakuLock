@@ -41,6 +41,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>証拠写真を撮るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。</string>
 	<key>NSSupportsLiveActivities</key>
@@ -73,6 +75,8 @@
 			<string>com.aokijp.goukakulock.quick.timer</string>
 		</dict>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

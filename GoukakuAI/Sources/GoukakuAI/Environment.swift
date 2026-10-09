@@ -159,6 +159,18 @@ public struct RouteDecision: Sendable, Equatable {
     public struct Skipped: Sendable, Equatable {
         public var name: String
         public var reason: String
+
+        public init(name: String, reason: String) {
+            self.name = name
+            self.reason = reason
+        }
+    }
+
+    public init(choice: EngineChoice, tuning: GenerationTuning, reasons: [String], skipped: [Skipped]) {
+        self.choice = choice
+        self.tuning = tuning
+        self.reasons = reasons
+        self.skipped = skipped
     }
 }
 

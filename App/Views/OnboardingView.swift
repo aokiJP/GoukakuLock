@@ -6,7 +6,10 @@ import GoukakuKit
 /// S-01 はじめの設定
 struct OnboardingView: View {
     @Environment(AppModel.self) private var model
+    @Environment(AIRuntime.self) private var runtime
+    @Environment(CompanionModel.self) private var companion
     @State private var step = Step.intro
+    @State private var aboutMe = ""
     @State private var draft: OnboardingDraft = {
         var draft = OnboardingDraft()
         #if DEBUG
@@ -29,11 +32,12 @@ struct OnboardingView: View {
     #endif
 
     enum Step: Int, CaseIterable {
-        case intro, screenTime, notifications, targets, schedule, commit, start, placement
+        case intro, companion, screenTime, notifications, targets, schedule, commit, start, placement
 
         var title: String {
             switch self {
             case .intro: return "合格ロック"
+            case .companion: return "相棒AI"
             case .screenTime: return "Screen Time の許可"
             case .notifications: return "通知"
             case .targets: return "ロックするもの"
@@ -82,6 +86,7 @@ struct OnboardingView: View {
     @ViewBuilder private var stepContent: some View {
         switch step {
         case .intro: introStep
+        case .companion: companionStep
         case .screenTime: screenTimeStep
         case .notifications: notificationStep
         case .targets: targetsStep
@@ -129,9 +134,10 @@ struct OnboardingView: View {
             Section("このアプリがすること") {
                 Text("決めた時刻に、お金を使うアプリ(決済・買い物)とアプリ内課金を止めます。今日のコミットを達成したと記録すると外れます。")
                 Text("お金は没収も送金もされません。使えなくなるだけです。")
+                Text("相棒AIが、人生の中でどんな体験ができるかを一緒に見つけます。AIはこの iPhone の中だけで動きます。")
             }
             Section("しないこと") {
-                Text("目標の中身を作ったり、採点したりしません。やるのはあなた、確かめるのもあなたです。")
+                Text("目標を勝手に決めたり、採点したりしません。相棒AIは体験を誘うだけで、やるかどうかも、確かめるのもあなたです。")
                 Text("電話・メッセージ・緊急通報は止まりません。地図・乗換・銀行・連絡・医療は「常に許可」で守ります。")
                 Text("監視・追跡・録音はしません。データはこの iPhone の中だけに置きます。")
             }
@@ -145,7 +151,79 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: 2. Screen Time の許可
+    // MARK: 2. 相棒AI(この iPhone で使うAIと、あなたのこと)
+
+    private var companionStep: some View {
+        Form {
+            Section {
+                HStack(alignment: .center, spacing: 16) {
+                    CategoryStamp(category: .first, filled: true, size: 56)
+                    Text("人生の中で、\nどんな体験ができるだろう。")
+                        .font(Theme.heading(.title3))
+                        .foregroundStyle(Theme.ink)
+                }
+                .padding(.vertical, 6)
+            }
+            Section("相棒AIがすること") {
+                Text("今のあなたに合いそうな体験を誘い、やってみたあとに短く返事をします。「〜しなければ」ではなく「〜してみると、〜かも」と誘います。")
+                Text("決めるのはあなたです。点数はつけず、ほかの人と比べません。")
+                Text("この iPhone の中だけで動きます。書いたことはどこにも送りません。")
+            }
+            Section {
+                Label(runtime.statusLine, systemImage: runtime.usesAI ? "cpu" : "book.closed")
+                    .foregroundStyle(Theme.pencil)
+                if let reason = runtime.decision.reasons.first {
+                    Text(reason).font(.footnote).foregroundStyle(Theme.muted)
+                }
+                if !runtime.usesAI, let spec = recommendedDownload {
+                    if let job = runtime.downloader.jobs[spec.id] {
+                        if case .failed(let why) = job.phase {
+                            Text(why).font(.footnote).foregroundStyle(Theme.seal)
+                        } else {
+                            ProgressView(value: job.fraction) {
+                                Text("「\(spec.name)」をダウンロード中(ほかの手順を進めて大丈夫です)").font(.footnote)
+                            }
+                            .tint(Theme.pencil)
+                        }
+                    } else {
+                        Button {
+                            runtime.download(spec)
+                        } label: {
+                            Label("「\(spec.name)」をダウンロード(\(DeviceProbe.gb(spec.downloadBytes)))", systemImage: "arrow.down.circle")
+                        }
+                        Text(spec.summary).font(.footnote).foregroundStyle(Theme.muted)
+                    }
+                }
+            } header: {
+                Text("この iPhone で使うAI")
+            } footer: {
+                Text("メモリ・iOS・熱・電池の様子から、自動で選びます。あとから 設定 › AI で変えられます。")
+            }
+            Section {
+                TextField("例:英語を勉強している・散歩が好き・いつか一人旅をしたい", text: $aboutMe, axis: .vertical)
+            } header: {
+                Text("あなたのこと(任意)")
+            } footer: {
+                Text("書いたことを相棒が覚えて、提案があなたに合っていきます。体験タブの「育ち」からいつでも消せます。")
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            primaryButton("次へ") {
+                if !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    companion.rememberIntroduction(aboutMe)
+                }
+                move(1)
+            }
+        }
+    }
+
+    /// AIのモデルが入っていない端末に、まずおすすめするモデル(メモリに収まる中で日本語が一番自然なもの)
+    private var recommendedDownload: ModelSpec? {
+        let ram = Double(runtime.profile.physicalMemory) / 1_073_741_824 + 0.5
+        return runtime.downloadable.filter { $0.recommendedRAMGB <= ram }.max { $0.japanese < $1.japanese }
+    }
+
+    // MARK: 3. Screen Time の許可
 
     private var screenTimeStep: some View {
         Form {

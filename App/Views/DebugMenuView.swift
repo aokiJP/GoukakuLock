@@ -10,6 +10,8 @@ import GoukakuShared
 /// デバッグメニュー(DEBUG ビルドだけ。第14章・第19.3節の実機テスト用)
 struct DebugMenuView: View {
     @Environment(AppModel.self) private var model
+    @Environment(AIRuntime.self) private var runtime
+    @AppStorage("debug.sampleAI") private var sampleAI = false
     @State private var dayStartMinute = 240
     @State private var output = ""
     @State private var logURL: URL?
@@ -63,6 +65,29 @@ struct DebugMenuView: View {
             }
             Section("見本") {
                 NavigationLink("ウィジェット・Live Activity・お祝い") { DebugGalleryView() }
+            }
+            Section {
+                Toggle("見本のAIを使う(画面の確認用)", isOn: $sampleAI)
+                    .onChange(of: sampleAI) { _, _ in runtime.refresh() }
+                Button("休ませているモデルを、すべて戻す") {
+                    for m in runtime.installed { runtime.retry(m) }
+                    output = "戻しました:\(runtime.statusLine)"
+                }
+                Button("いまのAIの様子") {
+                    let p = runtime.profile
+                    output = """
+                    AI: \(runtime.statusLine) / \(runtime.phase)
+                    理由: \(runtime.decision.reasons.joined(separator: " / "))
+                    メモリ: \(DeviceProbe.gb(p.physicalMemory)) 使える見込み: \(p.availableMemory.map(DeviceProbe.gb) ?? "-")
+                    熱: \(p.thermal.label) 低電力: \(p.lowPowerMode) Apple Intelligence: \(p.appleIntelligence.label)
+                    入っているモデル: \(runtime.installed.map { "\($0.name)(\($0.manifest.source.rawValue))" }.joined(separator: ", "))
+                    速さ: \(runtime.lastTokensPerSecond.map { String(format: "%.1f tok/s", $0) } ?? "-")
+                    """
+                }
+            } header: {
+                Text("相棒AI")
+            } footer: {
+                Text("シミュレータでは MLX が動かないので、見本のAI(実機の Gemma 4 E2B が返した文)で画面の流れを確かめられます。")
             }
             Section("中身を見る") {
                 Button("state.json") { output = stateJSON() }

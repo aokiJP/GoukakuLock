@@ -37,12 +37,16 @@ public enum PromptBook {
         return lines.joined(separator: "\n")
     }
 
-    /// 体験を1つ考えてもらう
+    /// 体験を1つ考えてもらう(hint は発想のきっかけの言葉。小さなモデルが同じ話題に寄るのを防ぐ)
     public static func suggestion(context: CompanionContext, angle: ExperienceCategory, avoid: [String],
-                                  tuning: GenerationTuning, temperature: Double = 0.85) -> GenerationRequest {
+                                  tuning: GenerationTuning, temperature: Double = 0.85,
+                                  hint: String? = nil) -> GenerationRequest {
         var prompt = contextBlock(context, items: tuning.contextItems)
         if !avoid.isEmpty {
-            prompt += "\nもう出した体験(ちがうものにする): " + avoid.suffix(6).joined(separator: "、")
+            prompt += "\nもう出した体験(これとはテーマのちがうものにする): " + avoid.suffix(6).joined(separator: "、")
+        }
+        if let hint {
+            prompt += "\n思いつきのきっかけ: 「\(hint)」(使わなくてもかまいません)"
         }
         prompt += "\n\n「\(angle.label)」に近い体験を1つ。" + suggestionFormat
         return GenerationRequest(system: system,
@@ -160,6 +164,26 @@ public enum PromptBook {
         let t = oneLine(text)
         guard let last = t.last else { return "" }
         return "。.!?！？".contains(last) ? t : t + "。"
+    }
+}
+
+/// 発想のきっかけの言葉(種類ごと)。毎回ちがう言葉を添えて、提案が同じ話題に寄らないようにする
+public enum IdeaHints {
+    static let words: [ExperienceCategory: [String]] = [
+        .learn: ["言葉", "地図", "歴史", "しくみ", "数字", "外国", "図鑑", "昔の自分"],
+        .body: ["呼吸", "足の裏", "手", "背中", "リズム", "水", "目", "姿勢"],
+        .make: ["紙", "台所", "写真", "声", "ことば遊び", "色", "手紙", "メモ"],
+        .people: ["家族", "昔の友だち", "近所", "ありがとう", "声", "思い出", "おすすめ", "あいさつ"],
+        .outside: ["空", "木", "道", "光", "風", "音", "影", "公園"],
+        .mind: ["音楽", "香り", "感謝", "思い出", "静けさ", "明かり", "書くこと", "ひと口"],
+        .living: ["机", "器", "窓", "靴", "冷蔵庫", "かばん", "植物", "寝る前"],
+        .first: ["反対の手", "知らないジャンル", "初めての道", "知らない国", "引き出し", "目を閉じる", "番組", "おすすめ"],
+    ]
+
+    public static func pick(_ category: ExperienceCategory, seed: UInt64) -> String? {
+        guard let list = words[category], !list.isEmpty else { return nil }
+        var rng = SeededGenerator(seed: seed)
+        return list.randomElement(using: &rng)
     }
 }
 

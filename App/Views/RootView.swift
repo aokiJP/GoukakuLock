@@ -39,15 +39,21 @@ struct RootView: View {
 }
 
 struct MainTabView: View {
+    @Environment(NotificationRouter.self) private var router
+
     var body: some View {
-        TabView {
-            Tab("今日", systemImage: "checkmark.seal") {
+        @Bindable var router = router
+        TabView(selection: $router.tab) {
+            Tab("今日", systemImage: "checkmark.seal", value: MainTab.today) {
                 HomeView()
             }
-            Tab("記録", systemImage: "calendar") {
+            Tab("体験", systemImage: "sparkles", value: MainTab.experience) {
+                CompanionView()
+            }
+            Tab("記録", systemImage: "calendar", value: MainTab.history) {
                 HistoryView()
             }
-            Tab("設定", systemImage: "gearshape") {
+            Tab("設定", systemImage: "gearshape", value: MainTab.settings) {
                 SettingsView()
             }
         }

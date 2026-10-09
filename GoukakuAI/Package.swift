@@ -16,5 +16,7 @@ let package = Package(
     targets: [
         .target(name: "GoukakuAI"),
         .testTarget(name: "GoukakuAITests", dependencies: ["GoukakuAI"]),
+        // アプリから見える形(public)で使えるか
+        .testTarget(name: "GoukakuAIAPITests", dependencies: ["GoukakuAI"]),
     ]
 )

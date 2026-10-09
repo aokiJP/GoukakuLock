@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import GoukakuAI
 
 /// 相棒と話す。どんな体験をしてみたいか、話しながら考える(会話はこの iPhone の中だけ)

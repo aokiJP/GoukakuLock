@@ -6,6 +6,7 @@ import GoukakuKit
 /// S-06 設定。ロック中に変えられない項目は隠さず、押すと理由を出す。
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
+    @Environment(AIRuntime.self) private var runtime
     @State private var confirmDeleteAll = false
     @State private var exportURL: URL?
 
@@ -29,6 +30,27 @@ struct SettingsView: View {
                 quotaSection
                 Section("通知") {
                     NavigationLink("リマインド") { ReminderSettingsView() }
+                }
+                Section {
+                    NavigationLink {
+                        AISettingsView()
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Label("AI", systemImage: "cpu")
+                            Text(runtime.statusLine)
+                                .font(.caption)
+                                .foregroundStyle(Theme.muted)
+                        }
+                    }
+                    NavigationLink {
+                        GrowthView()
+                    } label: {
+                        Label("体験の地図・相棒が覚えていること", systemImage: "leaf.arrow.triangle.circlepath")
+                    }
+                } header: {
+                    Text("相棒AI")
+                } footer: {
+                    Text("AIはこの iPhone の中だけで動きます。")
                 }
                 Section {
                     NavigationLink {

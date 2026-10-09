@@ -4,6 +4,7 @@ import GoukakuCore
 /// S-03 チェックイン(自己申告:一言メモは5文字以上)
 struct CheckInView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CompanionModel.self) private var companion
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let habit: HabitSnapshot
@@ -89,6 +90,8 @@ struct CheckInView: View {
 
     private func record() {
         guard let achievement = model.checkIn(habit: habit, minimum: useMinimum, note: note) else { return }
+        // 相棒が、書いたことにふれてひとこと返す(採点はしない)
+        companion.reflectOnCheckIn(habit: habit, achievement: achievement, note: note)
         noteFocused = false
         if reduceMotion {
             recorded = achievement
@@ -119,12 +122,15 @@ struct CheckInView: View {
             .foregroundStyle(Theme.muted)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
+            companionNote(for: achievement)
+                .padding(.horizontal, 24)
             Spacer()
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 let left = Int(300 - context.date.timeIntervalSince(achievement.at))
                 if left > 0 {
                     Button("取り消す(あと \(left / 60):\(String(format: "%02d", left % 60)))") {
                         if model.undoCheckIn(achievement.id) {
+                            companion.removeCheckInLog(for: achievement.id)
                             recorded = nil
                         }
                     }
@@ -136,6 +142,22 @@ struct CheckInView: View {
                 .buttonStyle(SealButtonStyle())
                 .padding(.horizontal)
                 .padding(.bottom)
+        }
+    }
+}
+
+extension CheckInView {
+    /// 相棒のひとこと(鉛筆の書き込み)
+    @ViewBuilder
+    func companionNote(for achievement: Achievement) -> some View {
+        if let log = companion.checkInLog(for: achievement.id) {
+            if let reply = log.reply {
+                PencilNote(text: reply + (log.question.map { "\n\($0)" } ?? ""),
+                           caption: log.replyFromAI ? "相棒(\(log.engineName ?? "AI"))" : "相棒")
+                    .transition(.opacity)
+            } else if companion.reflecting == log.id {
+                PencilNote(text: companion.reflectionPreview, caption: "相棒", writing: true)
+            }
         }
     }
 }

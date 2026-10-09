@@ -44,6 +44,9 @@ struct HomeView: View {
                         WeeklyReviewCard(week: week) { sheet = .review(week) }
                     }
                     todaySection
+                    if model.decision != nil {
+                        CompanionHomeCard()
+                    }
                     RecentStrip()
                     StreakRow(onShare: { sheet = .share })
                     WidgetNudgeCard(installed: widgetInstalled)

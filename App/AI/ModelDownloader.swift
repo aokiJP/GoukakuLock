@@ -144,7 +144,8 @@ final class FileTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Senda
         var continuation: CheckedContinuation<Int64, Error>
         var written: Int64 = 0
         var moveError: Error?
-        var finished = false
+        /// 最後に知らせたバイト数(知らせすぎないよう、4MB ごとにまとめる)
+        var reported: Int64 = 0
     }
 
     private let lock = NSLock()
@@ -185,9 +186,15 @@ final class FileTransfer: NSObject, URLSessionDownloadDelegate, @unchecked Senda
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64,
                     totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         lock.lock()
-        let handler = handlers[downloadTask.taskIdentifier]
+        guard var handler = handlers[downloadTask.taskIdentifier],
+              totalBytesWritten - handler.reported >= 4 * 1_048_576 || totalBytesWritten == totalBytesExpectedToWrite else {
+            lock.unlock()
+            return
+        }
+        handler.reported = totalBytesWritten
+        handlers[downloadTask.taskIdentifier] = handler
         lock.unlock()
-        handler?.progress(totalBytesWritten)
+        handler.progress(totalBytesWritten)
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {

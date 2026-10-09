@@ -1,4 +1,5 @@
 import SwiftUI
+import StripePaymentSheet
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
@@ -26,6 +27,8 @@ struct RootView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: model.celebration?.id)
         .onOpenURL { url in
+            // 預け金の支払いで、カード会社の確認(3D セキュア)から戻ってきたとき
+            if StripeAPI.handleURLCallback(with: url) { return }
             router.handle(url: url)
         }
         .alert(model.message?.title ?? "",

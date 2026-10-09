@@ -106,7 +106,7 @@ public final class MLXEngine: LanguageEngine {
             repetitionPenalty: repetitionPenalty.map { Float($0) },
             repetitionContextSize: 64
         )
-        let history: [Chat.Message] = request.history.map {
+        let history: [Chat.Message] = request.turns.map {
             $0.role == .user ? .user($0.text) : .assistant($0.text)
         }
         var context: [String: any Sendable]? = nil

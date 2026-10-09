@@ -74,6 +74,20 @@ enum Fmt {
         let c = calendar.dateComponents([.year, .month, .day], from: date)
         return "\(c.year ?? 0)/\(c.month ?? 0)/\(c.day ?? 0) \(hm(date))"
     }
+
+    /// 円 → "2,100円"
+    static func yen(_ amount: Int) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.locale = Locale(identifier: "ja_JP")
+        return (f.string(from: NSNumber(value: amount)) ?? "\(amount)") + "円"
+    }
+
+    /// 日付 → "10/12"
+    static func monthDay(_ date: Date) -> String {
+        let c = calendar.dateComponents([.month, .day], from: date)
+        return "\(c.month ?? 0)/\(c.day ?? 0)"
+    }
 }
 
 extension Acceptance.RejectReason {

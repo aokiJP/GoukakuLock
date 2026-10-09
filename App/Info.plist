@@ -37,6 +37,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GoukakuAppGroupID</key>
 	<string>group.com.aokijp.goukakulock</string>
+	<key>GoukakuDepositServerURL</key>
+	<string>$(GOUKAKU_DEPOSIT_SERVER_URL)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -44,7 +46,7 @@
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>証拠写真を撮るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。</string>
+	<string>証拠写真を撮るためと、預け金のカードを読み取るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -75,12 +77,12 @@
 			<string>com.aokijp.goukakulock.quick.timer</string>
 		</dict>
 	</array>
-	<key>UIFileSharingEnabled</key>
-	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

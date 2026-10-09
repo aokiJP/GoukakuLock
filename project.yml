@@ -18,8 +18,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "2.0.1"
-    CURRENT_PROJECT_VERSION: "4"
+    MARKETING_VERSION: "2.1.0"
+    CURRENT_PROJECT_VERSION: "5"
     TARGETED_DEVICE_FAMILY: "1"
     IPHONEOS_DEPLOYMENT_TARGET: "18.0"
     # 自分のチームで署名するときは、ここに Team ID を入れる(Xcode の Signing & Capabilities でも可)
@@ -39,6 +39,10 @@ packages:
     path: GoukakuAI
   GoukakuAIMLX:
     path: GoukakuAIMLX
+  # 預け金:カードの入力と支払いは Stripe の画面(PaymentSheet)で。カード番号はアプリに残らない
+  Stripe:
+    url: https://github.com/stripe/stripe-ios-spm
+    exactVersion: 26.13.0
 
 targets:
   GoukakuLock:
@@ -59,6 +63,8 @@ targets:
         product: GoukakuShared
       - package: GoukakuAI
       - package: GoukakuAIMLX
+      - package: Stripe
+        product: StripePaymentSheet
       - target: GoukakuMonitor
       - target: GoukakuShieldConfig
       - target: GoukakuShieldAction
@@ -81,9 +87,11 @@ targets:
         BGTaskSchedulerPermittedIdentifiers:
           - com.aokijp.goukakulock.refresh
         GoukakuAppGroupID: &group group.com.aokijp.goukakulock
+        # 預け金のサーバーの URL(ビルドのときに GOUKAKU_DEPOSIT_SERVER_URL で入れられる。空ならアプリの設定で入れる)
+        GoukakuDepositServerURL: $(GOUKAKU_DEPOSIT_SERVER_URL)
         ITSAppUsesNonExemptEncryption: false
         NSSupportsLiveActivities: true
-        NSCameraUsageDescription: 証拠写真を撮るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。
+        NSCameraUsageDescription: 証拠写真を撮るためと、預け金のカードを読み取るために使います。写真はこの iPhone の中だけに保存し、位置情報は残しません。
         # ファイル App・Finder から AIModels フォルダにモデルを置けるように
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
@@ -112,6 +120,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: &bundle com.aokijp.goukakulock
         PRODUCT_NAME: GoukakuLock
+        GOUKAKU_DEPOSIT_SERVER_URL: ""
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-Sumi AppIcon-Kin AppIcon-Sakura"

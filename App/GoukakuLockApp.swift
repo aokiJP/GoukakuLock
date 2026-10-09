@@ -10,6 +10,7 @@ struct GoukakuLockApp: App {
     @State private var router: NotificationRouter
     @State private var runtime: AIRuntime
     @State private var companion: CompanionModel
+    @State private var deposit: DepositModel
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -23,6 +24,8 @@ struct GoukakuLockApp: App {
         // 相棒AI:端末の様子を調べて、使うAIを決める(モデルの読み込みは使うときに)
         _runtime = State(initialValue: AIRuntime.shared)
         _companion = State(initialValue: CompanionModel.shared)
+        // 預け金:サーバーとつないでいれば、達成した日の返金を知らせる
+        _deposit = State(initialValue: DepositModel.shared)
         ModelStore.ensureInbox()
     }
 
@@ -33,15 +36,20 @@ struct GoukakuLockApp: App {
                 .environment(router)
                 .environment(runtime)
                 .environment(companion)
+                .environment(deposit)
                 .modelContainer(model.container)
                 .tint(Theme.seal)
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
             guard phase == .active else { return }
-            Task { await model.onLaunchOrForeground() }
+            Task {
+                await model.onLaunchOrForeground()
+                await deposit.sync()
+            }
         }
         .backgroundTask(.appRefresh(AppConstants.refreshTaskID)) { [model] in
             await model.onLaunchOrForeground()   // 第16.4節の 1〜8 と同じ
+            await DepositModel.shared.sync()
             scheduleNextRefresh()
         }
     }

@@ -1,0 +1,89 @@
+name: Deposit server
+
+# 預け金のサーバー(server/)のテストと、Cloudflare Workers へのデプロイ。
+# デプロイは「Run workflow」で deploy にチェックを入れたときだけ。要るもの(Settings › Secrets and variables › Actions):
+#   Secrets:   CLOUDFLARE_API_TOKEN(Workers を編集できるトークン)・CLOUDFLARE_ACCOUNT_ID
+#              STRIPE_SECRET_KEY(sk_test_… / sk_live_…)・DEPOSIT_TOKEN_SECRET(長いランダムな文字列)
+#   Variables: STRIPE_PUBLISHABLE_KEY(pk_test_… / pk_live_…)・DEPOSIT_REGISTRATION_CODE(任意。招待コード)
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", ".github/workflows/server.yml"]
+  pull_request:
+    paths: ["server/**"]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Cloudflare Workers に出す"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests (fake Stripe)
+        working-directory: server
+        run: npm test
+      - name: Bundle check (wrangler dry run)
+        working-directory: server
+        run: npx --yes wrangler@4.141.0 deploy --dry-run --outdir dist
+
+  deploy:
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check settings
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SK: ${{ secrets.STRIPE_SECRET_KEY }}
+          TS: ${{ secrets.DEPOSIT_TOKEN_SECRET }}
+          PK: ${{ vars.STRIPE_PUBLISHABLE_KEY }}
+        run: |
+          missing=""
+          [ -n "$CF_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CF_ACCOUNT" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$SK" ] || missing="$missing STRIPE_SECRET_KEY"
+          [ -n "$TS" ] || missing="$missing DEPOSIT_TOKEN_SECRET"
+          [ -n "$PK" ] || missing="$missing STRIPE_PUBLISHABLE_KEY(Variables)"
+          if [ -n "$missing" ]; then
+            echo "::error::設定が足りません:$missing(README の「預け金のサーバーを立てる」を参照)"
+            exit 1
+          fi
+          case "$SK" in sk_test_*|rk_test_*) mode=test ;; *) mode=live ;; esac
+          case "$PK" in pk_test_*) pmode=test ;; *) pmode=live ;; esac
+          if [ "$mode" != "$pmode" ]; then
+            echo "::error::秘密鍵と公開鍵のモード(テスト/本番)がそろっていません"
+            exit 1
+          fi
+          echo "Stripe: $mode モード" >> "$GITHUB_STEP_SUMMARY"
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.141.0"
+          workingDirectory: server
+          secrets: |
+            STRIPE_SECRET_KEY
+            TOKEN_SECRET
+          command: >-
+            deploy
+            --var STRIPE_PUBLISHABLE_KEY:${{ vars.STRIPE_PUBLISHABLE_KEY }}
+            --var REGISTRATION_CODE:${{ vars.DEPOSIT_REGISTRATION_CODE }}
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          TOKEN_SECRET: ${{ secrets.DEPOSIT_TOKEN_SECRET }}
+      - name: Summary
+        run: |
+          echo "デプロイしました。アプリの 設定 › 預け金 に、Workers の URL(https://goukaku-deposit.<あなたのサブドメイン>.workers.dev)を入れてください。" >> "$GITHUB_STEP_SUMMARY"

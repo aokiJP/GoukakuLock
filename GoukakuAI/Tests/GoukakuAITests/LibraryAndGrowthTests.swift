@@ -11,7 +11,6 @@ final class LibraryAndGrowthTests: XCTestCase {
             XCTAssertEqual(items.filter { $0.category == c }.count, 12, c.label)
         }
         for item in items + ExperienceLibrary.somedayItems + ExperienceLibrary.genericReframes {
-            XCTAssertTrue(ContentGuard.isAcceptable(item.draft()), item.title)
             XCTAssertLessThanOrEqual(item.title.count, 30, item.title)
             XCTAssertFalse(item.line.hasSuffix("。"), "ひとことは「かも」で終える:\(item.title)")
         }
@@ -30,7 +29,6 @@ final class LibraryAndGrowthTests: XCTestCase {
             XCTAssertEqual(picks.count, 3)
             for p in picks {
                 XCTAssertEqual(p.duration, .five, p.title)
-                XCTAssertNotEqual(p.category, .outside, p.title)
                 guard case .library(let id) = p.origin, let item = ExperienceLibrary.item(id) else { return XCTFail() }
                 XCTAssertNotEqual(item.place, .outside, p.title)
                 XCTAssertEqual(item.energy, .low, p.title)
@@ -89,8 +87,8 @@ final class LibraryAndGrowthTests: XCTestCase {
                        ["英語を勉強中", "散歩が好き", "猫と暮らしている"])
     }
 
-    /// 体験帳の体験は、どの様子でも「いまの自分」に合い、内容の確認も通る(AIに求めることを体験帳も守る)
-    func testLibraryPicksAlwaysFitTheContextAndPassTheGuard() {
+    /// 体験帳(AIが動かないときの備え)の体験は、どの様子でも「いまいる場所」に合う
+    func testLibraryPicksAlwaysFitThePlace() {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
         for hour in [2, 7, 14, 21] {
@@ -99,23 +97,18 @@ final class LibraryAndGrowthTests: XCTestCase {
                     let c = CompanionContext(now: cal.date(from: DateComponents(year: 2026, month: 10, day: 9, hour: hour))!,
                                              timeZone: cal.timeZone, budget: .hourPlus, place: place, mood: mood)
                     for seed in 0..<30 {
-                        for d in ExperienceLibrary.pick(for: c, count: 3, avoid: [], seed: UInt64(seed)) {
-                            XCTAssertTrue(ContextFit.fits(d, context: c), "\(hour)時・\(place):\(d.title)")
-                            XCTAssertTrue(ContentGuard.isAcceptable(d), d.title)
+                        let picks = ExperienceLibrary.pick(for: c, count: 3, avoid: [], seed: UInt64(seed))
+                        XCTAssertEqual(picks.count, 3)
+                        for d in picks {
+                            guard case .library(let id) = d.origin, let item = ExperienceLibrary.item(id) else {
+                                return XCTFail(d.title)
+                            }
+                            if place == .home { XCTAssertNotEqual(item.place, .outside, "\(hour)時・\(place):\(d.title)") }
+                            if place == .outside { XCTAssertNotEqual(item.place, .home, "\(hour)時・\(place):\(d.title)") }
                         }
                     }
                 }
             }
-        }
-    }
-
-    /// 体験帳のすべての項目(提案・工夫・いつか)が、内容の確認を通る
-    func testEveryLibraryItemPassesTheGuard() {
-        let all = ExperienceLibrary.items + ExperienceLibrary.reframes.flatMap(\.items)
-            + ExperienceLibrary.genericReframes + ExperienceLibrary.somedayItems
-        XCTAssertGreaterThan(all.count, 100)
-        for item in all {
-            XCTAssertTrue(ContentGuard.isAcceptable(item.draft()), item.title)
         }
     }
 }

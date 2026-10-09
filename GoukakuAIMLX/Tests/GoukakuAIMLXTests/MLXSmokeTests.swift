@@ -61,14 +61,14 @@ final class MLXSmokeTests: XCTestCase {
                                        timeZone: cal.timeZone, budget: .fifteen, place: .home, mood: .tired,
                                        notes: ["英語の勉強をしている", "散歩が好き"], recentExperiences: ["夕焼けを見に屋上へ"])
         let tuning = self.tuning
-        print("[smoke] 調整: 提案 \(tuning.freeSuggestions ? "自由に考える" : "体験帳にひとことを添える")・文脈 \(tuning.contextItems)・きっかけの言葉 \(tuning.useHints ? "あり" : "なし")・温度 \(tuning.suggestionTemperature)")
+        print("[smoke] 調整: 文脈 \(tuning.contextItems)・会話 \(tuning.chatTurns) 往復・きっかけの言葉 \(tuning.useHints ? "あり" : "なし")・温度 \(tuning.suggestionTemperature)")
         let brain = CompanionBrain(engine: engine, tuning: tuning)
         var ideas: [ExperienceDraft] = []
         for try await event in brain.suggestions(context: context, avoid: [], seed: 1) {
             switch event {
             case .value(let draft):
                 ideas.append(draft)
-                let kind = draft.isTailored ? "体験帳+AI" : draft.isFromAI ? "AI" : "体験帳"
+                let kind = draft.isFromAI ? "AI" : "体験帳"
                 print("[smoke] 提案(\(kind)): \(draft.title) / \(draft.line) / \(draft.firstStep) / \(draft.duration.label) / \(draft.category.label)")
             case .notice(let notice):
                 print("[smoke] 知らせ: \(notice)")
@@ -77,8 +77,8 @@ final class MLXSmokeTests: XCTestCase {
             }
         }
         XCTAssertEqual(ideas.count, 3)
-        // 小さいモデルは、いまの様子に合わない提案をはじかれて体験帳で補うことがある(それも正しい動き)
-        if ideas.allSatisfy({ !$0.isFromAI }) { print("[smoke] 注意: AIの提案はすべて体験帳で補った") }
+        // 中身でははじかないので、AIが動けば提案はAIのもの(重なったときだけ体験帳で補う)
+        XCTAssertTrue(ideas.contains(where: \.isFromAI), "AIの提案が1つもない")
 
         // ふり返り
         var reflection: ReflectionDraft?
@@ -89,6 +89,18 @@ final class MLXSmokeTests: XCTestCase {
         let r = try XCTUnwrap(reflection)
         print("[smoke] ふり返り(\(r.fromAI ? "AI" : "体験帳")): \(r.reply) / 問い: \(r.question ?? "-") / メモ: \(r.noteCandidate ?? "-")")
         XCTAssertTrue(r.fromAI, "AIのふり返りが使えなかった")
+
+        // 相棒と話す(2往復。決まりごとなしで、人と話すように返るか)
+        var history: [ChatTurn] = []
+        for message in ["最近ちょっと疲れてて、何もやる気が出ないんだよね", "じゃあ、今夜なにしたらいいと思う?"] {
+            var reply = ""
+            for try await event in brain.chat(context: context, history: history, message: message) {
+                if case .value(let text) = event { reply = text }
+            }
+            print("[smoke] 会話: あなた「\(message)」→ 相棒「\(reply.replacingOccurrences(of: "\n", with: " "))」")
+            XCTAssertFalse(reply.isEmpty, "会話の返事が空")
+            history += [ChatTurn(.user, message), ChatTurn(.assistant, reply)]
+        }
 
         await engine.unload()
         let loaded = await engine.isLoaded()

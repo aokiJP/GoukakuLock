@@ -42,16 +42,12 @@ public struct ModelSpec: Codable, Sendable, Hashable, Identifiable {
     public var repetitionPenalty: Double?
     /// このモデルを同梱した IPA を作るか
     public var ipa: Bool
-    /// 体験を自由に考えてもらうか。false なら体験帳の体験にひとことを添えてもらう
-    /// (小さいモデル向け。なければ大きさで決める)
-    public var freeSuggestions: Bool?
 
     public init(id: String, name: String, summary: String, family: String, repo: String, revision: String,
                 files: [String], stripPrefixes: [String], downloadBytes: Int64, installedBytes: Int64,
                 runtimeBytes: Int64, recommendedRAMGB: Double, japanese: Int, speed: Int, speedNote: String,
                 license: String, licenseURL: String, extraEOSTokens: [String] = [],
-                templateFlags: [String: Bool] = [:], repetitionPenalty: Double? = nil, ipa: Bool = true,
-                freeSuggestions: Bool? = nil) {
+                templateFlags: [String: Bool] = [:], repetitionPenalty: Double? = nil, ipa: Bool = true) {
         self.id = id
         self.name = name
         self.summary = summary
@@ -73,7 +69,6 @@ public struct ModelSpec: Codable, Sendable, Hashable, Identifiable {
         self.templateFlags = templateFlags
         self.repetitionPenalty = repetitionPenalty
         self.ipa = ipa
-        self.freeSuggestions = freeSuggestions
     }
 
     /// Hugging Face のダウンロード URL

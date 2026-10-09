@@ -3,6 +3,7 @@ import XCTest
 /// シミュレータで画面を一通り動かし、各画面のスクリーンショットを残す(DEBUG ビルドで実行)。
 /// Screen Time の許可はシミュレータでは得られないので、はじめの設定の「デバッグ」の抜け道を使う。
 /// シミュレータでは MLX が動かないので、相棒AIは「見本のAI」(Gemma 4 E2B の出力をもとにした決まった文)で動かす。
+/// 預け金はサーバーにつながず、「見本の預け金」(4日目の週)を見せる。
 final class WalkthroughUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -13,7 +14,8 @@ final class WalkthroughUITests: XCTestCase {
     @MainActor
     func testWalkthrough() throws {
         app = XCUIApplication()
-        app.launchArguments += ["-uiTesting", "-uiTestingScriptedAI", "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"]
+        app.launchArguments += ["-uiTesting", "-uiTestingScriptedAI", "-uiTestingSampleDeposit",
+                                "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP"]
         app.launchEnvironment["TZ"] = "Asia/Tokyo"
         app.launch()
 
@@ -100,6 +102,12 @@ final class WalkthroughUITests: XCTestCase {
         // S-02 ホーム(達成)
         waitFor(app.buttons["緊急解除"])
         snap("15-ホーム-達成")
+        // ホームの「今週の預け金」(見本)
+        let depositCard = app.buttons["deposit.home"]
+        if depositCard.waitForExistence(timeout: 3) {
+            scrollTo(depositCard)
+            snap("16-ホーム-預け金")
+        }
 
         // 体験タブ:体験を3つ見つける → やってみる → やってみた → 相棒の返事
         tap(app.tabBars.buttons["体験"])
@@ -205,6 +213,15 @@ final class WalkthroughUITests: XCTestCase {
         tap(app.tabBars.buttons["設定"])
         sleep(1)
         snap("41-設定")
+        // 設定 › 預け金(見本の週・預ける・サーバー)
+        scrollTo(app.buttons["settings.deposit"])
+        tap(app.buttons["settings.deposit"])
+        waitFor(app.navigationBars["預け金"])
+        snap("38-預け金")
+        app.swipeUp()
+        snap("39-預け金-下")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        scrollBackTo(app.buttons["settings.deposit"])
         scrollTo(app.buttons["ウィジェット・Siri・通知から記録する"])
         tap(app.buttons["ウィジェット・Siri・通知から記録する"])
         sleep(1)

@@ -38,10 +38,9 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(d.choice, .mlx(lfm))
         XCTAssertEqual(d.skipped.map(\.name), ["gemma"])
         XCTAssertTrue(d.skipped[0].reason.contains("メモリが足りない"))
-        XCTAssertEqual(d.tuning.contextItems, 3, "小さいモデルにはプロンプトを短く")
+        XCTAssertEqual(d.tuning.contextItems, 4, "小さいモデルにはプロンプトを短く")
         XCTAssertFalse(d.tuning.useHints, "小さいモデルにはきっかけの言葉を添えない")
-        XCTAssertFalse(d.tuning.freeSuggestions, "小さいモデルは体験帳にひとことを添える")
-        XCTAssertTrue(d.reasons.contains { $0.contains("体験帳の確かな体験") }, "提案のしかたも理由に出す")
+        XCTAssertFalse(d.reasons.contains { $0.contains("体験帳") }, "小さいモデルも自分で考える")
         XCTAssertEqual(d.tuning.suggestionTemperature, 0.7, accuracy: 0.001)
         let big = EngineRouter.decide(profile: profile(ramGB: 8, availableGB: 6), installed: [gemma, lfm], preference: .automatic)
         XCTAssertEqual(big.choice, .mlx(gemma))
@@ -135,31 +134,22 @@ final class RouterTests: XCTestCase {
             XCTAssertLessThanOrEqual(m.installedBytes, m.downloadBytes, m.id)
             XCTAssertEqual(m.revision.count, 40, "\(m.id):リビジョンはコミットで固定する")
             XCTAssertTrue((1...5).contains(m.japanese) && (1...5).contains(m.speed), m.id)
-            XCTAssertNotNil(m.freeSuggestions, "\(m.id):提案のしかた(自由か、体験帳にひとことか)を決めておく")
         }
     }
 
-    func testSuggestionStyleFollowsCatalogThenSize() {
-        // 目録で決めたもの
-        var small = spec("lfm", runtimeGB: 1.0, japanese: 3)
-        small.freeSuggestions = false
-        var big = spec("gemma", runtimeGB: 3.2, japanese: 5)
-        big.freeSuggestions = true
+    /// 大きさで変えるのは、プロンプトに入れる量・会話を覚えている長さ・きっかけの言葉と温度だけ
+    func testTuningFollowsSizeOnly() {
         var tuning = GenerationTuning()
-        tuning.apply(for: installed(small))
-        XCTAssertFalse(tuning.freeSuggestions)
-        tuning.apply(for: installed(big))
-        XCTAssertTrue(tuning.freeSuggestions)
-        // 大きくても、目録で「ひとこと」にしたものはそれ(Qwen3.5 4B)
-        var qwen4 = spec("qwen4b", runtimeGB: 2.75, japanese: 3)
-        qwen4.freeSuggestions = false
-        tuning.apply(for: installed(qwen4))
-        XCTAssertFalse(tuning.freeSuggestions)
-        XCTAssertTrue(tuning.useHints, "きっかけの言葉は大きさで決める")
-        // 目録にないモデルは大きさで
-        tuning.apply(for: installed(spec("unknown-small", runtimeGB: 1.2, japanese: 3)))
-        XCTAssertFalse(tuning.freeSuggestions)
-        tuning.apply(for: installed(spec("unknown-big", runtimeGB: 3.0, japanese: 3)))
-        XCTAssertTrue(tuning.freeSuggestions)
+        tuning.apply(for: installed(spec("lfm", runtimeGB: 1.0, japanese: 3)))
+        XCTAssertEqual(tuning.contextItems, 4)
+        XCTAssertEqual(tuning.chatTurns, 6)
+        XCTAssertFalse(tuning.useHints)
+        tuning.apply(for: installed(spec("qwen2b", runtimeGB: 1.5, japanese: 2)))
+        XCTAssertEqual(tuning.chatTurns, 8)
+        tuning.apply(for: installed(spec("gemma", runtimeGB: 3.2, japanese: 5)))
+        XCTAssertEqual(tuning.contextItems, 6)
+        XCTAssertEqual(tuning.chatTurns, 10)
+        XCTAssertTrue(tuning.useHints)
+        XCTAssertEqual(tuning.suggestionTemperature, 0.85, accuracy: 0.001)
     }
 }

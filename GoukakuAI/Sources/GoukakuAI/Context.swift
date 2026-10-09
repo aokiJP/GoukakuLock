@@ -53,11 +53,6 @@ public struct CompanionContext: Sendable, Equatable {
     /// 時間帯の言い方
     public var timeOfDay: TimeOfDay { TimeOfDay(hour: hour) }
 
-    /// 出かける体験を出してよいか(深夜は出さない。夜に家にいる人にも出さない)
-    public var allowsGoingOut: Bool {
-        timeOfDay.allowsOutside && !(place == .home && timeOfDay == .night)
-    }
-
     /// 「金曜日の夜(21時ごろ)」
     public var whenPhrase: String {
         let days = ["日", "月", "火", "水", "木", "金", "土"]
@@ -92,7 +87,4 @@ public enum TimeOfDay: String, Sendable, CaseIterable {
         case .night: return "夜"
         }
     }
-
-    /// 外に出る体験を出してよい時間帯か(深夜は家の中だけ)
-    public var allowsOutside: Bool { self != .lateNight }
 }

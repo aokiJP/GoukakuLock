@@ -27,7 +27,8 @@ final class PublicAPITests: XCTestCase {
         _ = (decision.reasons, decision.tuning.contextItems, profile.thermal.label, profile.appleIntelligence.label)
 
         let engine = ScriptedEngine(info: EngineInfo(kind: .mlx, id: "s", name: "S")) { request in
-            _ = (request.system, request.history.map(\.text), request.prompt, request.maxTokens, request.temperature)
+            _ = (request.system, request.examples.map(\.text), request.history.map(\.text), request.turns.count,
+                 request.prompt, request.maxTokens, request.temperature)
             return "体験: 空を見る\nひとこと: 風を感じるかも\nはじめ方: 外に出る\n時間: 5分\n種類: そと"
         }
         let brain = CompanionBrain(engine: engine, tuning: GenerationTuning())
@@ -45,16 +46,14 @@ final class PublicAPITests: XCTestCase {
         XCTAssertEqual(drafts.first?.isFromAI, true)
         let own = ExperienceDraft(title: "t", line: "", firstStep: "", duration: .nearest(minutes: 12), category: .first, origin: .user)
         XCTAssertEqual(own.duration, .fifteen)
-        // 小さいモデル向け:体験帳の体験にひとことを添える
+        // 前の版で保存した「体験帳+相棒」のカードも読める
         let tailoredOrigin = ExperienceDraft.Origin.tailored("S", "id")
         let tailored = ExperienceDraft(title: "t", line: "l", firstStep: "", duration: .five, category: .mind, origin: tailoredOrigin)
         XCTAssertTrue(tailored.isTailored && tailored.isFromAI)
-        var small = GenerationTuning(freeSuggestions: false)
+        var small = GenerationTuning(contextItems: 4, chatTurns: 6, useHints: false, suggestionTemperature: 0.7)
         small.apply(for: installed)
-        _ = (small.freeSuggestions, small.useHints, small.suggestionTemperature, spec.freeSuggestions)
-        _ = ExperienceParser.tailoredLine(from: "ひとこと: 静かな夜に、小さな発見があるかも", title: "t")
-        _ = PromptBook.tailor(tailored, context: CompanionContext(), tuning: small)
-        _ = ContextFit.fits(tailored, context: CompanionContext())
+        _ = (small.useHints, small.suggestionTemperature, small.chatTurns)
+        XCTAssertNotNil(ExperienceParser.suggestion(from: "空を見る", angle: .outside, budget: .five, engine: "S", loose: true))
         _ = (ExperienceCategory(rawValue: "outside")?.symbol, DurationBucket(rawValue: 5)?.label, Feeling.calm.symbol, Place.home.label, Mood.tired.label)
         _ = ChatTurn(.user, "やあ").role == ChatTurn.Role.user
         _ = EngineInfo.rules.name

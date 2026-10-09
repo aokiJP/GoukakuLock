@@ -142,19 +142,16 @@ public struct GenerationTuning: Sendable, Equatable {
     public var chatTurns: Int
     /// 提案に「思いつきのきっかけ」の言葉を添えるか(小さいモデルはその言葉に引っぱられて話がそれるので添えない)
     public var useHints: Bool
-    /// 提案の1回目の温度(小さいモデルは低めにして、形と話の筋を守る)
+    /// 提案の1回目の温度(小さいモデルは低めにして、話の筋を保ちやすくする)
     public var suggestionTemperature: Double
-    /// 体験を自由に考えてもらうか。false なら体験帳の確かな体験に、この人向けのひとことを添えてもらう
-    public var freeSuggestions: Bool
 
-    public init(lengthScale: Double = 1, contextItems: Int = 6, chatTurns: Int = 6,
-                useHints: Bool = true, suggestionTemperature: Double = 0.85, freeSuggestions: Bool = true) {
+    public init(lengthScale: Double = 1, contextItems: Int = 6, chatTurns: Int = 10,
+                useHints: Bool = true, suggestionTemperature: Double = 0.85) {
         self.lengthScale = lengthScale
         self.contextItems = contextItems
         self.chatTurns = chatTurns
         self.useHints = useHints
         self.suggestionTemperature = suggestionTemperature
-        self.freeSuggestions = freeSuggestions
     }
 
     public func tokens(_ base: Int) -> Int { max(48, Int((Double(base) * lengthScale).rounded())) }
@@ -245,7 +242,6 @@ public enum EngineRouter {
             if let model = runnable.first(where: { $0.id == id }) {
                 reasons.insert("設定で選んだ「\(model.name)」を、この iPhone の中で動かしています", at: 0)
                 tuning.apply(for: model)
-                noteStyle(tuning, model: model, reasons: &reasons)
                 return RouteDecision(choice: .mlx(model), tuning: tuning, reasons: reasons, skipped: skipped)
             }
             let name = installed.first(where: { $0.id == id })?.name ?? id
@@ -272,7 +268,6 @@ public enum EngineRouter {
                 reasons.append("入っているモデルのうち、動かせて日本語が一番自然なものを選びました")
             }
             tuning.apply(for: best)
-            noteStyle(tuning, model: best, reasons: &reasons)
             return RouteDecision(choice: .mlx(best), tuning: tuning, reasons: reasons, skipped: skipped)
         }
 
@@ -287,12 +282,6 @@ public enum EngineRouter {
             reasons.insert("入っているモデルを今は動かせないので、体験帳から選んでいます", at: 0)
         }
         return RouteDecision(choice: .rules, tuning: tuning, reasons: reasons, skipped: skipped)
-    }
-
-    /// 提案のしかたを、理由に書き添える(体験帳にひとことを添えるモデルのとき)
-    static func noteStyle(_ tuning: GenerationTuning, model: InstalledModel, reasons: inout [String]) {
-        guard !tuning.freeSuggestions else { return }
-        reasons.append("「\(model.name)」は小さめのモデルなので、体験の提案は、体験帳の確かな体験にあなた向けのひとことを添えてもらいます")
     }
 
     /// 動かせるモデルの中から選ぶ:日本語の自然さ → 熱いときは軽いもの → 小さいもの
@@ -312,26 +301,23 @@ public enum EngineRouter {
 }
 
 extension GenerationTuning {
-    /// モデルの大きさで、プロンプトに入れる量を変える(小さいモデルほど少なく)
+    /// モデルの大きさで、プロンプトに入れる量と会話を覚えている長さを変える(小さいモデルほど少なく。メモリと速さのため)。
+    /// 話す中身はどのモデルでも同じようにしばらない
     public mutating func apply(for model: InstalledModel) {
         let gb = Double(model.runtimeBytes) / 1_073_741_824
         if gb < 1.2 {
-            contextItems = 3
-            chatTurns = 3
+            contextItems = 4
+            chatTurns = 6
         } else if gb < 2.2 {
             contextItems = 5
-            chatTurns = 5
+            chatTurns = 8
         } else {
             contextItems = 6
-            chatTurns = 6
+            chatTurns = 10
         }
-        // 小さいモデル(CI で LFM2.5・Qwen3.5 2B を見た):きっかけの言葉に引っぱられて
-        // 「地図」→「公共交通機関で…」のように話がそれるので、言葉は添えず、温度も下げる
+        // 小さいモデル(CI で LFM2.5・Qwen3.5 2B を見た)は、きっかけの言葉に引っぱられて話がそれやすいので
+        // 言葉は添えず、温度も少し下げる(話の筋を保つための調整で、中身はしばらない)
         useHints = gb >= 2.2
         suggestionTemperature = gb >= 2.2 ? 0.85 : 0.7
-        // 自由に考えてもらうか(目録で決めたものはそれ。なければ大きさで)。
-        // CI で読み比べると、小さいモデルは「公共交通機関で食べ物を持って眠り過ごす」のように崩れやすい一方、
-        // 決まった体験に一文を添えるのは上手なので、そちらを任せる
-        freeSuggestions = model.spec?.freeSuggestions ?? (gb >= 2.2)
     }
 }

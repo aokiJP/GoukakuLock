@@ -7,6 +7,7 @@ import GoukakuKit
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @Environment(AIRuntime.self) private var runtime
+    @Environment(DepositModel.self) private var deposit
     @State private var confirmDeleteAll = false
     @State private var exportURL: URL?
 
@@ -30,6 +31,21 @@ struct SettingsView: View {
                 quotaSection
                 Section("通知") {
                     NavigationLink("リマインド") { ReminderSettingsView() }
+                }
+                Section {
+                    NavigationLink {
+                        DepositView()
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Label("預け金(クレカ)", systemImage: "creditcard")
+                            Text(depositStatus)
+                                .font(.caption)
+                                .foregroundStyle(Theme.muted)
+                        }
+                    }
+                    .accessibilityIdentifier("settings.deposit")
+                } footer: {
+                    Text("先にカードで7日分を預け、達成した日の分が返ってきます。使うかどうかは自由です。")
                 }
                 Section {
                     NavigationLink {
@@ -103,6 +119,15 @@ struct SettingsView: View {
                 Text("コミット・記録・ストリーク・設定が消え、ロックと区間の登録も外れます。元に戻せません。")
             }
         }
+    }
+
+    private var depositStatus: String {
+        if let week = deposit.current {
+            let b = deposit.breakdown(for: week)
+            return "\(Fmt.yen(week.total))を預けています(返金 \(Fmt.yen(b.returned + b.returning)))"
+        }
+        if deposit.renewalProblem != nil { return "自動で預けられませんでした" }
+        return deposit.connected ? "いまは預けていません" : "使っていません"
     }
 
     // MARK: ロック

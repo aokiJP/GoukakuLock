@@ -44,6 +44,7 @@ struct HomeView: View {
                         WeeklyReviewCard(week: week) { sheet = .review(week) }
                     }
                     todaySection
+                    DepositHomeCard()
                     if model.decision != nil {
                         CompanionHomeCard()
                     }

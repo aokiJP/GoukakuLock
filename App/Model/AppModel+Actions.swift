@@ -109,6 +109,7 @@ extension AppModel {
             }
             rebuildReminders()
             Task { await updateBadge() }
+            NotificationCenter.default.post(name: .goukakuDayChanged, object: nil)   // 預け金の返金のきっかけ
             return achievement
         } catch {
             show(error: error)
@@ -188,6 +189,7 @@ extension AppModel {
             reload()
             rebuildReminders()
             Task { await updateBadge() }
+            NotificationCenter.default.post(name: .goukakuDayChanged, object: nil)
             return true
         } catch ActionError.undoWindowPassed {
             show("取り消せません", "記録から5分を過ぎたので取り消せません。")

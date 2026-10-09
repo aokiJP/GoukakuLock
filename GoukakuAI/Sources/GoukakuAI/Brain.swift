@@ -11,7 +11,8 @@ public enum BrainEvent<Value: Sendable>: Sendable {
 }
 
 /// 相棒の「頭」。AI(LanguageEngine)があれば AI で、なければ体験帳で答える。
-/// AIの出力が形を守らない・安全でないときは1回だけ作り直し、それでもだめなら体験帳で補う。
+/// AIの書いたことは中身でははじかず、そのまま使う。カードの形にならないときだけ1回作り直し、
+/// それでも形にならなければ、見出しのない文章のままカードにする(体験帳で補うのは、AIが動かないときだけ)。
 /// どの端末・どの状態でも、ちゃんと答えが返ることを大事にしている(完全環境適応)。
 public struct CompanionBrain: Sendable {
     public let engine: (any LanguageEngine)?
@@ -39,23 +40,18 @@ public struct CompanionBrain: Sendable {
                 let pickSeed = seed &+ UInt64(produced.count)
                 if let engine, !fellBack {
                     do {
-                        if self.tuning.freeSuggestions {
-                            // AIが自由に考える(大きいモデル)
-                            let hint = IdeaHints.pick(angle, seed: seed &+ UInt64(index) &* 7919)
-                            draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { attempt in
-                                PromptBook.suggestion(context: context, angle: angle, avoid: avoid + produced,
-                                                      tuning: self.tuning,
-                                                      temperature: attempt == 0 ? self.tuning.suggestionTemperature : 0.6,
-                                                      hint: attempt == 0 && self.tuning.useHints ? hint : nil)
-                            } parse: { raw in
-                                ExperienceParser.suggestion(from: raw, angle: angle, budget: context.budget, engine: engine.info.name)
-                            } accept: { d in
-                                !Self.isDuplicate(d.title, of: avoid + produced) && ContextFit.fits(d, context: context)
-                            }
-                        } else if let base = Self.libraryPick(context: context, angle: angle, avoid: avoid, produced: produced,
-                                                              seed: pickSeed) {
-                            // 体験帳の確かな体験に、AIがこの人向けのひとことを添える(小さいモデル)
-                            draft = try await self.tailored(base, engine: engine, context: context, purpose: nil, emit: emit)
+                        // AIが自由に考える
+                        let hint = IdeaHints.pick(angle, seed: seed &+ UInt64(index) &* 7919)
+                        draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { attempt in
+                            PromptBook.suggestion(context: context, angle: angle, avoid: avoid + produced,
+                                                  tuning: self.tuning,
+                                                  temperature: attempt == 0 ? self.tuning.suggestionTemperature : 0.6,
+                                                  hint: attempt == 0 && self.tuning.useHints ? hint : nil)
+                        } parse: { raw, last in
+                            ExperienceParser.suggestion(from: raw, angle: angle, budget: context.budget,
+                                                        engine: engine.info.name, loose: last)
+                        } accept: { d in
+                            !Self.isDuplicate(d.title, of: avoid + produced)
                         }
                     } catch is CancellationError {
                         throw CancellationError()
@@ -87,18 +83,13 @@ public struct CompanionBrain: Sendable {
                 let base = library.first { !produced.contains($0.title) } ?? library.dropFirst(index).first
                 if let engine, !fellBack {
                     do {
-                        if self.tuning.freeSuggestions {
-                            draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { _ in
-                                PromptBook.reframe(commit: commit, context: context, avoid: avoid + produced, tuning: self.tuning)
-                            } parse: { raw in
-                                ExperienceParser.suggestion(from: raw, angle: .learn, budget: context.budget, engine: engine.info.name)
-                            } accept: { d in
-                                !Self.isDuplicate(d.title, of: avoid + produced) && ContextFit.fits(d, context: context)
-                            }
-                        } else if let base {
-                            draft = try await self.tailored(base, engine: engine, context: context,
-                                                            purpose: "これは、この人が続けている「\(commit)」を、ちょっと楽しみにする工夫です。",
-                                                            emit: emit)
+                        draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { _ in
+                            PromptBook.reframe(commit: commit, context: context, avoid: avoid + produced, tuning: self.tuning)
+                        } parse: { raw, last in
+                            ExperienceParser.suggestion(from: raw, angle: .learn, budget: context.budget,
+                                                        engine: engine.info.name, loose: last)
+                        } accept: { d in
+                            !Self.isDuplicate(d.title, of: avoid + produced)
                         }
                     } catch is CancellationError {
                         throw CancellationError()
@@ -135,21 +126,13 @@ public struct CompanionBrain: Sendable {
                                                      seed: seed &+ UInt64(produced.count))
                 if let engine, !fellBack {
                     do {
-                        if self.tuning.freeSuggestions {
-                            draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { _ in
-                                PromptBook.someday(context: context, angle: angle, theme: theme, avoid: avoid + produced,
-                                                   tuning: self.tuning)
-                            } parse: { raw in
-                                ExperienceParser.someday(from: raw, angle: angle, engine: engine.info.name)
-                            } accept: { d in
-                                !Self.isDuplicate(d.title, of: avoid + produced)
-                            }
-                        } else if let base {
-                            var purpose = "これは、人生のどこかで味わってみたい「いつかの体験」です。"
-                            if let theme, !theme.trimmingCharacters(in: .whitespaces).isEmpty {
-                                purpose += "この人がいま気になっていること: \(theme)"
-                            }
-                            draft = try await self.tailored(base, engine: engine, context: context, purpose: purpose, emit: emit)
+                        draft = try await self.generateDraft(engine: engine, attempts: 2, emit: emit) { _ in
+                            PromptBook.someday(context: context, angle: angle, theme: theme, avoid: avoid + produced,
+                                               tuning: self.tuning)
+                        } parse: { raw, last in
+                            ExperienceParser.someday(from: raw, angle: angle, engine: engine.info.name, loose: last)
+                        } accept: { d in
+                            !Self.isDuplicate(d.title, of: avoid + produced)
                         }
                     } catch is CancellationError {
                         throw CancellationError()
@@ -214,7 +197,7 @@ public struct CompanionBrain: Sendable {
                         raw += piece
                         emit(.progress(OutputCleaner.clean(raw)))
                     }
-                    if let text = ExperienceParser.prose(from: raw, limit: 420), ContentGuard.isAcceptable(text: text) {
+                    if let text = ExperienceParser.prose(from: raw) {
                         emit(.value(text))
                         return
                     }
@@ -244,8 +227,7 @@ public struct CompanionBrain: Sendable {
                         raw += piece
                         emit(.progress(OutputCleaner.clean(raw)))
                     }
-                    if let text = ExperienceParser.prose(from: raw, limit: 300), ContentGuard.isAcceptable(text: text),
-                       TextCheck.hasJapanese(text) {
+                    if let text = ExperienceParser.prose(from: raw) {
                         emit(.value(InsightDraft(text: text, fromAI: true)))
                         return
                     }
@@ -275,18 +257,19 @@ public struct CompanionBrain: Sendable {
                 raw += piece
                 emit(.progress(OutputCleaner.clean(raw)))
             }
-            guard let text = ExperienceParser.prose(from: raw, limit: 900) else { throw AIError.emptyOutput }
+            guard let text = ExperienceParser.prose(from: raw) else { throw AIError.emptyOutput }
             emit(.value(text))
         }
     }
 
     // MARK: 中身
 
-    /// 1つ作る:生成 → 読む → だめなら作り直す
+    /// 1つ作る:生成 → 読む → カードの形にならなければ作り直す。
+    /// parse の2つ目は「最後の1回か」(最後は見出しがなくても、書いたことをそのまま使う)
     func generateDraft(engine: any LanguageEngine, attempts: Int,
                        emit: @Sendable (BrainEvent<ExperienceDraft>) -> Void,
                        request: (Int) -> GenerationRequest,
-                       parse: (String) -> ExperienceDraft?,
+                       parse: (String, Bool) -> ExperienceDraft?,
                        accept: (ExperienceDraft) -> Bool) async throws -> ExperienceDraft? {
         for attempt in 0..<attempts {
             var raw = ""
@@ -294,36 +277,12 @@ public struct CompanionBrain: Sendable {
                 raw += piece
                 emit(.progress(Self.titlePreview(raw)))
             }
-            if let draft = parse(raw), accept(draft) { return draft }
+            if let draft = parse(raw, attempt == attempts - 1), accept(draft) { return draft }
         }
         return nil
     }
 
-    /// 体験帳の体験に、AIがこの人向けのひとことを添える(だめなら体験帳のまま返す)
-    func tailored(_ base: ExperienceDraft, engine: any LanguageEngine, context: CompanionContext, purpose: String?,
-                  emit: @Sendable (BrainEvent<ExperienceDraft>) -> Void) async throws -> ExperienceDraft {
-        emit(.progress(base.title))
-        for attempt in 0..<2 {
-            var request = PromptBook.tailor(base, context: context, purpose: purpose, tuning: tuning)
-            if attempt > 0 { request.temperature = 0.5 }
-            var raw = ""
-            for try await piece in engine.generate(request) { raw += piece }
-            if let line = ExperienceParser.tailoredLine(from: raw, title: base.title, firstStep: base.firstStep,
-                                                        context: context) {
-                var draft = base
-                draft.line = line
-                if case .library(let id) = base.origin {
-                    draft.origin = .tailored(engine.info.name, id)
-                } else {
-                    draft.origin = .tailored(engine.info.name, "")
-                }
-                return draft
-            }
-        }
-        return base
-    }
-
-    /// 体験帳から、その種類の体験を1つ(なければ種類を問わず)。
+    /// 体験帳から、その種類の体験を1つ(なければ種類を問わず。AIが動かないときに使う)。
     /// 最近出したものを避けると何も残らないときは、今回まだ出していないものから選ぶ(提案が欠けないように)
     static func libraryPick(context: CompanionContext, angle: ExperienceCategory, avoid: [String], produced: [String],
                             seed: UInt64) -> ExperienceDraft? {

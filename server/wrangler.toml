@@ -1,0 +1,22 @@
+# 合格ロックの預け金サーバー(Cloudflare Workers)
+# 秘密の値は wrangler.toml に書かず、`npx wrangler secret put <名前>` か GitHub Actions の「Deploy deposit server」で入れる:
+#   STRIPE_SECRET_KEY   Stripe の秘密鍵(sk_test_… / sk_live_…。制限付きキー rk_… でもよい)
+#   TOKEN_SECRET        端末の合い言葉に署名する鍵(長いランダムな文字列)
+#   REGISTRATION_CODE   (任意)招待コード。決めると、コードを知っている人だけが登録できる
+name = "goukaku-deposit"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[vars]
+# Stripe の公開鍵(pk_test_… / pk_live_…)。アプリに渡す
+STRIPE_PUBLISHABLE_KEY = ""
+MERCHANT_NAME = "合格ロック"
+MIN_DAILY_YEN = "100"
+MAX_DAILY_YEN = "3000"
+# 週が終わってから、達成の知らせを受け付ける日数
+GRACE_DAYS = "7"
+
+# 15 分ごとに、週が終わった預け金を次の週へ(自動で続ける人だけ)
+[triggers]
+crons = ["*/15 * * * *"]

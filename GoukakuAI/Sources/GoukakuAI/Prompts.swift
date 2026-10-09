@@ -1,24 +1,21 @@
 import Foundation
 
-/// AIへのお願いの書き方。小さなモデルでも形を守れるよう、
-/// ① 短い役割の説明 ② 手本の1往復 ③ 1回に1つだけ・決まった行だけで書く、にしている
-/// (Gemma 4 E2B・Qwen3.5・LFM2.5 で試して決めた形。CI の AI check で、実際のモデルに通して確かめている)。
+/// AIへのお願いの書き方。
+/// 話す中身はしばらない(「〜しない」「〜は避ける」を並べると、話し方に変な癖がつき、人と自然に話せなくなるため)。
+/// 役割の説明は1文だけにして、あとは「いまの様子」と「この人について」を渡し、AIが自分の言葉で考える。
+/// カードに出す提案とふり返りだけは、画面に並べるために「体験:」などの見出しの形を手本で見せる
+/// (形が崩れても、AIの書いたことをそのまま使う)。
 public enum PromptBook {
     /// 役割の説明(すべてのお願いで共通)
-    public static let system = """
-    あなたは、この人が人生の中でできる「体験」を一緒に見つける相棒です。
-    体験とは、気持ちや五感が少し動く、小さな発見のある出来事です。義務やノルマではありません。
-    「〜しなさい」「〜すべき」は使わず、「〜してみると、〜かも」と誘います。決めるのは本人で、点数はつけません。
-    お金がかからず、安全で、今の様子に合うことを選びます。やさしく短い日本語で書き、絵文字は使いません。
-    """
+    public static let system = "あなたは、この人の相棒です。この人が人生の中でどんな体験ができるかを一緒に考えながら、思ったことを自分の言葉で自由に話します。"
 
     // MARK: 体験の提案(1回に1つ)
 
-    static let suggestionFormat = "次の5行だけで書いてください。\n体験:\nひとこと:\nはじめ方:\n時間:\n種類:"
+    static let suggestionFormat = "次の形で書いてください。\n体験:\nひとこと:\nはじめ方:\n時間:\n種類:"
 
     static let suggestionExample = (
         user: "いまの様子: 日曜日の朝(9時ごろ)。使える時間は30分くらい。場所は家。元気。\nこの人について: 料理が好き。\n\n「つくる」に近い体験を1つ。" + suggestionFormat,
-        assistant: "体験: 冷蔵庫の残りで名前のない一品\nひとこと: 決まったレシピがないと、思いがけない組み合わせに出会えるかも\nはじめ方: 冷蔵庫を開けて、目についた材料を3つ選ぶ\n時間: 30分\n種類: つくる"
+        assistant: "体験: 冷蔵庫の残りで名前のない一品\nひとこと: レシピなしで作ると、自分でも思いがけない組み合わせが生まれて楽しいですよ。\nはじめ方: 冷蔵庫を開けて、目についた材料を3つ選ぶ\n時間: 30分\n種類: つくる"
     )
 
     /// 「いまの様子」と「この人について」のまとまり
@@ -50,34 +47,8 @@ public enum PromptBook {
         }
         prompt += "\n\n「\(angle.label)」に近い体験を1つ。" + suggestionFormat
         return GenerationRequest(system: system,
-                                 history: [ChatTurn(.user, suggestionExample.user), ChatTurn(.assistant, suggestionExample.assistant)],
-                                 prompt: prompt, maxTokens: tuning.tokens(110), temperature: temperature, topP: 0.95)
-    }
-
-    // MARK: 体験帳の体験に、この人向けのひとことを添える(小さいモデル向け)
-
-    static let tailorFormat = "この体験の中身にふれて、この人に合わせて誘うひとことを1文で書いてください。「〜かも」で終えます。\nひとこと:"
-
-    static let tailorExample = (
-        // 手本には曜日や時間帯を書かない(小さいモデルが「日曜の朝に」と写してしまうため)
-        user: "いまの様子: 使える時間は30分くらい。場所は家。\nこの人について: 料理が好き。\n\n体験: 冷蔵庫の残りで名前のない一品\nはじめ方: 冷蔵庫を開けて、目についた材料を3つ選ぶ\n\n" + tailorFormat,
-        assistant: "ひとこと: 料理が好きなあなたなら、決まったレシピがないほうが思いがけない組み合わせに出会えるかも"
-    )
-
-    /// 決まった体験(体験帳)を、この人に合わせて誘うひとことを書いてもらう。purpose は体験の位置づけ(工夫・いつか)
-    public static func tailor(_ draft: ExperienceDraft, context: CompanionContext, purpose: String? = nil,
-                              tuning: GenerationTuning) -> GenerationRequest {
-        // 文脈は短く(最近の体験などを入れると、小さいモデルはそちらの話に流れるため)
-        var prompt = "いまの様子: \(context.whenPhrase)。使える時間は\(context.budget.phrase)。場所は\(context.place.phrase)。\(context.mood.phrase)。"
-        let notes = context.notes.prefix(min(3, tuning.contextItems))
-        if !notes.isEmpty { prompt += "\nこの人について: " + notes.map(sentence).joined() }
-        if let purpose { prompt += "\n" + purpose }
-        prompt += "\n\n体験: \(draft.title)"
-        if !draft.firstStep.isEmpty { prompt += "\nはじめ方: \(draft.firstStep)" }
-        prompt += "\n\n" + tailorFormat
-        return GenerationRequest(system: system,
-                                 history: [ChatTurn(.user, tailorExample.user), ChatTurn(.assistant, tailorExample.assistant)],
-                                 prompt: prompt, maxTokens: tuning.tokens(70), temperature: 0.7, topP: 0.9)
+                                 examples: [ChatTurn(.user, suggestionExample.user), ChatTurn(.assistant, suggestionExample.assistant)],
+                                 prompt: prompt, maxTokens: tuning.tokens(180), temperature: temperature, topP: 0.95)
     }
 
     /// 続けていること(コミット)を、ちょっと楽しみな体験に変える工夫を1つ
@@ -89,17 +60,17 @@ public enum PromptBook {
         }
         prompt += "\n\nこの人が続けている「\(commit)」を、やらされる作業ではなく、ちょっと楽しみな体験に変える工夫を1つ。" + suggestionFormat
         return GenerationRequest(system: system,
-                                 history: [ChatTurn(.user, suggestionExample.user), ChatTurn(.assistant, suggestionExample.assistant)],
-                                 prompt: prompt, maxTokens: tuning.tokens(110), temperature: 0.8, topP: 0.95)
+                                 examples: [ChatTurn(.user, suggestionExample.user), ChatTurn(.assistant, suggestionExample.assistant)],
+                                 prompt: prompt, maxTokens: tuning.tokens(180), temperature: 0.8, topP: 0.95)
     }
 
     // MARK: いつかの体験(人生の中で味わってみたいこと)
 
-    static let lifeFormat = "次の4行だけで書いてください。\n体験:\nひとこと:\n最初の一歩:\n種類:"
+    static let lifeFormat = "次の形で書いてください。\n体験:\nひとこと:\n最初の一歩:\n種類:"
 
     static let lifeExample = (
         user: "この人について: 料理が好き。海の近くで育った。\n\n「そと」に近い、人生のどこかで味わってみたい「いつかの体験」を1つ。大きな体験でもかまいません。" + lifeFormat,
-        assistant: "体験: 漁港の朝市で、とれたての魚を見る\nひとこと: 海から台所までの道のりを、目と鼻で感じられるかも\n最初の一歩: 近くの漁港の朝市が何曜日にあるか調べてみる\n種類: そと"
+        assistant: "体験: 漁港の朝市で、とれたての魚を見る\nひとこと: 港の朝の活気は、スーパーの魚売り場とはまるで別の世界です。\n最初の一歩: 近くの漁港の朝市が何曜日にあるか調べてみる\n種類: そと"
     )
 
     public static func someday(context: CompanionContext, angle: ExperienceCategory, theme: String?,
@@ -114,13 +85,14 @@ public enum PromptBook {
         }
         prompt += "\n\n「\(angle.label)」に近い、人生のどこかで味わってみたい「いつかの体験」を1つ。大きな体験でもかまいません。" + lifeFormat
         return GenerationRequest(system: system,
-                                 history: [ChatTurn(.user, lifeExample.user), ChatTurn(.assistant, lifeExample.assistant)],
-                                 prompt: prompt, maxTokens: tuning.tokens(110), temperature: 0.9, topP: 0.95)
+                                 examples: [ChatTurn(.user, lifeExample.user), ChatTurn(.assistant, lifeExample.assistant)],
+                                 prompt: prompt, maxTokens: tuning.tokens(180), temperature: 0.9, topP: 0.95)
     }
 
     // MARK: やってみたあとのふり返り
 
-    static let reflectionFormat = "次の3行だけで返事を書いてください。\n返事:\n問い:\nメモ:"
+    /// 返事・問いかけ・覚えておきたいこと(画面で分けて出すため、見出しをつけてもらう)
+    static let reflectionFormat = "次の形で返事を書いてください。\n返事:\n問い:\nメモ:"
 
     static let reflectionExample = (
         user: "この人がやってみた体験を書きました。\n体験: 冷蔵庫の残りで名前のない一品\n書いたこと: 卵とトマトとチーズで焼いてみた。思ったよりおいしくて、名前を「朝の小さな太陽」にした。\n気持ち: たのしい\n\n" + reflectionFormat,
@@ -133,8 +105,8 @@ public enum PromptBook {
         if let feeling { prompt += "\n気持ち: \(feeling.label)" }
         prompt += "\n\n" + reflectionFormat
         return GenerationRequest(system: system,
-                                 history: [ChatTurn(.user, reflectionExample.user), ChatTurn(.assistant, reflectionExample.assistant)],
-                                 prompt: prompt, maxTokens: tuning.tokens(140), temperature: 0.7, topP: 0.9)
+                                 examples: [ChatTurn(.user, reflectionExample.user), ChatTurn(.assistant, reflectionExample.assistant)],
+                                 prompt: prompt, maxTokens: tuning.tokens(300), temperature: 0.7, topP: 0.9)
     }
 
     // MARK: 週の手紙
@@ -153,8 +125,8 @@ public enum PromptBook {
         if !notes.isEmpty {
             prompt += "\nこの人について: " + notes.prefix(tuning.contextItems).map(sentence).joined()
         }
-        prompt += "\n\nこの人に、短い手紙を3〜4文で書いてください。できたことや感じたことにふれて、来週ためしてみたくなる体験を1つだけ添えます。数字で評価したり、ほかの人と比べたりはしません。手紙の文だけを書いてください。"
-        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(220), temperature: 0.8, topP: 0.95)
+        prompt += "\n\nこの1週間のこの人に、相棒として手紙を書いてください。来週やってみたくなる体験も添えてください。手紙の本文を書いてください。"
+        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(450), temperature: 0.8, topP: 0.95)
     }
 
     // MARK: 相棒の気づき(体験の記録から)
@@ -175,17 +147,18 @@ public enum PromptBook {
         }
         if let next = unexplored.first {
             prompt += "\nまだやっていない種類: " + unexplored.prefix(3).map(\.label).joined(separator: "、")
-            prompt += "\n\nこの記録から、相棒として気づいたことを2〜3文で書いてください。決めつけず「〜のようですね」「〜かもしれません」とやわらかく。点数をつけたり、ほかの人と比べたりはしません。最後に「\(next.label)」の体験を1つ、やってみたくなるように誘います。気づいたことの文だけを書いてください。"
+            prompt += "\n\nこの記録を見て、相棒として気づいたことを書いてください。まだやっていない「\(next.label)」の体験も1つ、誘ってみてください。気づいたことの本文を書いてください。"
         } else {
-            prompt += "\n\nこの記録から、相棒として気づいたことを2〜3文で書いてください。決めつけず「〜のようですね」「〜かもしれません」とやわらかく。点数をつけたり、ほかの人と比べたりはしません。気づいたことの文だけを書いてください。"
+            prompt += "\n\nこの記録を見て、相棒として気づいたことを書いてください。気づいたことの本文を書いてください。"
         }
-        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(200), temperature: 0.7, topP: 0.95)
+        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(360), temperature: 0.7, topP: 0.95)
     }
 
     // MARK: 相棒と話す
 
+    /// 会話の役割の説明。決まりごとは足さず、この人について知っていることと、いまの時間だけを添える
     public static func chatSystem(context: CompanionContext, tuning: GenerationTuning) -> String {
-        var text = system + "\n返事は2〜4文の話し言葉で書きます。わからないことは、わからないと言います。病気・法律・お金の判断が要る話は、専門家に相談するよう伝えます。"
+        var text = system
         let notes = context.notes.prefix(tuning.contextItems)
         if !notes.isEmpty { text += "\nこの人について知っていること: " + notes.map(sentence).joined() }
         let recent = context.recentExperiences.prefix(3)
@@ -198,7 +171,7 @@ public enum PromptBook {
                             tuning: GenerationTuning) -> GenerationRequest {
         let turns = Array(history.suffix(tuning.chatTurns * 2))
         return GenerationRequest(system: chatSystem(context: context, tuning: tuning), history: turns,
-                                 prompt: message, maxTokens: tuning.tokens(260), temperature: 0.8, topP: 0.95)
+                                 prompt: message, maxTokens: tuning.tokens(800), temperature: 0.8, topP: 0.95)
     }
 
     // MARK: 小さな道具
@@ -238,7 +211,7 @@ public enum IdeaHints {
     }
 }
 
-/// 3つの提案をどの「種類」から出すかを決める(調子・場所・時間帯・好みで重みを変える)
+/// 3つの提案をどの「種類」から出すかを決める(調子・場所・好みで重みを変えるだけで、締め出す種類はない)
 public enum AnglePlanner {
     public static func angles(for context: CompanionContext, count: Int = 3, seed: UInt64) -> [ExperienceCategory] {
         var weights: [ExperienceCategory: Double] = [:]
@@ -257,9 +230,6 @@ public enum AnglePlanner {
             weights[.make, default: 1] += 0.4
         case .normal:
             break
-        }
-        if !context.allowsGoingOut {
-            weights[.outside] = 0
         }
         if context.place == .outside {
             weights[.outside, default: 1] += 0.8

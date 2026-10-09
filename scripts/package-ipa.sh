@@ -25,7 +25,7 @@ sign() {
   fi
 }
 
-# 中に入れ子になったフレームワークがあれば先に(静的リンクなので通常はない)
+# 中に入れ子になったフレームワーク(預け金の支払い画面の Stripe など)を先に
 if [[ -d "$APP/Frameworks" ]]; then
   find "$APP/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -print0 | while IFS= read -r -d '' fw; do sign "$fw"; done
 fi

@@ -75,12 +75,13 @@ jobs:
           EOF
           cat "$GITHUB_OUTPUT"
 
-      - name: Core unit tests (GoukakuCore・GoukakuAI)
+      - name: Core unit tests (GoukakuCore・GoukakuAI・預け金のサーバー)
         run: |
           mkdir -p build
           set -o pipefail
           swift test --package-path GoukakuCore 2>&1 | tee build/core-tests.log | tail -n 20
           swift test --package-path GoukakuAI 2>&1 | tee build/ai-core-tests.log | tail -n 20
+          (cd server && npm test) 2>&1 | tee build/server-tests.log | tail -n 12
 
       - name: Generate Xcode project (XcodeGen)
         run: |
@@ -94,6 +95,9 @@ jobs:
             -skipPackagePluginValidation -skipMacroValidation 2>&1 | tail -n 30
 
       - name: Build Debug and Release (unsigned)
+        env:
+          # 預け金のサーバーの URL(リポジトリの Variables に DEPOSIT_SERVER_URL があれば、アプリに最初から入れる)
+          DEPOSIT_SERVER_URL: ${{ vars.DEPOSIT_SERVER_URL }}
         run: |
           set -o pipefail
           for CONF in Debug Release; do
@@ -106,6 +110,7 @@ jobs:
               -derivedDataPath "build/DerivedData-$CONF" \
               -skipPackagePluginValidation -skipMacroValidation \
               CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+              GOUKAKU_DEPOSIT_SERVER_URL="$DEPOSIT_SERVER_URL" \
               2>&1 | tee "build/xcodebuild-$CONF.log" | xcbeautify --renderer github-actions
             echo "::endgroup::"
           done

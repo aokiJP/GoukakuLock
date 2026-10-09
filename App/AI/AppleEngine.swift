@@ -6,7 +6,8 @@ import FoundationModels
 
 /// Apple Intelligence(Foundation Models のシステムモデル)で文章を作るAI。
 /// iOS 26 以降・Apple Intelligence がオンの iPhone で使える。モデルのダウンロードは要らない。
-/// 手本の1往復や会話の履歴は、指示文と頼みの文に書き込んで渡す(どのAIでも同じプロンプトを使うため)。
+/// 手本の1往復は指示文に、会話の履歴は頼みの文に書き込んで渡す(どのAIでも同じプロンプトを使うため)。
+/// アプリの側では話す中身をしばらない。Apple のガードレールも、いちばんゆるい設定で使う
 struct AppleEngine: LanguageEngine {
     let info = EngineInfo(kind: .apple, id: "apple", name: "Apple Intelligence")
 
@@ -18,7 +19,8 @@ struct AppleEngine: LanguageEngine {
             return AsyncThrowingStream { continuation in
                 let task = Task {
                     do {
-                        let session = LanguageModelSession(instructions: Self.instructions(for: request))
+                        let model = SystemLanguageModel(useCase: .general, guardrails: .permissiveContentTransformations)
+                        let session = LanguageModelSession(model: model, instructions: Self.instructions(for: request))
                         let options = GenerationOptions(sampling: nil, temperature: request.temperature,
                                                         maximumResponseTokens: request.maxTokens)
                         var sent = ""
@@ -48,24 +50,23 @@ struct AppleEngine: LanguageEngine {
         return AsyncThrowingStream { $0.finish(throwing: AIError.unavailable("Apple Intelligence は iOS 26 以降で使えます")) }
     }
 
-    /// 役割の説明と、手本(あれば)
+    /// 役割の説明と、答え方の手本(あれば)
     static func instructions(for request: GenerationRequest) -> String {
         var text = request.system
-        let pairs = stride(from: 0, to: request.history.count - 1, by: 2).compactMap { i -> (String, String)? in
-            let a = request.history[i], b = request.history[i + 1]
+        let pairs = stride(from: 0, to: request.examples.count - 1, by: 2).compactMap { i -> (String, String)? in
+            let a = request.examples[i], b = request.examples[i + 1]
             guard a.role == .user, b.role == .assistant else { return nil }
             return (a.text, b.text)
         }
-        // 手本(1往復だけのときは手本として渡す。会話の履歴は頼みの文に入れる)
-        if request.history.count == 2, let (user, assistant) = pairs.first {
-            text += "\n\n次は、頼まれ方と答え方の手本です。答えるときは手本と同じ形だけで書きます。\n【手本の頼み】\n\(user)\n【手本の答え】\n\(assistant)"
+        for (user, assistant) in pairs {
+            text += "\n\n次は、頼まれ方と答え方の例です。\n【例の頼み】\n\(user)\n【例の答え】\n\(assistant)"
         }
         return text
     }
 
     /// 頼みの文(会話の履歴があれば、その流れを添える)
     static func prompt(for request: GenerationRequest) -> String {
-        guard request.history.count > 2 else { return request.prompt }
+        guard !request.history.isEmpty else { return request.prompt }
         let lines = request.history.map { ($0.role == .user ? "あなた: " : "相棒: ") + $0.text }
         return "これまでの会話:\n" + lines.joined(separator: "\n") + "\n\nいまのメッセージ:\n" + request.prompt
     }

@@ -20,7 +20,9 @@ public struct ChatTurn: Codable, Sendable, Equatable {
 public struct GenerationRequest: Sendable, Equatable {
     /// 役割の説明(system)
     public var system: String
-    /// これまでのやりとり(手本の1往復や会話の履歴)
+    /// 答え方の手本(提案やふり返りで、カードに出す形を見せる1往復)
+    public var examples: [ChatTurn]
+    /// これまでの会話(相棒と話すときの履歴)
     public var history: [ChatTurn]
     /// 今回のお願い
     public var prompt: String
@@ -28,15 +30,19 @@ public struct GenerationRequest: Sendable, Equatable {
     public var temperature: Double
     public var topP: Double
 
-    public init(system: String, history: [ChatTurn] = [], prompt: String, maxTokens: Int,
-                temperature: Double = 0.8, topP: Double = 0.95) {
+    public init(system: String, examples: [ChatTurn] = [], history: [ChatTurn] = [], prompt: String,
+                maxTokens: Int, temperature: Double = 0.8, topP: Double = 0.95) {
         self.system = system
+        self.examples = examples
         self.history = history
         self.prompt = prompt
         self.maxTokens = maxTokens
         self.temperature = temperature
         self.topP = topP
     }
+
+    /// モデルに渡す順のやりとり(手本 → 会話)
+    public var turns: [ChatTurn] { examples + history }
 }
 
 /// AIの名前と種類(画面に出す)

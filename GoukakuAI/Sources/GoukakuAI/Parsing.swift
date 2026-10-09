@@ -158,13 +158,15 @@ public enum FieldReader {
     }
 }
 
-/// 体験の提案・ふり返り・手紙を読む
+/// 体験の提案・ふり返り・手紙を読む。
+/// 中身でははじかない(AIが書いたことは、そのまま本人に見せる)。見るのは、カードに並べられる形かどうかだけ
 public enum ExperienceParser {
     static let suggestionKeys = ["体験", "ひとこと", "はじめ方", "時間", "種類"]
 
-    /// 体験の候補を読む(1つ目のまとまり)。形がおかしい・安全でないときは nil
+    /// 体験の候補を読む(1つ目のまとまり)。見出しの形でなければ nil。
+    /// loose なら、見出しがなくても AIの書いたことをそのまま使う(1行目を名前、残りをひとことに)
     public static func suggestion(from raw: String, angle: ExperienceCategory, budget: TimeBudget,
-                                  engine: String) -> ExperienceDraft? {
+                                  engine: String, loose: Bool = false) -> ExperienceDraft? {
         let text = OutputCleaner.clean(raw)
         let blocks = FieldReader.blocks(in: text, keys: suggestionKeys, startKey: "体験")
         for block in blocks {
@@ -172,23 +174,48 @@ public enum ExperienceParser {
                 return draft
             }
         }
-        return nil
+        guard loose, let block = looseBlock(text) else { return nil }
+        return draft(from: block, angle: angle, budget: budget, engine: engine)
     }
 
     static func draft(from block: [String: String], angle: ExperienceCategory, budget: TimeBudget?,
                       engine: String) -> ExperienceDraft? {
         guard var title = block["体験"], !title.isEmpty else { return nil }
         title = trimTitle(title)
-        guard title.count >= 2, title.count <= 34, TextCheck.hasJapanese(title) else { return nil }
-        let line = trimSentence(block["ひとこと"] ?? "", limit: 70)
-        let step = trimSentence(block["はじめ方"] ?? "", limit: 60)
-        var duration = block["時間"].flatMap(DurationBucket.from(text:)) ?? budget.map(defaultDuration) ?? .fifteen
-        if let budget, !budget.allows(duration) { duration = defaultDuration(budget) }
+        guard !title.isEmpty else { return nil }
+        let line = trimSentence(block["ひとこと"] ?? "", limit: 240)
+        let step = trimSentence(block["はじめ方"] ?? "", limit: 200)
+        // 時間は、AIが書いたものをそのまま(書いていなければ、使える時間から)
+        let duration = block["時間"].flatMap(DurationBucket.from(text:)) ?? budget.map(defaultDuration) ?? .fifteen
         let category = block["種類"].flatMap(ExperienceCategory.from(text:)) ?? angle
-        let draft = ExperienceDraft(title: title, line: line, firstStep: step, duration: duration,
-                                    category: category, origin: .ai(engine))
-        guard ContentGuard.isAcceptable(draft) else { return nil }
-        return draft
+        return ExperienceDraft(title: title, line: line, firstStep: step, duration: duration,
+                               category: category, origin: .ai(engine))
+    }
+
+    /// 見出しのそろっていない文章を、カードの形にする
+    /// (見出しのついた行はその欄に、見出しのない最初の行を名前に、残りをひとことに)
+    static func looseBlock(_ text: String) -> [String: String]? {
+        var block: [String: String] = [:]
+        var free: [String] = []
+        for rawLine in text.components(separatedBy: .newlines) {
+            if let (key, value) = FieldReader.split(rawLine, keys: suggestionKeys) {
+                if !value.isEmpty, block[key] == nil { block[key] = value }
+            } else {
+                let line = OutputCleaner.stripDecoration(rawLine)
+                if !line.isEmpty { free.append(FieldReader.cleanValue(line)) }
+            }
+        }
+        if block["体験"] == nil {
+            if !free.isEmpty {
+                block["体験"] = free.removeFirst()
+            } else if let line = block.removeValue(forKey: "ひとこと") {
+                block["体験"] = line
+            } else {
+                return nil
+            }
+        }
+        if block["ひとこと"] == nil, !free.isEmpty { block["ひとこと"] = free.joined(separator: " ") }
+        return block
     }
 
     static func defaultDuration(_ budget: TimeBudget) -> DurationBucket {
@@ -201,9 +228,11 @@ public enum ExperienceParser {
     }
 
     /// 「いつかの体験」を読む(時間は問わない)
-    public static func someday(from raw: String, angle: ExperienceCategory, engine: String) -> ExperienceDraft? {
+    public static func someday(from raw: String, angle: ExperienceCategory, engine: String,
+                               loose: Bool = false) -> ExperienceDraft? {
         let text = OutputCleaner.clean(raw)
-        let blocks = FieldReader.blocks(in: text, keys: suggestionKeys, startKey: "体験")
+        var blocks = FieldReader.blocks(in: text, keys: suggestionKeys, startKey: "体験")
+        if loose, let block = looseBlock(text) { blocks.append(block) }
         for block in blocks {
             if var draft = draft(from: block, angle: angle, budget: nil, engine: engine) {
                 draft.duration = block["時間"].flatMap(DurationBucket.from(text:)) ?? .halfDay
@@ -235,18 +264,17 @@ public enum ExperienceParser {
                 if !line.isEmpty, question == nil, memo == nil { loose.append(line) }
             }
         }
-        if reply.isEmpty { reply = loose.joined() }
+        if reply.isEmpty { reply = loose.joined(separator: "\n") }
         // 「返事: 回答: …」のように見出しが重なっていたら外す
         if let (_, inner) = FieldReader.split(reply, keys: ["返事"]), !inner.isEmpty { reply = inner }
-        reply = trimSentence(reply, limit: 160)
-        // 書いたことをそのまま繰り返しただけの返事は使わない
+        reply = trimSentence(reply, limit: 800)
+        // 空の返事と、書いたことをそのまま写しただけのもの(生成の失敗)は使わない
         let normalizedNote = note.replacingOccurrences(of: " ", with: "")
         if reply.isEmpty || reply.replacingOccurrences(of: " ", with: "") == normalizedNote { return nil }
-        guard TextCheck.hasJapanese(reply), ContentGuard.isAcceptable(text: reply) else { return nil }
         if let q = question {
-            question = trimSentence(q, limit: 90)
-            // 「問い: -」のような空の問いは出さない
-            if let value = question, value.isEmpty || !TextCheck.hasJapanese(value) || !ContentGuard.isAcceptable(text: value) {
+            question = trimSentence(q, limit: 400)
+            // 「問い: -」のような、記号だけの問いは出さない
+            if let value = question, !value.contains(where: { $0.isLetter }) {
                 question = nil
             }
         }
@@ -254,95 +282,41 @@ public enum ExperienceParser {
                                fromAI: true)
     }
 
-    /// 体験帳の体験に添えるひとことを読む(短く・日本語で・安全なもの。体験の名前をくり返しただけのものは使わない)。
-    /// 頼んだとおり「〜かも」で終わる1文だけを使う(CI で、だらだら続く文や「日曜の朝に」のずれが出たため)。
-    /// context があれば、ちがう曜日を書いたものも使わない
-    public static func tailoredLine(from raw: String, title: String, firstStep: String = "",
-                                    context: CompanionContext? = nil) -> String? {
-        let text = OutputCleaner.clean(raw)
-        guard !text.isEmpty else { return nil }
-        let lines = text.components(separatedBy: .newlines)
-        var found: String?
-        for line in lines {
-            if let (key, value) = FieldReader.split(line, keys: ["ひとこと"]), key == "ひとこと", !value.isEmpty {
-                found = value
-                break
-            }
-        }
-        if found == nil {
-            // 見出しがなければ、ほかの見出しのついていない最初の行
-            found = lines.map(OutputCleaner.stripDecoration).first { line in
-                !line.isEmpty && FieldReader.split(line, keys: ["体験", "はじめ方", "時間", "種類", "返事", "問い", "メモ"]) == nil
-            }
-        }
-        guard var value = found else { return nil }
-        value = value.trimmingCharacters(in: CharacterSet(charactersIn: " \u{3000}"))
-        // 全体を囲むかっこだけ外す(途中の「」は残す)
-        for (open, close) in [("「", "」"), ("『", "』"), ("\"", "\""), ("'", "'")]
-        where value.count >= 2 && value.hasPrefix(open) && value.hasSuffix(close) {
-            value = String(value.dropFirst().dropLast())
-            break
-        }
-        // 「〜かも」までで切る(「かもしれません」「かもね」も)。なければ使わない
-        guard let kamo = value.range(of: "かも") else { return nil }
-        var end = kamo.upperBound
-        for tail in ["しれません", "しれない", "ね"] where value[end...].hasPrefix(tail) {
-            end = value.index(end, offsetBy: tail.count)
-            break
-        }
-        value = String(value[..<end])
-        guard value.count >= 8, value.count <= 80, TextCheck.hasJapanese(value),
-              ContentGuard.isAcceptable(text: value) else { return nil }
-        // 体験の中身にふれているか(漢字かカタカナの言葉を1つは同じくする。CI で「1曲だけ聴く」に
-        // 「今夜の散歩は楽しいかも」と、別の話を添えたことがあるため)
-        guard TextCheck.sharesContentWord(value, with: title + " " + firstStep) else { return nil }
-        if let context {
-            let days = ["日曜", "月曜", "火曜", "水曜", "木曜", "金曜", "土曜"]
-            let today = days[(context.weekday - 1 + 7) % 7]
-            if days.contains(where: { $0 != today && value.contains($0) }) { return nil }
-        }
-        let squash = { (s: String) in s.filter { !$0.isWhitespace && !"「」『』、。・".contains($0) } }
-        guard squash(value) != squash(title) else { return nil }
-        return value
-    }
-
-    /// 覚えてよさそうなメモか(短い・問いではない・「なし」ではない)
+    /// 覚えておきたいこと(本人が「覚えてもらう」を押したときだけ覚えるので、ここでは「なし」だけを外す)
     static func noteCandidate(_ raw: String?, title: String) -> String? {
         guard var memo = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !memo.isEmpty else { return nil }
-        memo = trimSentence(memo, limit: 40)
-        let none = ["なし", "特になし", "とくになし", "ない", "無し", "なし。", "-", "ー"]
-        if none.contains(memo) || memo.hasPrefix("なし") { return nil }
-        if memo.contains("?") || memo.contains("？") || memo.hasSuffix("か") { return nil }
-        if memo.count < 3 || memo.count > 36 { return nil }
-        if memo.hasPrefix("書いたこと") || memo.hasPrefix("体験") || memo == title { return nil }
-        guard TextCheck.hasJapanese(memo), ContentGuard.isAcceptable(text: memo) else { return nil }
+        memo = trimSentence(memo, limit: 120)
+        let none = ["なし", "特になし", "とくになし", "ない", "無し", "なし。", "-", "ー", "none", "None", "N/A"]
+        if none.contains(memo) || memo.hasPrefix("なし") || !memo.contains(where: { $0.isLetter }) { return nil }
+        if memo == title || memo.hasPrefix("書いたこと") { return nil }
         if memo.hasSuffix("。") { memo.removeLast() }
         return memo
     }
 
-    /// 手紙・会話の返事を読む
-    public static func prose(from raw: String, limit: Int = 600) -> String? {
+    /// 手紙・会話の返事を読む(書いたことはそのまま。見出しと飾りの ** だけ外す)
+    public static func prose(from raw: String, limit: Int = 4000) -> String? {
         var text = OutputCleaner.clean(raw)
         for prefix in ["手紙:", "手紙：", "返事:", "返事："] where text.hasPrefix(prefix) {
             text = String(text.dropFirst(prefix.count)).trimmingCharacters(in: .whitespacesAndNewlines)
         }
         text = text.replacingOccurrences(of: "**", with: "")
-        guard !text.isEmpty, TextCheck.hasJapanese(text) else { return nil }
+        guard !text.isEmpty else { return nil }
         if text.count > limit {
             let cut = text.prefix(limit)
-            if let end = cut.lastIndex(of: "。") { text = String(cut[...end]) } else { text = String(cut) }
+            if let end = cut.lastIndex(where: { "。.!?！？".contains($0) }) { text = String(cut[...end]) } else { text = String(cut) }
         }
         return text
     }
 
-    // MARK: 長さの調整
+    // MARK: 長さの調整(カードに並べるためだけ。中身は変えない)
 
     static func trimTitle(_ raw: String) -> String {
         var t = raw.trimmingCharacters(in: .whitespaces)
         while let last = t.last, "。.、,".contains(last) { t.removeLast() }
-        if t.count > 30, let cut = t.firstIndex(where: { "、。,(（".contains($0) }), t.distance(from: t.startIndex, to: cut) >= 4 {
+        if t.count > 40, let cut = t.firstIndex(where: { "、。,(（".contains($0) }), t.distance(from: t.startIndex, to: cut) >= 4 {
             t = String(t[..<cut])
         }
+        if t.count > 60 { t = String(t.prefix(60)) + "…" }
         return t
     }
 
@@ -357,87 +331,10 @@ public enum ExperienceParser {
 
 /// 文字の種類を調べる
 public enum TextCheck {
-    /// 漢字(々を含む)
-    static func isKanji(_ c: Character) -> Bool {
-        c.unicodeScalars.allSatisfy { (0x4E00...0x9FFF).contains($0.value) || (0x3400...0x4DBF).contains($0.value) || $0.value == 0x3005 }
-    }
-
-    /// カタカナ(ーを含む)
-    static func isKatakana(_ c: Character) -> Bool {
-        c.unicodeScalars.allSatisfy { (0x30A1...0x30FA).contains($0.value) || $0.value == 0x30FC }
-    }
-
-    /// 中身を表す言葉(漢字1字ずつ・2字以上のカタカナのまとまり)
-    static func contentWords(_ text: String) -> Set<String> {
-        var words = Set<String>()
-        var katakana = ""
-        for c in text {
-            if isKatakana(c) {
-                katakana.append(c)
-                continue
-            }
-            if katakana.count >= 2 { words.insert(katakana) }
-            katakana = ""
-            if isKanji(c) { words.insert(String(c)) }
-        }
-        if katakana.count >= 2 { words.insert(katakana) }
-        return words
-    }
-
-    /// a が b と、中身を表す言葉を1つでも同じくするか(b に言葉がなければ問わない)
-    public static func sharesContentWord(_ a: String, with b: String) -> Bool {
-        let base = contentWords(b)
-        guard !base.isEmpty else { return true }
-        return !contentWords(a).isDisjoint(with: base)
-    }
-
     /// ひらがな・カタカナ・漢字を1文字以上含むか
     public static func hasJapanese(_ text: String) -> Bool {
         text.unicodeScalars.contains { s in
             (0x3040...0x30FF).contains(s.value) || (0x4E00...0x9FFF).contains(s.value) || (0x3400...0x4DBF).contains(s.value)
         }
-    }
-}
-
-/// 出してはいけない提案をはじく(お金を使う・危ない・体を損ねる)。
-/// 合格ロックはお金を使うアプリを止めるので、買い物や課金を誘う体験は出さない
-public enum ContentGuard {
-    static let blocked: [String] = [
-        // お金を使う
-        "買", "購入", "課金", "通販", "ショッピング", "セール", "ガチャ", "投資", "株",
-        // 体を損ねる・危ない
-        "お酒", "飲酒", "ビール", "ワイン", "酎ハイ", "タバコ", "たばこ", "喫煙", "徹夜", "夜ふかし", "夜更かし",
-        "断食", "絶食", "食事を抜", "ご飯を抜", "薬を", "サプリ", "運転", "崖", "飛び込", "立ち入り禁止", "無断",
-        // 食べることを減らす・やめる(体験として誘わない)
-        "食べるのをやめ", "食べない", "食事をやめ", "食事を減ら", "食事制限", "朝食を抜", "昼食を抜", "夕食を抜",
-        "朝ごはんを抜", "晩ごはんを抜", "夕飯を抜", "ダイエット", "減量", "カロリー", "体重",
-        "ギャンブル", "パチンコ", "競馬", "競輪", "宝くじ", "借金", "危険な",
-    ]
-
-    public static func isAcceptable(_ draft: ExperienceDraft) -> Bool {
-        isAcceptable(text: draft.title + " " + draft.line + " " + draft.firstStep)
-    }
-
-    public static func isAcceptable(text: String) -> Bool {
-        !blocked.contains { text.contains($0) }
-    }
-}
-
-/// 提案が「いまの自分」に合っているか。小さなモデルは「夜・家にいる」を見落として
-/// 「カフェで〜」「公園で〜」と出しがちなので、あからさまなずれだけをはじく(作り直すか、体験帳で補う)
-public enum ContextFit {
-    /// 出かける前提の言葉
-    static let goingOut: [String] = [
-        "カフェ", "喫茶店", "公園", "散歩", "街角", "街へ", "お店", "店に", "店へ", "駅", "海へ", "海に",
-        "山へ", "山に", "旅行", "旅に", "出かけ", "外出", "外に出", "映画館", "美術館", "博物館", "図書館",
-        "ジム", "レストラン", "予約", "屋上", "電車", "バス", "公共交通", "地下鉄", "タクシー",
-    ]
-
-    public static func fits(_ draft: ExperienceDraft, context: CompanionContext) -> Bool {
-        if !context.allowsGoingOut {
-            let text = draft.title + "\n" + draft.firstStep
-            if goingOut.contains(where: { text.contains($0) }) { return false }
-        }
-        return true
     }
 }

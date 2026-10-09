@@ -8,7 +8,7 @@ import GoukakuAI
 /// 相棒AI(体験を一緒に見つけて、一緒に育つ)の中心。
 /// 「いまの自分」と、覚えていること・やってみた体験・手ごたえから文脈を作り、
 /// AIRuntime が選んだAI(または体験帳)に頼んで、結果を SwiftData に残す。
-/// 義務ではなく体験として誘い、決めるのはいつも本人。点数はつけない。
+/// 義務ではなく体験として誘い、決めるのはいつも本人。AIの話す中身はしばらない(縛ると話し方に癖がつくため)。
 @MainActor @Observable
 final class CompanionModel {
     static let shared = CompanionModel(app: .shared, runtime: .shared)
@@ -384,7 +384,7 @@ final class CompanionModel {
     func remember(_ text: String, fromAI: Bool) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, CompanionMemory.isNew(trimmed, existing: notes.map(\.text)) else { return }
-        context.insert(CompanionNote(text: String(trimmed.prefix(60)), fromAI: fromAI))
+        context.insert(CompanionNote(text: String(trimmed.prefix(120)), fromAI: fromAI))
         // 多すぎたら、古いAIのメモから消す(本人が書いたものは消さない)
         let aiNotes = notes.filter(\.fromAI)
         if notes.count > CompanionMemory.capacity, let oldest = aiNotes.last {

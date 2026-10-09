@@ -12,6 +12,8 @@ struct DebugMenuView: View {
     @Environment(AppModel.self) private var model
     @Environment(AIRuntime.self) private var runtime
     @AppStorage("debug.sampleAI") private var sampleAI = false
+    @AppStorage("debug.sampleDeposit") private var sampleDeposit = false
+    @Environment(DepositModel.self) private var deposit
     @State private var dayStartMinute = 240
     @State private var output = ""
     @State private var logURL: URL?
@@ -88,6 +90,17 @@ struct DebugMenuView: View {
                 Text("相棒AI")
             } footer: {
                 Text("シミュレータでは MLX が動かないので、見本のAI(Gemma 4 E2B の出力をもとにした決まった文)で画面の流れを確かめられます。")
+            }
+            Section {
+                Toggle("見本の預け金を見せる(画面の確認用)", isOn: $sampleDeposit)
+                    .onChange(of: sampleDeposit) { _, on in
+                        if on { deposit.loadSample() }
+                        output = on ? "見本の預け金を出しました(サーバーにはつながない)" : "次に起動したときから、見本を出しません"
+                    }
+            } header: {
+                Text("預け金")
+            } footer: {
+                Text("サーバーなしで、4日目の週(返金した日・戻らない日・今日)を見せます。支払いはしません。")
             }
             Section("中身を見る") {
                 Button("state.json") { output = stateJSON() }

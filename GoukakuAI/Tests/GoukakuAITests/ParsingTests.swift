@@ -41,7 +41,7 @@ final class ParsingTests: XCTestCase {
         let raw = "体験: 「星空観察」(15文字)\nひとこと: 暗い部屋で星を見ると、頭がスッキリする\nはじめ方: 窓の外を見つめる\n時間: 30分\n種類: こころ\n\n体験: 夕焼け散歩\nひとこと: 静かな美しさ"
         let d = try XCTUnwrap(ExperienceParser.suggestion(from: raw, angle: .mind, budget: .fifteen, engine: "LFM"))
         XCTAssertEqual(d.title, "星空観察")
-        XCTAssertEqual(d.duration, .fifteen, "使える時間(15分)に合わせる")
+        XCTAssertEqual(d.duration, .thirty, "AIが書いた時間をそのまま使う")
     }
 
     func testMarkdownDecorationAndNumbering() throws {
@@ -58,12 +58,47 @@ final class ParsingTests: XCTestCase {
         XCTAssertEqual(OutputCleaner.clean("<|channel>thought\nxx<channel|>返事: はい<turn|>"), "返事: はい")
     }
 
-    func testRejectsSpendingAndNonJapanese() {
-        let spend = "体験: 新しい服を買いに行く\nひとこと: 気分が変わるかも\nはじめ方: 店を探す\n時間: 1時間\n種類: そと"
-        XCTAssertNil(ExperienceParser.suggestion(from: spend, angle: .outside, budget: .hourPlus, engine: "x"))
+    /// 中身でははじかない:お金を使う話も、食べ物の話も、英語も、AIが書いたとおりに使う
+    func testKeepsWhateverTheAIWrote() throws {
+        let spend = "体験: 新しい服を買いに行く\nひとこと: 気分が変わりますよ\nはじめ方: 店を探す\n時間: 1時間\n種類: そと"
+        XCTAssertEqual(ExperienceParser.suggestion(from: spend, angle: .outside, budget: .fifteen, engine: "x")?.title,
+                       "新しい服を買いに行く")
+        let eating = "体験: 夕食を抜いて、空腹の感覚を観察する\nひとこと: いつもとちがう体の声が聞こえます\n時間: 15分\n種類: からだ"
+        XCTAssertEqual(ExperienceParser.suggestion(from: eating, angle: .body, budget: .fifteen, engine: "x")?.line,
+                       "いつもとちがう体の声が聞こえます")
         let english = "体験: Go for a walk\nひとこと: nice\n時間: 15分"
-        XCTAssertNil(ExperienceParser.suggestion(from: english, angle: .outside, budget: .hourPlus, engine: "x"))
+        let e = try XCTUnwrap(ExperienceParser.suggestion(from: english, angle: .outside, budget: .hourPlus, engine: "x"))
+        XCTAssertEqual(e.title, "Go for a walk")
+        XCTAssertEqual(e.line, "nice")
         XCTAssertNil(ExperienceParser.suggestion(from: "", angle: .outside, budget: .five, engine: "x"))
+        // ふり返り・手紙も
+        let r = try XCTUnwrap(ExperienceParser.reflection(from: "返事: Sounds lovely!\n問い: What next?", title: "散歩", note: "歩いた"))
+        XCTAssertEqual(r.reply, "Sounds lovely!")
+        XCTAssertEqual(r.question, "What next?")
+        XCTAssertEqual(ExperienceParser.prose(from: "Have a great week."), "Have a great week.")
+    }
+
+    /// 見出しの形でない文章は、1回目は作り直してもらい、最後はそのままカードにする
+    func testLooseSuggestionKeepsTheAIWords() throws {
+        XCTAssertNil(ExperienceParser.suggestion(from: "わかりません", angle: .mind, budget: .fifteen, engine: "x"))
+        let free = try XCTUnwrap(ExperienceParser.suggestion(from: "わかりません", angle: .mind, budget: .fifteen,
+                                                             engine: "x", loose: true))
+        XCTAssertEqual(free.title, "わかりません")
+        XCTAssertEqual(free.origin, .ai("x"))
+        let prose = "**夜風にあたる**\nベランダに出て、5分だけ風を感じてみてください。\n思ったより気持ちが切りかわります。"
+        let p = try XCTUnwrap(ExperienceParser.suggestion(from: prose, angle: .outside, budget: .fifteen, engine: "x", loose: true))
+        XCTAssertEqual(p.title, "夜風にあたる")
+        XCTAssertEqual(p.line, "ベランダに出て、5分だけ風を感じてみてください。 思ったより気持ちが切りかわります。")
+        XCTAssertEqual(p.category, .outside)
+        // 「体験:」の行がなく、ひとことだけ書いたとき
+        let onlyLine = try XCTUnwrap(ExperienceParser.suggestion(from: "ひとこと: 好きな曲を大きめの音で聴く\n時間: 5分",
+                                                                 angle: .mind, budget: .fifteen, engine: "x", loose: true))
+        XCTAssertEqual(onlyLine.title, "好きな曲を大きめの音で聴く")
+        XCTAssertEqual(onlyLine.duration, .five)
+        let someday = try XCTUnwrap(ExperienceParser.someday(from: "オーロラを見に行く\n一生に一度は見ておきたい光です。",
+                                                             angle: .outside, engine: "x", loose: true))
+        XCTAssertEqual(someday.title, "オーロラを見に行く")
+        XCTAssertEqual(someday.duration, .halfDay)
     }
 
     func testDoesNotMistakeSentenceForKey() {
@@ -89,11 +124,13 @@ final class ParsingTests: XCTestCase {
         XCTAssertTrue(r.reply.hasPrefix("夕焼けの空が色づく瞬間"))
         XCTAssertNil(r.noteCandidate)
 
-        // LFM:メモが問いになっている・「なし」
-        XCTAssertNil(ExperienceParser.noteCandidate("風をどれくらい感じましたか?", title: "x"))
+        // 「なし」・見出しを写しただけのものは覚える候補にしない(覚えるかどうかは本人が決める)
         XCTAssertNil(ExperienceParser.noteCandidate("なし", title: "x"))
+        XCTAssertNil(ExperienceParser.noteCandidate("-", title: "x"))
         XCTAssertNil(ExperienceParser.noteCandidate("書いたこと: 空を見た", title: "x"))
         XCTAssertEqual(ExperienceParser.noteCandidate("料理に名前をつけて楽しむ。", title: "x"), "料理に名前をつけて楽しむ")
+        XCTAssertEqual(ExperienceParser.noteCandidate("風をどれくらい感じたか、あとで聞きたい", title: "x"),
+                       "風をどれくらい感じたか、あとで聞きたい")
     }
 
     /// CI で LFM2.5 が返したもの:返事の見出しが重なる・見出しが「回答」
@@ -110,59 +147,12 @@ final class ParsingTests: XCTestCase {
         XCTAssertTrue(r3.reply.hasPrefix("答えが見つからなくても"), r3.reply)
     }
 
-    func testTailoredLine() {
-        let title = "好きな音楽を1曲だけ聴く"
-        XCTAssertEqual(ExperienceParser.tailoredLine(from: "ひとこと: 疲れた夜には、いつもの曲が少しちがって聞こえるかも", title: title),
-                       "疲れた夜には、いつもの曲が少しちがって聞こえるかも")
-        XCTAssertEqual(ExperienceParser.tailoredLine(from: "「静かな部屋で聴くと、音の重なりに気づけるかも」", title: title),
-                       "静かな部屋で聴くと、音の重なりに気づけるかも")
-        // 見出しのない1行目・ほかの見出しの行は使わない
-        XCTAssertEqual(ExperienceParser.tailoredLine(from: "体験: 好きな音楽\n今夜の気分にぴったりの一曲が見つかるかも", title: title),
-                       "今夜の気分にぴったりの一曲が見つかるかも")
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 好きな音楽を1曲だけ聴く", title: title), "名前のくり返しは使わない")
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: いいね", title: title), "短すぎる")
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: Listening may help you relax tonight", title: title))
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 夕食を抜いて音楽に集中すると、気分が変わるかも", title: title))
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "<think></think>", title: title))
-        // 「〜かも」までの1文だけ。かもで終わらないものは使わない(CI の LFM2.5 の出力)
-        XCTAssertEqual(ExperienceParser.tailoredLine(from: "ひとこと: 夜の静けさの中なら、音が近く感じられるかもしれません。ゆっくりどうぞ。", title: title),
-                       "夜の静けさの中なら、音が近く感じられるかもしれません")
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 今日の出来事を紙に書き留めながら、散歩をしながら空を見上げてみると、夕焼けがゆっくりと色づいていきますね", title: "今日の出来事を4コマにする"))
-        // 体験の中身にふれていないひとことは使わない(CI の LFM2.5:「1曲だけ聴く」に「今夜の散歩は楽しいかも」)
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 今夜の散歩は楽しいかもしれません",
-                                                   title: "ほかのことをせずに1曲だけ聴く", firstStep: "イヤホンをして、目を閉じる"))
-        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 疲れた夜には、いつもの曲が少しちがって聞こえるかも",
-                                                      title: "ほかのことをせずに1曲だけ聴く", firstStep: "イヤホンをして、目を閉じる"))
-        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 今日の出来事を4コマにまとめると、ちがう見方で一日をふり返れるかも",
-                                                      title: "今日の出来事を4コマにする", firstStep: "紙に四角を4つ描く"))
-        XCTAssertTrue(TextCheck.sharesContentWord("イヤホンで聴くと、音が近いかも", with: "イヤホンをして、目を閉じる"))
-        XCTAssertTrue(TextCheck.sharesContentWord("なんでも", with: "のんびりする"), "ひらがなだけの体験は問わない")
-        // 手本を写した「日曜の朝」は、金曜の夜には使わない
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
-        let friday = CompanionContext(now: cal.date(from: DateComponents(year: 2026, month: 10, day: 9, hour: 21))!,
-                                      timeZone: cal.timeZone)
-        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: おだやかな日曜の朝に、新しい発見が待ってるかも", title: "地図で歩く",
-                                                   context: friday))
-        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 金曜の夜のごほうびに、知らない街を歩いてみるのも楽しいかも", title: "地図で歩く",
-                                                      context: friday))
-    }
-
     /// CI で LFM2.5 が返した「問い: -」「メモ: -」は、ないものとして扱う
     func testDashQuestionAndMemoAreDropped() throws {
         let raw = "返事: 夕焼けを見に屋上へ行くという体験は、心地よい感覚を与えてくれましたね。\n問い: -\nメモ: -"
         let r = try XCTUnwrap(ExperienceParser.reflection(from: raw, title: "夕焼けを見に屋上へ", note: "風が気持ちよかった"))
         XCTAssertNil(r.question)
         XCTAssertNil(r.noteCandidate)
-    }
-
-    /// CI で LFM2.5 が出した「夕食に食べるのをやめて…」のような、食べることを減らす誘いははじく
-    func testRejectsEatingRestriction() {
-        let raw = "体験: 食事の前に視覚的な休憩\nひとこと: 夕食に食べるのをやめて、一度視線を上げると、呼吸にゆっくりと意識が向くかも\nはじめ方: 好きな料理を見る\n時間: 15分\n種類: つくる"
-        XCTAssertNil(ExperienceParser.suggestion(from: raw, angle: .make, budget: .fifteen, engine: "x"))
-        XCTAssertFalse(ContentGuard.isAcceptable(text: "朝ごはんを抜いて体を軽くする"))
-        XCTAssertFalse(ContentGuard.isAcceptable(text: "ダイエットのために歩く"))
-        XCTAssertTrue(ContentGuard.isAcceptable(text: "好きな料理をゆっくり味わう"))
     }
 
     func testReflectionThatOnlyEchoesTheNoteIsRejected() {

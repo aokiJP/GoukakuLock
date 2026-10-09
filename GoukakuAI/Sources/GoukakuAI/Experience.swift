@@ -291,6 +291,32 @@ public struct ExperienceDraft: Codable, Sendable, Equatable, Hashable {
     }
 }
 
+/// やってみた体験の記録の要点(相棒の気づきに渡す)
+public struct ExperienceMemo: Sendable, Equatable {
+    public var title: String
+    public var category: ExperienceCategory
+    public var feeling: Feeling?
+    public var note: String
+
+    public init(title: String, category: ExperienceCategory, feeling: Feeling?, note: String) {
+        self.title = title
+        self.category = category
+        self.feeling = feeling
+        self.note = note
+    }
+}
+
+/// 相棒の気づき(だれが書いたか)
+public struct InsightDraft: Sendable, Equatable {
+    public var text: String
+    public var fromAI: Bool
+
+    public init(text: String, fromAI: Bool) {
+        self.text = text
+        self.fromAI = fromAI
+    }
+}
+
 /// やってみたあとの返事(ふり返り)
 public struct ReflectionDraft: Codable, Sendable, Equatable {
     public var reply: String

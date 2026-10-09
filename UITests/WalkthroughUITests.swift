@@ -130,9 +130,10 @@ final class WalkthroughUITests: XCTestCase {
         snap("24-やってみた")
         tap(app.buttons["記録する"])
         waitFor(app.staticTexts["体験の地図に、ひとつ増えました"], timeout: 10)
-        waitFor(app.buttons["覚えてもらう"], timeout: 20)
+        waitFor(app.buttons["覚えてもらう"].firstMatch, timeout: 20)
         snap("25-相棒の返事")
-        tap(app.buttons["覚えてもらう"])
+        // シートの下の一覧にも同じボタンがあるので、押せるほうを押す
+        tap(firstHittable(app.buttons.matching(NSPredicate(format: "label == '覚えてもらう'"))))
         tap(app.buttons["閉じる"].firstMatch)
 
         // 相棒と話す
@@ -289,6 +290,15 @@ final class WalkthroughUITests: XCTestCase {
         quickCheckIn.tap()
         waitFor(app.navigationBars["チェックイン"], timeout: 15)
         snap("57-クイックアクションから")
+    }
+
+    /// 押せる(ほかのものに隠れていない)最初の要素
+    @MainActor
+    private func firstHittable(_ query: XCUIElementQuery) -> XCUIElement {
+        for element in query.allElementsBoundByIndex where element.exists && element.isHittable {
+            return element
+        }
+        return query.firstMatch
     }
 
     /// 画面の中(ナビゲーションバーとタブバーのあいだ)に、まるごと見えている最初の要素

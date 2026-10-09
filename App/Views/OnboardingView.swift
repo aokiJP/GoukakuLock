@@ -176,7 +176,7 @@ struct OnboardingView: View {
                 if let reason = runtime.decision.reasons.first {
                     Text(reason).font(.footnote).foregroundStyle(Theme.muted)
                 }
-                if !runtime.usesAI, let spec = recommendedDownload {
+                if !runtime.usesAI, runtime.profile.supportsMLX || runtime.profile.isSimulator, let spec = recommendedDownload {
                     if let job = runtime.downloader.jobs[spec.id] {
                         if case .failed(let why) = job.phase {
                             Text(why).font(.footnote).foregroundStyle(Theme.seal)

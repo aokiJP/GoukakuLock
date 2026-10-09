@@ -223,6 +223,10 @@ final class AppSettings {
     var companionStartedAt: Date? = nil
     /// 相棒AI:チェックインのあとにひとこと返す
     var companionReflectAfterCheckIn: Bool = true
+    /// 相棒AI:体験の記録から相棒が気づいたこと(育ちの画面)と、その日時・AIが書いたか
+    var companionInsight: String = ""
+    var companionInsightAt: Date? = nil
+    var companionInsightFromAI: Bool = false
 
     init() {
         self.reminderMinutes = [12 * 60, 20 * 60]

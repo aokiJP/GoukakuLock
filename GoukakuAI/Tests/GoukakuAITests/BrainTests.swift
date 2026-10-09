@@ -156,6 +156,8 @@ final class BrainTests: XCTestCase {
         }
         XCTAssertEqual(Set(result.values.map(\.title)).count, 3)
         XCTAssertTrue(recorder.all.allSatisfy { $0.prompt.hasSuffix("「〜かも」で終えます。\nひとこと:") })
+        XCTAssertFalse(recorder.all.contains { $0.prompt.contains("最近やった体験") }, "ひとことの文脈は短く")
+        XCTAssertTrue(recorder.all.first?.prompt.contains("この人について: 英語の勉強をしている。散歩が好き。") == true)
         XCTAssertTrue(recorder.all.first?.prompt.contains("体験: \(result.values[0].title)") == true)
         XCTAssertEqual(result.progress, 3, "書く前に体験の名前を見せる")
 
@@ -187,6 +189,44 @@ final class BrainTests: XCTestCase {
             XCTAssertEqual(Set(r.values.map(\.title)).count, 3, "同じ回の中では重ならない")
             shown += r.values.map(\.title)
         }
+    }
+
+    func testInsightFromExperiences() async throws {
+        let memos = [
+            ExperienceMemo(title: "夕焼けを見に屋上へ", category: .outside, feeling: .calm, note: "空がオレンジから紫に"),
+            ExperienceMemo(title: "静かな音楽と深呼吸", category: .mind, feeling: .calm, note: ""),
+            ExperienceMemo(title: "お茶をいれる", category: .mind, feeling: .discovery, note: "香りがよかった"),
+        ]
+        let unexplored: [ExperienceCategory] = [.people, .first]
+        // 体験帳(AIなし)
+        let rules = try await collect(CompanionBrain(engine: nil).insight(experiences: memos, notes: [], unexplored: unexplored))
+        let text = try XCTUnwrap(rules.values.first?.text)
+        XCTAssertEqual(rules.values.first?.fromAI, false)
+        XCTAssertTrue(text.contains("「こころ」の体験がいちばん多い"), text)
+        XCTAssertTrue(text.contains("「おだやか」"), text)
+        XCTAssertTrue(text.contains("「ひと」"), text)
+        // AI
+        let recorder = Recorder()
+        let reply = "<think></think>静かな時間を味わう体験が多く、香りや空の色にふれると、おだやかになれるようですね。次は「ひと」の体験として、昔の友だちに一言送ってみるのはどうでしょう。"
+        let engine = ScriptedEngine { request in recorder.add(request); return reply }
+        let ai = try await collect(CompanionBrain(engine: engine).insight(experiences: memos, notes: ["散歩が好き"], unexplored: unexplored))
+        XCTAssertEqual(ai.values.first?.text.hasPrefix("静かな時間を味わう体験が多く"), true)
+        XCTAssertEqual(ai.values.first?.fromAI, true)
+        let prompt = try XCTUnwrap(recorder.all.first?.prompt)
+        XCTAssertTrue(prompt.contains("- 夕焼けを見に屋上へ(そと・おだやか):空がオレンジから紫に"), prompt)
+        XCTAssertTrue(prompt.contains("まだやっていない種類: ひと、はじめて"))
+        XCTAssertTrue(prompt.contains("この人について: 散歩が好き。"))
+        // AIが日本語を返さなければ、体験帳で
+        let english = try await collect(CompanionBrain(engine: ScriptedEngine { _ in "You seem calm." })
+            .insight(experiences: memos, notes: [], unexplored: unexplored))
+        XCTAssertEqual(english.values.first?.text, text)
+        XCTAssertEqual(english.values.first?.fromAI, false)
+        // 記録がなければ、AIに頼まない
+        let empty = Recorder()
+        let none = try await collect(CompanionBrain(engine: ScriptedEngine { r in empty.add(r); return "x" })
+            .insight(experiences: [], notes: [], unexplored: unexplored))
+        XCTAssertTrue(none.values.first?.text.contains("まだ体験の記録がありません") == true)
+        XCTAssertTrue(empty.all.isEmpty)
     }
 
     func testDuplicateAIIdeasAreNotRepeated() async throws {

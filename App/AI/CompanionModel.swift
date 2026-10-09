@@ -39,6 +39,9 @@ final class CompanionModel {
     /// 会話の返事を書いている途中の文
     private(set) var isChatting = false
     private(set) var chatPreview = ""
+    /// 相棒の気づきを書いているか、その途中の文
+    private(set) var isThinkingInsight = false
+    private(set) var insightPreview = ""
     /// 本人に伝えること(例:AIの返事が使えなかった)
     var notice: String?
     /// 画面の再計算のきっかけ
@@ -499,6 +502,48 @@ final class CompanionModel {
         }
     }
 
+    // MARK: 相棒の気づき
+
+    /// 気づきを書けるだけの体験があるか
+    static let insightMinimum = 3
+
+    var experienceLogs: [ExperienceLog] { logs.filter { $0.source == .experience } }
+
+    /// やってみた体験の記録から、相棒が気づいたことを書く(育ちの画面)
+    func refreshInsight() {
+        guard !isThinkingInsight else { return }
+        let memos = experienceLogs.prefix(12).map {
+            ExperienceMemo(title: $0.title, category: $0.category, feeling: $0.feeling, note: $0.note)
+        }
+        guard memos.count >= Self.insightMinimum else { return }
+        let notes = self.notes.map(\.text)
+        let unexplored = growth.unexplored
+        isThinkingInsight = true
+        insightPreview = ""
+        startAI { [self] in
+            await runtime.ensureReady()
+            let brain = runtime.brain
+            do {
+                for try await event in brain.insight(experiences: Array(memos), notes: notes, unexplored: unexplored) {
+                    switch event {
+                    case .progress(let text): insightPreview = text
+                    case .value(let draft):
+                        app.settings.companionInsight = draft.text
+                        app.settings.companionInsightAt = Date()
+                        app.settings.companionInsightFromAI = draft.fromAI
+                        touch()
+                    case .notice(let text): notice = text
+                    }
+                }
+            } catch is CancellationError {
+            } catch {
+                notice = error.localizedDescription
+            }
+            isThinkingInsight = false
+            insightPreview = ""
+        }
+    }
+
     // MARK: 相棒と話す
 
     func send(_ text: String) {
@@ -591,6 +636,7 @@ final class CompanionModel {
         reframes = [:]
         isSuggesting = false
         isChatting = false
+        isThinkingInsight = false
         reflecting = nil
         notice = nil
         revision &+= 1

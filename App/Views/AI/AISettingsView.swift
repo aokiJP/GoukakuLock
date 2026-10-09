@@ -208,6 +208,11 @@ struct AISettingsView: View {
                 .padding(.vertical, 4)
             }
             Toggle("モバイル通信でもダウンロードする", isOn: $runtime.allowCellular)
+            if !runtime.profile.supportsMLX && !runtime.profile.isSimulator {
+                Text("この iPhone の GPU では MLX が動かないため、モデルを入れても使えません(A13 以降が必要)。Apple Intelligence か体験帳で動きます。")
+                    .font(.caption)
+                    .foregroundStyle(Theme.amber)
+            }
         } header: {
             Text("ダウンロードできるモデル")
         } footer: {

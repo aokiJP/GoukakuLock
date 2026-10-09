@@ -56,7 +56,7 @@ public enum PromptBook {
 
     // MARK: 体験帳の体験に、この人向けのひとことを添える(小さいモデル向け)
 
-    static let tailorFormat = "この体験を、この人に合わせて誘うひとことを1文で書いてください。「〜かも」で終えます。\nひとこと:"
+    static let tailorFormat = "この体験の中身にふれて、この人に合わせて誘うひとことを1文で書いてください。「〜かも」で終えます。\nひとこと:"
 
     static let tailorExample = (
         // 手本には曜日や時間帯を書かない(小さいモデルが「日曜の朝に」と写してしまうため)
@@ -67,7 +67,10 @@ public enum PromptBook {
     /// 決まった体験(体験帳)を、この人に合わせて誘うひとことを書いてもらう。purpose は体験の位置づけ(工夫・いつか)
     public static func tailor(_ draft: ExperienceDraft, context: CompanionContext, purpose: String? = nil,
                               tuning: GenerationTuning) -> GenerationRequest {
-        var prompt = contextBlock(context, items: tuning.contextItems)
+        // 文脈は短く(最近の体験などを入れると、小さいモデルはそちらの話に流れるため)
+        var prompt = "いまの様子: \(context.whenPhrase)。使える時間は\(context.budget.phrase)。場所は\(context.place.phrase)。\(context.mood.phrase)。"
+        let notes = context.notes.prefix(min(3, tuning.contextItems))
+        if !notes.isEmpty { prompt += "\nこの人について: " + notes.map(sentence).joined() }
         if let purpose { prompt += "\n" + purpose }
         prompt += "\n\n体験: \(draft.title)"
         if !draft.firstStep.isEmpty { prompt += "\nはじめ方: \(draft.firstStep)" }
@@ -152,6 +155,31 @@ public enum PromptBook {
         }
         prompt += "\n\nこの人に、短い手紙を3〜4文で書いてください。できたことや感じたことにふれて、来週ためしてみたくなる体験を1つだけ添えます。数字で評価したり、ほかの人と比べたりはしません。手紙の文だけを書いてください。"
         return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(220), temperature: 0.8, topP: 0.95)
+    }
+
+    // MARK: 相棒の気づき(体験の記録から)
+
+    /// やってみた体験の記録から、相棒が気づいたことを書いてもらう(育ちの画面)
+    public static func insight(experiences: [ExperienceMemo], notes: [String], unexplored: [ExperienceCategory],
+                               tuning: GenerationTuning) -> GenerationRequest {
+        var prompt = "この人がやってみた体験の記録(新しい順):\n"
+        prompt += experiences.prefix(12).map { memo in
+            var line = "- \(oneLine(memo.title))(\(memo.category.label)"
+            if let feeling = memo.feeling { line += "・\(feeling.label)" }
+            line += ")"
+            if !memo.note.isEmpty { line += ":" + String(oneLine(memo.note).prefix(40)) }
+            return line
+        }.joined(separator: "\n")
+        if !notes.isEmpty {
+            prompt += "\nこの人について: " + notes.prefix(tuning.contextItems).map(sentence).joined()
+        }
+        if let next = unexplored.first {
+            prompt += "\nまだやっていない種類: " + unexplored.prefix(3).map(\.label).joined(separator: "、")
+            prompt += "\n\nこの記録から、相棒として気づいたことを2〜3文で書いてください。決めつけず「〜のようですね」「〜かもしれません」とやわらかく。点数をつけたり、ほかの人と比べたりはしません。最後に「\(next.label)」の体験を1つ、やってみたくなるように誘います。気づいたことの文だけを書いてください。"
+        } else {
+            prompt += "\n\nこの記録から、相棒として気づいたことを2〜3文で書いてください。決めつけず「〜のようですね」「〜かもしれません」とやわらかく。点数をつけたり、ほかの人と比べたりはしません。気づいたことの文だけを書いてください。"
+        }
+        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(200), temperature: 0.7, topP: 0.95)
     }
 
     // MARK: 相棒と話す

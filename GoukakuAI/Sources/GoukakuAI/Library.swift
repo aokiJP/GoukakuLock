@@ -364,6 +364,30 @@ public enum ExperienceLibrary {
         return text
     }
 
+    /// 体験の記録から、ルールで気づきを書く(AIがないとき)
+    public static func insight(experiences: [ExperienceMemo], unexplored: [ExperienceCategory]) -> String {
+        guard !experiences.isEmpty else {
+            return "まだ体験の記録がありません。やってみた体験が増えると、相棒が気づいたことを書きます。"
+        }
+        var categories: [ExperienceCategory: Int] = [:]
+        var feelings: [Feeling: Int] = [:]
+        for e in experiences {
+            categories[e.category, default: 0] += 1
+            if let f = e.feeling { feelings[f, default: 0] += 1 }
+        }
+        let top = categories.max { a, b in a.value != b.value ? a.value < b.value : a.key.rawValue > b.key.rawValue }!.key
+        var text = "これまでの\(experiences.count)つの体験では、「\(top.label)」の体験がいちばん多いようです。"
+        if let feeling = feelings.max(by: { a, b in a.value != b.value ? a.value < b.value : a.key.rawValue > b.key.rawValue })?.key {
+            text += "気持ちは「\(feeling.label)」と書くことが多いですね。"
+        }
+        if let next = unexplored.first {
+            text += "まだの「\(next.label)」の体験も、気が向いたらのぞいてみませんか。"
+        } else {
+            text += "8つの区画を、ぜんぶ歩いてきました。"
+        }
+        return text
+    }
+
     /// 文字列から安定した数を作る(ふり返りの問いを選ぶため。実行ごとに変わらない)
     static func stableHash(_ text: String) -> UInt64 {
         var h: UInt64 = 1_469_598_103_934_665_603

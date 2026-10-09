@@ -39,6 +39,9 @@ enum SampleAI {
 
     static func reply(to request: GenerationRequest) -> String {
         let prompt = request.prompt
+        if prompt.contains("相棒として気づいたこと") {
+            return "静かな時間の中で、空の色や音の小さな変化に気づく体験が多いようですね。書いた言葉からは、おだやかな気持ちが伝わってきます。次は「ひと」の体験として、昔の友だちに一言送ってみるのはどうでしょう。"
+        }
         if prompt.contains("誘うひとことを1文で") {
             return "ひとこと: 今のあなたにちょうどいい、小さな発見がありそうかも"
         }

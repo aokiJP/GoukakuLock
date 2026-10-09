@@ -229,6 +229,37 @@ public struct CompanionBrain: Sendable {
         }
     }
 
+    // MARK: 相棒の気づき
+
+    /// やってみた体験の記録から、相棒が気づいたこと(AIがなければ体験帳のルールで)
+    public func insight(experiences: [ExperienceMemo], notes: [String],
+                        unexplored: [ExperienceCategory]) -> AsyncThrowingStream<BrainEvent<InsightDraft>, Error> {
+        run { emit in
+            if let engine, !experiences.isEmpty {
+                do {
+                    let request = PromptBook.insight(experiences: experiences, notes: notes, unexplored: unexplored,
+                                                     tuning: self.tuning)
+                    var raw = ""
+                    for try await piece in engine.generate(request) {
+                        raw += piece
+                        emit(.progress(OutputCleaner.clean(raw)))
+                    }
+                    if let text = ExperienceParser.prose(from: raw, limit: 300), ContentGuard.isAcceptable(text: text),
+                       TextCheck.hasJapanese(text) {
+                        emit(.value(InsightDraft(text: text, fromAI: true)))
+                        return
+                    }
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch {
+                    emit(.notice("AIが使えなかったので、記録から書きました(\(error.localizedDescription))"))
+                }
+            }
+            emit(.value(InsightDraft(text: ExperienceLibrary.insight(experiences: experiences, unexplored: unexplored),
+                                     fromAI: false)))
+        }
+    }
+
     // MARK: 相棒と話す
 
     /// 会話はAIがあるときだけ(体験帳では話せない)

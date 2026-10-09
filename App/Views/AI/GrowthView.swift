@@ -5,6 +5,7 @@ import GoukakuAI
 /// あなたが体験するほど地図が埋まり、覚えてもらうほど相棒の提案があなたに合っていく。
 /// 他の人との比較や、連続の記録はない
 struct GrowthView: View {
+    @Environment(AppModel.self) private var model
     @Environment(CompanionModel.self) private var companion
     @State private var newNote = ""
     @State private var confirmForget = false
@@ -24,6 +25,8 @@ struct GrowthView: View {
                     Text("8つの区画すべてで体験しました。")
                 }
             }
+
+            insightSection
 
             Section {
                 VStack(alignment: .leading, spacing: 10) {
@@ -99,6 +102,40 @@ struct GrowthView: View {
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("相棒が覚えていることを、すべて忘れてもらいますか?", isPresented: $confirmForget, titleVisibility: .visible) {
             Button("すべて忘れる", role: .destructive) { companion.forgetAll() }
+        }
+    }
+
+    /// 相棒の気づき:やってみた体験の記録から、相棒が気づいたこと(本人が頼んだときだけ書く)
+    @ViewBuilder
+    private var insightSection: some View {
+        let settings = model.settings
+        let count = companion.experienceLogs.count
+        Section {
+            if companion.isThinkingInsight {
+                PencilNote(text: companion.insightPreview, caption: "相棒の気づき", writing: true)
+            } else if !settings.companionInsight.isEmpty {
+                PencilNote(text: settings.companionInsight,
+                           caption: "相棒の気づき" + (settings.companionInsightAt.map { "(\(Fmt.clock($0)))" } ?? "")
+                               + (settings.companionInsightFromAI ? "" : "・体験帳"))
+            }
+            if count >= CompanionModel.insightMinimum {
+                Button {
+                    companion.refreshInsight()
+                } label: {
+                    Label(settings.companionInsight.isEmpty ? "相棒の気づきを聞く" : "いまの記録で、もう一度聞く",
+                          systemImage: "lightbulb")
+                }
+                .tint(Theme.pencil)
+                .disabled(companion.isThinkingInsight)
+            } else {
+                Text("やってみた体験が\(CompanionModel.insightMinimum)つたまると、相棒が記録から気づいたことを書きます(あと\(CompanionModel.insightMinimum - count)つ)。")
+                    .font(.footnote)
+                    .foregroundStyle(Theme.muted)
+            }
+        } header: {
+            Text("相棒の気づき")
+        } footer: {
+            Text("決めつけたり、点数をつけたりはしません。気づきは、あなたが頼んだときだけ書きます。")
         }
     }
 

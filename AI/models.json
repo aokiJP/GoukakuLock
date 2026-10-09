@@ -44,6 +44,8 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {"enable_thinking": false},
       "repetitionPenalty": 1.05,
+      "chatTemperature": 0.7,
+      "chatTopP": 0.8,
       "ipa": true
     },
     {
@@ -67,6 +69,8 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {},
       "repetitionPenalty": 1.05,
+      "chatTemperature": 0.3,
+      "chatTopP": 0.9,
       "ipa": true
     },
     {
@@ -90,6 +94,8 @@
       "extraEOSTokens": ["<|im_end|>"],
       "templateFlags": {"enable_thinking": false},
       "repetitionPenalty": 1.05,
+      "chatTemperature": 0.7,
+      "chatTopP": 0.8,
       "ipa": true
     }
   ]

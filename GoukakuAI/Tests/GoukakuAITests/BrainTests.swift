@@ -284,6 +284,14 @@ final class BrainTests: XCTestCase {
         XCTAssertEqual(c.values.first, "こんばんは。今日はどんな一日でしたか?")
     }
 
+    /// 会話で同じ行をくり返しはじめたら、生成を止め、くり返す前までを返事にする
+    func testChatStopsWhenTheModelLoops() async throws {
+        let loop = "今夜のプランです。\n" + String(repeating: "21時:夕焼けを見に屋上へ行く。\n22時:夜の散歩をする時間。\n", count: 20)
+        let brain = CompanionBrain(engine: ScriptedEngine { _ in loop })
+        let reply = try await collect(brain.chat(context: nightAtHome, history: [], message: "今夜なにしよう"))
+        XCTAssertEqual(reply.values.first, "今夜のプランです。\n21時:夕焼けを見に屋上へ行く。\n22時:夜の散歩をする時間。")
+    }
+
     func testChatHistoryIsTrimmedForSmallModels() {
         var tuning = GenerationTuning()
         tuning.chatTurns = 2

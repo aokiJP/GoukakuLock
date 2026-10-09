@@ -144,14 +144,20 @@ public struct GenerationTuning: Sendable, Equatable {
     public var useHints: Bool
     /// 提案の1回目の温度(小さいモデルは低めにして、話の筋を保ちやすくする)
     public var suggestionTemperature: Double
+    /// 会話・手紙・気づきの温度と top-p(モデルを作った人のおすすめ。小さいモデルほど低くして、話の筋とくり返しを抑える)
+    public var chatTemperature: Double
+    public var chatTopP: Double
 
     public init(lengthScale: Double = 1, contextItems: Int = 6, chatTurns: Int = 10,
-                useHints: Bool = true, suggestionTemperature: Double = 0.85) {
+                useHints: Bool = true, suggestionTemperature: Double = 0.85,
+                chatTemperature: Double = 0.8, chatTopP: Double = 0.95) {
         self.lengthScale = lengthScale
         self.contextItems = contextItems
         self.chatTurns = chatTurns
         self.useHints = useHints
         self.suggestionTemperature = suggestionTemperature
+        self.chatTemperature = chatTemperature
+        self.chatTopP = chatTopP
     }
 
     public func tokens(_ base: Int) -> Int { max(48, Int((Double(base) * lengthScale).rounded())) }
@@ -319,5 +325,8 @@ extension GenerationTuning {
         // 言葉は添えず、温度も少し下げる(話の筋を保つための調整で、中身はしばらない)
         useHints = gb >= 2.2
         suggestionTemperature = gb >= 2.2 ? 0.85 : 0.7
+        // 会話の温度:目録にモデルのおすすめがあればそれ(LFM2.5 は 0.3、Qwen3.5 は 0.7・top-p 0.8)、なければ大きさで
+        chatTemperature = model.spec?.chatTemperature ?? (gb < 1.2 ? 0.4 : gb < 2.2 ? 0.7 : 0.8)
+        chatTopP = model.spec?.chatTopP ?? (gb < 2.2 ? 0.8 : 0.95)
     }
 }

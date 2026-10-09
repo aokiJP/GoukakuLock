@@ -104,7 +104,7 @@ public final class MLXEngine: LanguageEngine {
             temperature: Float(request.temperature),
             topP: Float(request.topP),
             repetitionPenalty: repetitionPenalty.map { Float($0) },
-            repetitionContextSize: 64
+            repetitionContextSize: 256
         )
         let history: [Chat.Message] = request.turns.map {
             $0.role == .user ? .user($0.text) : .assistant($0.text)

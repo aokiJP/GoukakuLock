@@ -155,6 +155,34 @@ final class ParsingTests: XCTestCase {
         XCTAssertNil(r.noteCandidate)
     }
 
+    /// CI で Qwen3.5 2B が会話で出した、同じ行をくり返しつづける出力は、くり返しが始まる前で止める
+    func testRepetitionGuardCutsLoops() {
+        let loop = """
+        だから、今夜の活動プランを提案しよう。
+        ④ 21 時頃:サマの時間と今日の反省
+        21 時頃、夕焼けを見に屋上へ。あなたの疲れた状態も、私のサマの時間も。
+        ⑤ 21 時頃:夜散歩の約束
+        21 時頃、夕焼けを見に屋上へ。あなたの疲れも私の方にも。
+        ⑥ 21 時頃:サマの時間と今日の反省
+        21 時頃、夕焼けを見に屋上へ。あなたの疲れた状態も、私のサマの時間も。
+        ⑦ 21 時頃:夜散歩の約束
+        21 時頃、夕焼けを見に屋上へ。あなたの疲れも私の方にも。
+        ⑧ 21 時頃:サマの時間と今日の反省
+        """
+        let r = RepetitionGuard.check(loop)
+        XCTAssertTrue(r.looping)
+        XCTAssertTrue(r.text.hasSuffix("21 時頃、夕焼けを見に屋上へ。あなたの疲れも私の方にも。"), r.text)
+        XCTAssertFalse(r.text.contains("⑥"))
+        // くり返していなければ、そのまま
+        let calm = "今日はおつかれさま。\n\nゆっくり休んでね。\n\nまた明日。"
+        XCTAssertEqual(RepetitionGuard.check(calm).text, calm)
+        XCTAssertFalse(RepetitionGuard.check(calm).looping)
+        // 短い行(「はい」など)は数えない
+        XCTAssertFalse(RepetitionGuard.check("はい\nはい\nはい\nはい").looping)
+        // 2回までは、くり返しとみなさない(手紙の結びの言葉など)
+        XCTAssertFalse(RepetitionGuard.check("また一緒に考えようね。\n本文\nまた一緒に考えようね。").looping)
+    }
+
     func testReflectionThatOnlyEchoesTheNoteIsRejected() {
         let raw = "空の色が変わるのを10分見た"
         XCTAssertNil(ExperienceParser.reflection(from: raw, title: "夕焼け", note: "空の色が変わるのを10分見た"))

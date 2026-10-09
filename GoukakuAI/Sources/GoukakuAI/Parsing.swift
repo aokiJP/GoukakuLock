@@ -47,7 +47,7 @@ public enum OutputCleaner {
             }
             // 1. 1) (1) ① など
             if let first = s.first {
-                if "①②③④⑤⑥⑦⑧⑨".contains(first) {
+                if "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳".contains(first) {
                     s = s.dropFirst().drop { $0 == " " || $0 == "　" || $0 == "." }
                     changed = true
                 } else if first.isNumber || first == "(" || first == "（" {
@@ -326,6 +326,33 @@ public enum ExperienceParser {
         let cut = t.prefix(limit)
         if let end = cut.lastIndex(where: { "。!?！？".contains($0) }) { return String(cut[...end]) }
         return String(cut) + "…"
+    }
+}
+
+/// 生成のくり返し(小さなモデルが同じ行を何度も書きつづける)を見つけて止める。
+/// 中身でははじかない。同じ行(8文字以上)が3回目に出たら「くり返し」とみなし、くり返しが始まる前までを使う
+public enum RepetitionGuard {
+    public static let minimumLength = 8
+    public static let limit = 3
+
+    /// (使う文, くり返しに入っていたか)
+    public static func check(_ text: String) -> (text: String, looping: Bool) {
+        let lines = text.components(separatedBy: "\n")
+        var counts: [String: Int] = [:]
+        var firstRepeat: Int?
+        for (index, line) in lines.enumerated() {
+            let key = OutputCleaner.stripDecoration(line).filter { !$0.isWhitespace }
+            guard key.count >= minimumLength else { continue }
+            let count = (counts[key] ?? 0) + 1
+            counts[key] = count
+            if count == 2, firstRepeat == nil { firstRepeat = index }
+            if count >= limit {
+                let cut = firstRepeat ?? index
+                let kept = lines[..<cut].joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+                return (kept, true)
+            }
+        }
+        return (text, false)
     }
 }
 

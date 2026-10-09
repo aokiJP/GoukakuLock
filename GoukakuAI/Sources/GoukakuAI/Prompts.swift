@@ -126,7 +126,8 @@ public enum PromptBook {
             prompt += "\nこの人について: " + notes.prefix(tuning.contextItems).map(sentence).joined()
         }
         prompt += "\n\nこの1週間のこの人に、相棒として手紙を書いてください。来週やってみたくなる体験も添えてください。手紙の本文を書いてください。"
-        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(450), temperature: 0.8, topP: 0.95)
+        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(450),
+                                 temperature: tuning.chatTemperature, topP: tuning.chatTopP)
     }
 
     // MARK: 相棒の気づき(体験の記録から)
@@ -151,7 +152,8 @@ public enum PromptBook {
         } else {
             prompt += "\n\nこの記録を見て、相棒として気づいたことを書いてください。気づいたことの本文を書いてください。"
         }
-        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(360), temperature: 0.7, topP: 0.95)
+        return GenerationRequest(system: system, prompt: prompt, maxTokens: tuning.tokens(360),
+                                 temperature: min(0.7, tuning.chatTemperature), topP: tuning.chatTopP)
     }
 
     // MARK: 相棒と話す
@@ -171,7 +173,8 @@ public enum PromptBook {
                             tuning: GenerationTuning) -> GenerationRequest {
         let turns = Array(history.suffix(tuning.chatTurns * 2))
         return GenerationRequest(system: chatSystem(context: context, tuning: tuning), history: turns,
-                                 prompt: message, maxTokens: tuning.tokens(800), temperature: 0.8, topP: 0.95)
+                                 prompt: message, maxTokens: tuning.tokens(800),
+                                 temperature: tuning.chatTemperature, topP: tuning.chatTopP)
     }
 
     // MARK: 小さな道具

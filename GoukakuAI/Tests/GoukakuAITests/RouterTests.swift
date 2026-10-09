@@ -151,5 +151,18 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(tuning.chatTurns, 10)
         XCTAssertTrue(tuning.useHints)
         XCTAssertEqual(tuning.suggestionTemperature, 0.85, accuracy: 0.001)
+        XCTAssertEqual(tuning.chatTemperature, 0.8, accuracy: 0.001)
+        // 会話の温度:目録のおすすめが先、なければ大きさで(小さいほど低く)
+        var lfm = spec("lfm", runtimeGB: 1.0, japanese: 3)
+        lfm.chatTemperature = 0.3
+        lfm.chatTopP = 0.9
+        tuning.apply(for: installed(lfm))
+        XCTAssertEqual(tuning.chatTemperature, 0.3, accuracy: 0.001)
+        XCTAssertEqual(tuning.chatTopP, 0.9, accuracy: 0.001)
+        tuning.apply(for: installed(spec("imported-small", runtimeGB: 1.0, japanese: 3)))
+        XCTAssertEqual(tuning.chatTemperature, 0.4, accuracy: 0.001)
+        let chat = PromptBook.chat(context: CompanionContext(), history: [], message: "やあ", tuning: tuning)
+        XCTAssertEqual(chat.temperature, 0.4, accuracy: 0.001)
+        XCTAssertEqual(chat.topP, 0.8, accuracy: 0.001)
     }
 }

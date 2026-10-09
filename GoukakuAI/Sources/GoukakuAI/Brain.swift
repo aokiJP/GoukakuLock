@@ -162,11 +162,7 @@ public struct CompanionBrain: Sendable {
                     for attempt in 0..<2 {
                         var request = PromptBook.reflection(title: title, note: note, feeling: feeling, tuning: self.tuning)
                         if attempt > 0 { request.temperature = 0.5 }
-                        var raw = ""
-                        for try await piece in engine.generate(request) {
-                            raw += piece
-                            emit(.progress(Self.replyPreview(raw)))
-                        }
+                        let raw = try await Self.stream(engine, request) { emit(.progress(Self.replyPreview($0))) }
                         if let draft = ExperienceParser.reflection(from: raw, title: title, note: note) {
                             emit(.value(draft))
                             return
@@ -192,11 +188,7 @@ public struct CompanionBrain: Sendable {
                 do {
                     let request = PromptBook.letter(experiences: experiences.map(\.title), achievedDays: achievedDays,
                                                     plannedDays: plannedDays, notes: notes, tuning: self.tuning)
-                    var raw = ""
-                    for try await piece in engine.generate(request) {
-                        raw += piece
-                        emit(.progress(OutputCleaner.clean(raw)))
-                    }
+                    let raw = try await Self.stream(engine, request) { emit(.progress($0)) }
                     if let text = ExperienceParser.prose(from: raw) {
                         emit(.value(text))
                         return
@@ -222,11 +214,7 @@ public struct CompanionBrain: Sendable {
                 do {
                     let request = PromptBook.insight(experiences: experiences, notes: notes, unexplored: unexplored,
                                                      tuning: self.tuning)
-                    var raw = ""
-                    for try await piece in engine.generate(request) {
-                        raw += piece
-                        emit(.progress(OutputCleaner.clean(raw)))
-                    }
+                    let raw = try await Self.stream(engine, request) { emit(.progress($0)) }
                     if let text = ExperienceParser.prose(from: raw) {
                         emit(.value(InsightDraft(text: text, fromAI: true)))
                         return
@@ -252,11 +240,7 @@ public struct CompanionBrain: Sendable {
                 throw AIError.unavailable("会話にはAIのモデルが要ります。設定 › AI から入れられます")
             }
             let request = PromptBook.chat(context: context, history: history, message: message, tuning: self.tuning)
-            var raw = ""
-            for try await piece in engine.generate(request) {
-                raw += piece
-                emit(.progress(OutputCleaner.clean(raw)))
-            }
+            let raw = try await Self.stream(engine, request) { emit(.progress($0)) }
             guard let text = ExperienceParser.prose(from: raw) else { throw AIError.emptyOutput }
             emit(.value(text))
         }
@@ -306,6 +290,20 @@ public struct CompanionBrain: Sendable {
 
     static func normalize(_ text: String) -> String {
         text.filter { !$0.isWhitespace && !"「」『』、。・".contains($0) }
+    }
+
+    /// 生成しながら、掃除した文を onText に渡す。同じ行をくり返しはじめたら(小さなモデルで起きる)生成を止め、
+    /// くり返す前までの文を返す
+    static func stream(_ engine: any LanguageEngine, _ request: GenerationRequest,
+                       onText: (String) -> Void) async throws -> String {
+        var raw = ""
+        for try await piece in engine.generate(request) {
+            raw += piece
+            let guarded = RepetitionGuard.check(OutputCleaner.clean(raw))
+            onText(guarded.text)
+            if guarded.looping { return guarded.text }
+        }
+        return raw
     }
 
     /// 生成中の提案から、表示する名前を取る

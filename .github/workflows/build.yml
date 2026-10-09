@@ -11,12 +11,17 @@ on:
     tags: ["v*"]
     paths-ignore: ["**.md", "docs/**"]
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Releases に載せるときのタグ(例 v1.0.0)。空なら載せない"
+        required: false
+        default: ""
 
 permissions:
   contents: write
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -117,11 +122,13 @@ jobs:
             ls -la build/screenshots || true
           fi
 
-      - name: Publish release (tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish release (tags or manual)
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
         uses: softprops/action-gh-release@v3
         with:
-          name: 合格ロック ${{ github.ref_name }}
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: 合格ロック ${{ inputs.release_tag || github.ref_name }}
           files: |
             dist/*.ipa
             dist/SHA256SUMS.txt

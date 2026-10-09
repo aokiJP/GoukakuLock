@@ -48,7 +48,7 @@
 `main` に push するたびに GitHub Actions がビルドします。
 
 - **Actions の Artifacts**:各実行の `GoukakuLock-ipa-<番号>`
-- **Releases**:`v` で始まるタグを push したとき
+- **Releases**:`v` で始まるタグを push したとき、または Actions の「Run workflow」で `release_tag` を入れたとき
 
 | ファイル | 中身 |
 |---|---|

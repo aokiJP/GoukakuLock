@@ -328,3 +328,22 @@ public enum ContentGuard {
         !blocked.contains { text.contains($0) }
     }
 }
+
+/// 提案が「いまの自分」に合っているか。小さなモデルは「夜・家にいる」を見落として
+/// 「カフェで〜」「公園で〜」と出しがちなので、あからさまなずれだけをはじく(作り直すか、体験帳で補う)
+public enum ContextFit {
+    /// 出かける前提の言葉
+    static let goingOut: [String] = [
+        "カフェ", "喫茶店", "公園", "散歩", "街角", "街を", "街へ", "お店", "店に", "店へ", "駅", "海へ", "海に",
+        "山へ", "山に", "旅行", "旅に", "出かけ", "外出", "外に出", "映画館", "美術館", "博物館", "図書館",
+        "ジム", "レストラン", "予約",
+    ]
+
+    public static func fits(_ draft: ExperienceDraft, context: CompanionContext) -> Bool {
+        if !context.allowsGoingOut {
+            let text = draft.title + "\n" + draft.firstStep
+            if goingOut.contains(where: { text.contains($0) }) { return false }
+        }
+        return true
+    }
+}

@@ -86,6 +86,37 @@ final class BrainTests: XCTestCase {
         }
     }
 
+    func testGoingOutIdeasAreRejectedAtNightAtHome() async throws {
+        // 小さなモデルが実際に出した「夜・家・疲れている」人への提案(CI の LFM2.5 の出力)
+        let counter = Counter()
+        let engine = ScriptedEngine { _ in
+            counter.next() % 2 == 0
+                ? "体験: お気に入りの街角のカフェで英語を練習\nひとこと: 毎日少しずつ上達するかも\nはじめ方: カフェに予約して一言\n時間: 15分\n種類: こころ"
+                : "体験: 公園で人々に声をかける\nひとこと: 新しい出会いがあるかも\nはじめ方: ベンチに座る\n時間: 15分\n種類: ひと"
+        }
+        let brain = CompanionBrain(engine: engine)
+        let result = try await collect(brain.suggestions(context: nightAtHome, avoid: [], seed: 8))
+        XCTAssertEqual(result.values.count, 3)
+        XCTAssertTrue(result.values.allSatisfy { !$0.isFromAI }, "出かける提案は使わず、体験帳で補う")
+        XCTAssertEqual(counter.value, 6, "1つにつき2回まで作り直す")
+
+        // 昼なら、家にいても出かける提案は使える
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+        var daytime = nightAtHome
+        daytime.now = cal.date(from: DateComponents(year: 2026, month: 10, day: 10, hour: 14))!
+        daytime.mood = .normal
+        XCTAssertTrue(daytime.allowsGoingOut)
+        XCTAssertFalse(nightAtHome.allowsGoingOut)
+        let cafe = ExperienceDraft(title: "近くのカフェで本を読む", line: "", firstStep: "", duration: .thirty,
+                                   category: .mind, origin: .ai("x"))
+        XCTAssertTrue(ContextFit.fits(cafe, context: daytime))
+        XCTAssertFalse(ContextFit.fits(cafe, context: nightAtHome))
+        let stretch = ExperienceDraft(title: "伸びをする", line: "外の空気を思い出すかも", firstStep: "椅子に座る",
+                                      duration: .five, category: .body, origin: .ai("x"))
+        XCTAssertTrue(ContextFit.fits(stretch, context: nightAtHome), "ひとことの中の言葉までは見ない")
+    }
+
     func testDuplicateAIIdeasAreNotRepeated() async throws {
         let engine = ScriptedEngine { _ in "体験: 好きな音楽を聴く\nひとこと: 心が緩むかも\nはじめ方: 1曲選ぶ\n時間: 5分\n種類: こころ" }
         let brain = CompanionBrain(engine: engine)

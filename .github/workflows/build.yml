@@ -228,6 +228,7 @@ jobs:
           ls -la dist > "$OUT/dist-sizes.txt" 2>/dev/null || true
           # 生成した Xcode プロジェクト(リポジトリの GoukakuLock.xcodeproj を最新に保つため)
           mkdir -p "$OUT/xcodeproj" && cp GoukakuLock.xcodeproj/project.pbxproj "$OUT/xcodeproj/" 2>/dev/null || true
+          cp GoukakuLock.xcodeproj/xcshareddata/xcschemes/GoukakuLock.xcscheme "$OUT/xcodeproj/" 2>/dev/null || true
           if [ -d build/screenshots ]; then mkdir -p "$OUT/screenshots" && cp build/screenshots/* "$OUT/screenshots/" 2>/dev/null || true; fi
           if [ -d build/launch-probe ]; then cp -R build/launch-probe "$OUT/" 2>/dev/null || true; fi
           [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true

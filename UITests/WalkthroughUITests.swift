@@ -24,12 +24,12 @@ final class WalkthroughUITests: XCTestCase {
 
         // 相棒AI(この iPhone で使うAIと、あなたのこと)
         waitFor(app.navigationBars["相棒AI"])
-        let about = app.textViews.firstMatch.waitForExistence(timeout: 3) ? app.textViews.firstMatch : app.textFields.firstMatch
-        if about.waitForExistence(timeout: 3) {
-            about.tap()
-            about.typeText("English study. I like walking.")
-        }
         snap("02-相棒AI")
+        let about = textInput()
+        scrollTo(about)
+        about.tap()
+        app.typeText("English study. I like walking.")
+        snap("02-相棒AI-あなたのこと")
         tap(app.buttons["次へ"])
 
         waitFor(app.buttons["許可なしで進む(デバッグ)"])
@@ -76,10 +76,10 @@ final class WalkthroughUITests: XCTestCase {
 
         // S-03 チェックイン → 相棒のひとこと → はじめての合格(はなまる)
         tap(checkIn)
-        let note = app.textViews.firstMatch.waitForExistence(timeout: 5) ? app.textViews.firstMatch : app.textFields.firstMatch
+        let note = textInput()
         waitFor(note)
         note.tap()
-        note.typeText("Did 20 words. Self test 8/10")
+        app.typeText("Did 20 words. Self test 8/10")
         snap("12-チェックイン")
         tap(app.buttons["記録する"])
         waitFor(app.staticTexts["記録しました"])
@@ -113,10 +113,10 @@ final class WalkthroughUITests: XCTestCase {
         scrollTo(app.buttons["やってみた"].firstMatch)
         snap("23-体験-やってみる")
         tap(app.buttons["やってみた"].firstMatch)
-        let logNote = app.textViews.firstMatch.waitForExistence(timeout: 5) ? app.textViews.firstMatch : app.textFields.firstMatch
+        let logNote = textInput()
         waitFor(logNote)
         logNote.tap()
-        logNote.typeText("The sky turned orange to purple.")
+        app.typeText("The sky turned orange to purple.")
         tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
         snap("24-やってみた")
         tap(app.buttons["記録する"])
@@ -280,6 +280,15 @@ final class WalkthroughUITests: XCTestCase {
         quickCheckIn.tap()
         waitFor(app.navigationBars["チェックイン"], timeout: 15)
         snap("57-クイックアクションから")
+    }
+
+    /// 文字を入れる欄(縦に伸びる TextField は、TextField としても TextView としても見えることがあるので両方を探す)。
+    /// 押したあとは、欄ではなくアプリに打ち込む(欄の見え方が変わっても入る)
+    @MainActor
+    private func textInput() -> XCUIElement {
+        let types = [XCUIElement.ElementType.textField.rawValue, XCUIElement.ElementType.textView.rawValue]
+        return app.descendants(matching: .any)
+            .matching(NSPredicate(format: "elementType IN %@", types)).firstMatch
     }
 
     /// 文を含む要素(相棒の書き込みは、まとめて読み上げる1つの要素になるので種類を問わない)

@@ -46,7 +46,7 @@ public struct CompanionBrain: Sendable {
                         } parse: { raw in
                             ExperienceParser.suggestion(from: raw, angle: angle, budget: context.budget, engine: engine.info.name)
                         } accept: { d in
-                            !Self.isDuplicate(d.title, of: avoid + produced)
+                            !Self.isDuplicate(d.title, of: avoid + produced) && ContextFit.fits(d, context: context)
                         }
                     } catch is CancellationError {
                         throw CancellationError()
@@ -85,7 +85,7 @@ public struct CompanionBrain: Sendable {
                         } parse: { raw in
                             ExperienceParser.suggestion(from: raw, angle: .learn, budget: context.budget, engine: engine.info.name)
                         } accept: { d in
-                            !Self.isDuplicate(d.title, of: avoid + produced)
+                            !Self.isDuplicate(d.title, of: avoid + produced) && ContextFit.fits(d, context: context)
                         }
                     } catch is CancellationError {
                         throw CancellationError()

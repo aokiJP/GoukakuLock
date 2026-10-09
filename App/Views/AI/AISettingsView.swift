@@ -62,7 +62,7 @@ struct AISettingsView: View {
         .alert(runtime.message ?? "", isPresented: Binding(get: { runtime.message != nil }, set: { if !$0 { runtime.message = nil } })) {
             Button("OK", role: .cancel) {}
         }
-        .refreshable { await runtime.refresh() }
+        .refreshable { runtime.refresh() }
         .onAppear { runtime.refresh() }
     }
 

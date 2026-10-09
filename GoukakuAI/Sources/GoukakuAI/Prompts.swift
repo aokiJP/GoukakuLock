@@ -207,8 +207,7 @@ public enum AnglePlanner {
         case .normal:
             break
         }
-        let tod = context.timeOfDay
-        if !tod.allowsOutside || (context.place == .home && tod == .night) {
+        if !context.allowsGoingOut {
             weights[.outside] = 0
         }
         if context.place == .outside {

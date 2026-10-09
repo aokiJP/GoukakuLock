@@ -372,7 +372,7 @@ struct RecentStrip: View {
                 HStack(spacing: 0) {
                     ForEach(items) { item in
                         VStack(spacing: 4) {
-                            MarkView(outcome: item.cycle > current ? .blank : item.outcome.mark, size: 16)
+                            SlotMarkView(outcome: item.cycle > current ? .blank : item.outcome.mark, size: 16)
                             Text(Fmt.weekdaySymbols[cal.weekday(of: item.cycle) - 1])
                                 .font(.system(size: 9))
                                 .foregroundStyle(item.cycle == current ? Theme.seal : Theme.muted)

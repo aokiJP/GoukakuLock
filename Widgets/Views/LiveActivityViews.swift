@@ -21,7 +21,7 @@ enum LiveActivityStyle {
     static func title(_ state: State) -> String {
         switch state.kind {
         case .emergency: return "緊急解除"
-        case .focus: return state.title
+        case .focus: return state.pausedRemaining == nil ? "集中タイマー" : "一時停止中"
         case .earn: return "解除中"
         }
     }
@@ -33,7 +33,7 @@ enum LiveActivityStyle {
             let range = "\(ClockText.hm(state.startsAt, calendar: cal))〜\(ClockText.hm(state.endsAt, calendar: cal))"
             return now < state.startsAt ? "\(range) に解除(待機中)" : "\(range) 解除中"
         case .focus:
-            return state.pausedRemaining == nil ? "集中タイマー" : "一時停止中:アプリに戻ると再開"
+            return state.pausedRemaining == nil ? state.title : "アプリに戻ると再開:\(state.title)"
         case .earn:
             return "\(ClockText.hm(state.endsAt, calendar: cal)) まで使えます"
         }
@@ -77,9 +77,7 @@ struct LiveActivityContentView: View {
                 Text(LiveActivityStyle.title(state))
                     .font(Theme.heading(.headline))
                     .foregroundStyle(Theme.ink)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.85)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(1)
                 Text(LiveActivityStyle.subtitle(state))
                     .font(.caption)
                     .foregroundStyle(Theme.muted)

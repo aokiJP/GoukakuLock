@@ -114,6 +114,23 @@ enum OutcomeMark {
     case maru, sankaku, batsu, rest, paused, none, pending, blank
 }
 
+/// 帯(直近の日々)の1マス。まだ記録のない日も小さな点で枠を見せ、「埋めていく」形にする
+struct SlotMarkView: View {
+    var outcome: OutcomeMark
+    var size: CGFloat = 16
+
+    var body: some View {
+        if outcome == .blank {
+            Circle()
+                .fill(Theme.rule)
+                .frame(width: max(3, size * 0.3), height: max(3, size * 0.3))
+                .frame(width: size, height: size)
+        } else {
+            MarkView(outcome: outcome, size: size)
+        }
+    }
+}
+
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()

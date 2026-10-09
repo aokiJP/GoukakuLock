@@ -214,7 +214,7 @@ struct RecentMarksRow: View {
     var body: some View {
         HStack(spacing: 5) {
             ForEach(Array(outcomes.suffix(7).enumerated()), id: \.offset) { pair in
-                MarkView(outcome: pair.element.mark, size: 11)
+                SlotMarkView(outcome: pair.element.mark, size: 11)
             }
         }
     }

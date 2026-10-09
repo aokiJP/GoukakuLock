@@ -90,7 +90,7 @@ struct DepositView: View {
         let marks = deposit.marks(for: week)
         Section {
             HStack(alignment: .firstTextBaseline) {
-                Text("\(Fmt.monthDay(week.startsAt))〜\(Fmt.monthDay(week.endsAt.addingTimeInterval(-1)))")
+                Text(week.rangeText)
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Text("1日 \(Fmt.yen(week.daily))・合計 \(Fmt.yen(week.total))")
@@ -187,7 +187,7 @@ struct DepositView: View {
                 let b = deposit.breakdown(for: week)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text("\(Fmt.monthDay(week.startsAt))〜\(Fmt.monthDay(week.endsAt.addingTimeInterval(-1)))")
+                        Text(week.rangeText)
                             .font(.subheadline.weight(.semibold))
                         Spacer()
                         Text(Fmt.yen(week.total)).font(.subheadline.monospacedDigit())

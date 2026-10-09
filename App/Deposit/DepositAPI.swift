@@ -52,6 +52,11 @@ struct DepositWeek: Codable, Equatable, Identifiable {
 
     /// 返金の知らせをまだ受け付けているか
     var acceptsReports: Bool { status == .active || status == .ended }
+
+    /// 「10/6〜10/12」(最初の日〜最後の日。終わりの時刻は次の日の日付切替なので使わない)
+    var rangeText: String {
+        "\(Fmt.monthDay(days.first?.startsAt ?? startsAt))〜\(Fmt.monthDay(days.last?.startsAt ?? endsAt))"
+    }
 }
 
 struct DepositState: Codable {

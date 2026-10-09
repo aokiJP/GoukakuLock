@@ -49,7 +49,8 @@ struct GoukakuLockApp: App {
         }
         .backgroundTask(.appRefresh(AppConstants.refreshTaskID)) { [model] in
             await model.onLaunchOrForeground()   // 第16.4節の 1〜8 と同じ
-            await DepositModel.shared.sync()
+            // 返金の知らせだけ。「この週にアプリを開いた」印は、本人が開いたときだけ送る
+            await DepositModel.shared.sync(heartbeat: false)
             scheduleNextRefresh()
         }
     }

@@ -235,8 +235,9 @@ final class DepositModel {
 
     // MARK: 様子を合わせる・返金を知らせる
 
-    /// サーバーの様子を読み、結果が決まった日の返金を知らせる(前に出たとき・チェックインのあと・裏の更新)
-    func sync(force: Bool = false) async {
+    /// サーバーの様子を読み、結果が決まった日の返金を知らせる(前に出たとき・チェックインのあと・裏の更新)。
+    /// heartbeat:この週にアプリがつながった印を送るか。裏の更新では送らない(自動で続けるのは、本人がアプリを開いた週だけ)
+    func sync(force: Bool = false, heartbeat: Bool = true) async {
         guard connected, !isSample, let api, phase == .idle || force else { return }
         if !force, let lastSync, Date().timeIntervalSince(lastSync) < 20 { return }
         let previous = phase
@@ -246,7 +247,7 @@ final class DepositModel {
             let state = try await api.state()
             config = state.config
             weeks = state.deposits
-            try await sendHeartbeat(api)
+            if heartbeat { try await sendHeartbeat(api) }
             try await reportFinishedDays(api)
             lastSync = Date()
         } catch let error as DepositServerError where error.status == 401 {

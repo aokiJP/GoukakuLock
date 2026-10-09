@@ -168,6 +168,7 @@ jobs:
 
             預け金(カードで7日分を先に預け、達成した日の分が返ってくる)を使うときは、自分で立てるサーバー(Cloudflare Workers)と
             Stripe のアカウントが要ります(README の「預け金」)。使わなければ、いままでどおり動きます。
+            アプリを新しくしたら、預け金のサーバーも同じ版で Deploy し直してください(Actions › Deposit server › Run workflow)。
 
             GitHub の Releases は 1 ファイル 2GiB までなので、超えるモデル入りの IPA は `.ipa.part-aa`・`.ipa.part-ab` に分けてあります。
             つなげ方:`cat GoukakuLock-AI-<モデル>.ipa.part-* > GoukakuLock-AI-<モデル>.ipa`(Windows は `copy /b 1つ目 + 2つ目 GoukakuLock-AI-<モデル>.ipa`)。

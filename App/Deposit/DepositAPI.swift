@@ -82,6 +82,15 @@ struct DepositServerError: LocalizedError, Equatable {
     var errorDescription: String? { message }
 }
 
+/// サーバーのエラーの形({"error":{"code","message"}})
+private struct DepositErrorEnvelope: Decodable {
+    struct Detail: Decodable {
+        var code: String
+        var message: String
+    }
+    var error: Detail
+}
+
 /// 預け金のサーバーと話す(カード番号は扱わない。支払いは Stripe の画面が Stripe と直接やりとりする)
 struct DepositAPI {
     var baseURL: URL
@@ -172,8 +181,7 @@ struct DepositAPI {
         let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard (200..<300).contains(status) else {
-            struct Envelope: Decodable { struct E: Decodable { var code: String; var message: String }; var error: E }
-            if let envelope = try? Self.decoder.decode(Envelope.self, from: data) {
+            if let envelope = try? Self.decoder.decode(DepositErrorEnvelope.self, from: data) {
                 throw DepositServerError(status: status, code: envelope.error.code, message: envelope.error.message)
             }
             throw DepositServerError(status: status, code: "http_\(status)", message: "サーバーにつながりませんでした(\(status))")

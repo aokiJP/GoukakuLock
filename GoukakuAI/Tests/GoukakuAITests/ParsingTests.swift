@@ -96,6 +96,29 @@ final class ParsingTests: XCTestCase {
         XCTAssertEqual(ExperienceParser.noteCandidate("料理に名前をつけて楽しむ。", title: "x"), "料理に名前をつけて楽しむ")
     }
 
+    /// CI で LFM2.5 が返したもの:返事の見出しが重なる・見出しが「回答」
+    func testReflectionWithNestedOrOtherLabel() throws {
+        let nested = "返事: 回答: 屋上の風の通りが良いと感じ、空の色の変化を10分間堪能しました。\n問い: 次に屋上に行くなら、どんな景色が見たいですか?\nメモ: 呼吸しながら空を見上げる時間を大切にする"
+        let r1 = try XCTUnwrap(ExperienceParser.reflection(from: nested, title: "夕焼けを見に屋上へ", note: "風が気持ちよかった"))
+        XCTAssertTrue(r1.reply.hasPrefix("屋上の風の通りが良い"), r1.reply)
+        let other = "回答: 屋上の風の通りが良いと感じたんですね。\n問い: どんな景色が見たいですか?"
+        let r2 = try XCTUnwrap(ExperienceParser.reflection(from: other, title: "夕焼けを見に屋上へ", note: "風が気持ちよかった"))
+        XCTAssertEqual(r2.reply, "屋上の風の通りが良いと感じたんですね。")
+        // ふつうの文の頭の「ことば」「答え」は見出しとみなさない
+        let plain = "返事: 答えが見つからなくても、空を見上げた時間はちゃんと残っています。"
+        let r3 = try XCTUnwrap(ExperienceParser.reflection(from: plain, title: "空", note: "なんとなく"))
+        XCTAssertTrue(r3.reply.hasPrefix("答えが見つからなくても"), r3.reply)
+    }
+
+    /// CI で LFM2.5 が出した「夕食に食べるのをやめて…」のような、食べることを減らす誘いははじく
+    func testRejectsEatingRestriction() {
+        let raw = "体験: 食事の前に視覚的な休憩\nひとこと: 夕食に食べるのをやめて、一度視線を上げると、呼吸にゆっくりと意識が向くかも\nはじめ方: 好きな料理を見る\n時間: 15分\n種類: つくる"
+        XCTAssertNil(ExperienceParser.suggestion(from: raw, angle: .make, budget: .fifteen, engine: "x"))
+        XCTAssertFalse(ContentGuard.isAcceptable(text: "朝ごはんを抜いて体を軽くする"))
+        XCTAssertFalse(ContentGuard.isAcceptable(text: "ダイエットのために歩く"))
+        XCTAssertTrue(ContentGuard.isAcceptable(text: "好きな料理をゆっくり味わう"))
+    }
+
     func testReflectionThatOnlyEchoesTheNoteIsRejected() {
         let raw = "空の色が変わるのを10分見た"
         XCTAssertNil(ExperienceParser.reflection(from: raw, title: "夕焼け", note: "空の色が変わるのを10分見た"))

@@ -2,7 +2,13 @@
 
 自分で決めた試験(目標)を、毎日の習慣にするための iOS アプリ。決めた時刻に、お金を使うアプリ(決済・買い物)とアプリ内課金を止め、その日のコミットを達成したと記録すると外れます。お金は没収も送金もされず、使えなくなるだけです。
 
-設計は「合格ロック 完全仕様書(iOS)v3.0」のとおりで、このリポジトリはその**フェーズ1(MVP)とフェーズ2**(ドメインの直接指定を除く)を実装したものです。
+**v2.0 から「相棒AI」が入りました。** iPhone の中だけで動くAIが、人生の中でどんな体験ができるかを一緒に見つけます。「〜しなければ」ではなく「やってみると、〜かも」と体験を誘い、やってみたら書いたことにふれて返事をします。やるかどうかは、いつも本人が決めます。
+
+設計は「合格ロック 完全仕様書(iOS)v3.0」のとおりで、このリポジトリはその**フェーズ1(MVP)とフェーズ2**(ドメインの直接指定を除く)に、相棒AIを足したものです。
+
+![体験タブ・体験の提案・やってみた体験への返事・育ち(体験の地図)](docs/screens-ai.jpg)
+
+![相棒と話す・いつかの体験・設定 › AI(選んだAIと理由)・ホームの「相棒から」](docs/screens-ai-more.jpg)
 
 ![ホーム(未達成)・チェックイン・はじめての合格(はなまる)・ホーム(達成とウィジェットの案内)](docs/screens-main.jpg)
 
@@ -14,21 +20,222 @@
 
 ![設定・緊急解除・一時停止](docs/screens-settings.jpg)
 
-スクリーンショットは CI の UI テストで撮ったもの(iPhone 17 シミュレータ・iOS 26.5)。シミュレータでは Screen Time の許可が得られないため、警告の帯が出ています。ウィジェットと Live Activity は、拡張と同じビューをアプリ内の見本画面(Debug 版)で描いたものです。
+スクリーンショットは CI の UI テストで撮ったもの(iPhone 17 シミュレータ・iOS 26.5)。シミュレータでは Screen Time の許可が得られないため、警告の帯が出ています。シミュレータでは MLX が動かないので、相棒AIの画面は「見本のAI」(実機用の Gemma 4 E2B が返した文をそのまま返す、Debug 版だけの仕組み)で動かしています。ウィジェットと Live Activity は、拡張と同じビューをアプリ内の見本画面(Debug 版)で描いたものです。
 
-見た目は「答案用紙と赤ペン」:状態は丸い印(はんこ)1つで表し、達成は朱の ◯、最小版は △、未達成は ✕ で記録します。
+見た目は「答案用紙と赤ペン」:状態は丸い印(はんこ)1つで表し、達成は朱の ◯、最小版は △、未達成は ✕ で記録します。相棒の言葉は「余白の鉛筆の書き込み」(藍色)で書き、採点の赤ペンとは分けています。
 
-## いまの状態(v1.1)
+## いまの状態(v2.0)
 
 | 項目 | 状態 |
 |---|---|
 | 判定の芯 GoukakuCore | 単体テスト 69 件が通過(macOS + Xcode 26.6、Linux + Swift 6.3.3) |
-| iOS アプリ(本体+拡張4つ) | Xcode 26.6 / iOS 26.5 SDK でビルド成功(コンパイラの警告 0)。最低 iOS 18.0、iPhone 専用 |
-| 画面の通し確認 | CI で iPhone 17 シミュレータ(iOS 26.5)を使い、はじめの設定 → チェックイン → はなまる → 合格証 → コミット追加 → 記録 → 設定 → 見本(ウィジェット・Live Activity)→ 集中タイマー → 緊急解除 → 一時停止まで動かしてスクリーンショットを残す |
-| 実機スパイク(第20章) | **未実施**。Screen Time API はシミュレータでは動かないので、ロックそのものは実機で確かめる |
+| 相棒AIの芯 GoukakuAI | 単体テスト 45 件が通過(同上)。実際のモデルの出力をそのまま使った読み取りのテストを含む |
+| MLX の実行部 GoukakuAIMLX | CI の Mac(GitHub Actions・Apple M1 の仮想 GPU)で、4 つのモデルをアプリと同じコードで読み込み、提案とふり返りが日本語で返ることを確認 |
+| iOS アプリ(本体+拡張4つ) | Xcode 26.6 / iOS 26.5 SDK でビルド成功(このリポジトリのコードの警告 0)。最低 iOS 18.0、iPhone 専用 |
+| 画面の通し確認 | CI で iPhone 17 シミュレータ(iOS 26.5)を使い、はじめの設定(相棒AIを含む)→ ホームの「相棒から」→ チェックインと相棒のひとこと → はなまる → 体験タブ(提案・やってみた・返事・話す・いつか・育ち)→ 設定 › AI → 記録 → 設定 → 週のふり返りの手紙 → 緊急解除 → 一時停止まで動かしてスクリーンショットを残す |
+| 実機 | **未確認**。iPhone での MLX の速さとメモリ、Apple Intelligence、アプリ内のダウンロード、同梱モデルのクローン、そしてロックそのもの(Screen Time API)は実機で確かめる |
 | SP-01(無料の Apple ID で使えるか) | **使えない**で確定。Apple の DTS が、Personal Team(無料)では Family Controls を使えないと回答している |
 
-### アプリだからできること(v1.1)
+## 相棒AI(v2.0)
+
+### できること
+
+| どこで | できること |
+|---|---|
+| 体験タブ | いまの自分(使える時間・いる場所・調子)を選ぶと、合いそうな体験を 3 つ誘う。書いている途中から見える。「やってみる」「いつか」に入れる、👍/👎 で好みを伝える、自分で書いて入れる |
+| 体験タブ › やってみた | 一言(書かなくてもいい)と気持ちを残すと、相棒が書いたことの具体的なところにふれて返事をし、問いを 1 つ添える |
+| 体験タブ › 相棒と話す | どんな体験をしてみたいか、話しながら考える(AIのモデルか Apple Intelligence があるとき) |
+| 体験タブ › いつかの体験 | 人生のどこかで味わってみたいことを集める。期限はつけず、最初の一歩だけを今日の「やってみる」に入れられる。続けたくなったら、任意のコミットの下書きにもできる |
+| 体験タブ › 育ち | 体験の地図(学ぶ・からだ・つくる・ひと・そと・こころ・くらし・はじめて の 8 区画)と、相棒の理解(はじめまして → 知りはじめ → 顔なじみ → 相棒)。相棒が覚えていることは本人が見て、消せる |
+| ホーム | 「相棒から」:今日のコミットを、やらされる作業ではなく、ちょっと楽しみな体験にする工夫を聞ける |
+| チェックインのあと | 書いた一言にふれて、相棒がひとこと返す(設定 › AI で止められる) |
+| 週のふり返り | その週の体験から、相棒が短い手紙を書く |
+| はじめの設定 | 相棒AIの説明と、この iPhone で使うAI(おすすめのモデルのダウンロード)、「あなたのこと」(任意) |
+
+使うほど育つのは、相棒の側です。体験するほど地図が埋まり、覚えてもらう・👍/👎 をつけるほど、提案がその人に合っていきます(覚えていること・好きだった体験・合わなかった体験・続けていることを、毎回プロンプトに入れます)。
+
+### 大事にしていること
+
+- 体験を誘うだけ。目標を勝手に決めない・採点しない・ほかの人と比べない・連続の記録で追い立てない
+- 決めるのは本人。AIが「覚えておきたい」と言ったことも、本人が「覚えてもらう」を押したときだけ覚える
+- 買い物・課金・お酒・徹夜・断食・運転・ギャンブル・借金など、お金やからだに障りそうな提案は出さない(AIが出しても外して作り直し、だめなら体験帳から補う)。夜に家にいる人に外の体験は出さない
+- AIはこの iPhone の中だけで動く。書いたことはどこにも送らない。通信するのはモデルをダウンロードするときだけ(Hugging Face から公開のファイルを取るだけ)
+- ロックの安全の床(緊急解除・一時停止・やめる合図・没収しない)はそのまま。相棒AIはロックに関わらない
+
+### 完全環境適応(どのAIで動くかは、端末が決める)
+
+相棒の「頭」は 3 種類あり、端末の様子を見て自動で選び、様子が変わるたびに選び直します。設定 › AI に、選んだ理由と、選ばなかったモデルとその理由がそのまま出ます。
+
+1. **この iPhone に入っている MLX のモデル**:メモリに収まるもののうち、日本語が一番自然なもの
+2. **Apple Intelligence**(iOS 26 以降・オンのとき):ダウンロード不要
+3. **体験帳**(AIなし):96 の体験と、ルールで書く返事・手紙。どの端末でも必ず動く
+
+| 見ているもの | どう変わるか |
+|---|---|
+| アプリが使えるメモリ(`os_proc_available_memory`) | 動かすのに要るメモリの見込みが、使える量の 9 割を超えるモデルは使わない |
+| 熱 | 熱いときは返事を短く・軽いモデルを先に。とても熱いときは AI を休ませて体験帳に |
+| 低電力モード | 返事を短く。Apple Intelligence が使えればそちらを先に |
+| Apple Intelligence の状態 | 使えるときだけ候補に入れる(非対応・オフ・準備中を見分けて表示) |
+| モデルの大きさ | 小さいモデルほど、プロンプトに入れる文脈と会話の履歴を少なくする |
+| 読み込み中にアプリが終了したモデル | 次からは休ませる(落ち続けない)。設定 › AI から戻せる |
+| 裏に回った・メモリの警告 | 20 秒たったら(警告ならすぐ)モデルを手放し、使うときに読み込み直す |
+| シミュレータ | MLX は動かないので使わない |
+
+小さなモデルでも形が崩れにくいよう、プロンプトは短くし、手本を 1 往復だけ見せ、1 回に 1 つずつ頼みます(提案は「体験:/ひとこと:/はじめ方:/時間:/種類:」の 5 行)。AIの返事が形を守らない・安全でないときは 1 回だけ作り直し、それでもだめなら体験帳で補います。どの状態でも、ちゃんと答えが返ることを優先しています。
+
+### ライブラリ:MLX(mlx-swift-lm)を選んだ理由
+
+iPhone 17 Pro での生成の速さ(毎秒のトークン数。[apple-silicon-llm-bench](https://github.com/john-rocky/apple-silicon-llm-bench) の実測):
+
+| モデル | MLX-Swift | llama.cpp | Core ML(ANE) | Core AI | LiteRT-LM |
+|---|---|---|---|---|---|
+| Qwen3.5 2B(iOS 26.4.2) | **61.2** | 39.1 | 27.9 | — | — |
+| Gemma 4 E2B(iOS 27.0) | 49.1 | 38.8 | — | 47.1 | **61.1**(公式の QAT ビルド) |
+
+- いろいろな系統のモデル(Gemma 4・Qwen3.5・LFM2.5・Llama・Mistral・Phi など)を、1 つの仕組みで速く動かせるのが MLX。Swift のパッケージとして組み込め、iOS 18 から動く
+- Gemma 4 E2B だけなら、Google の LiteRT-LM の公式ビルドが速く、メモリも小さい(約 0.5GB。MLX は約 3GB)。ただ対応するモデルが限られ、Swift からそのまま使える形がないので、今回は見送り
+- Core AI は出たばかり(iOS 27 から・iOS では文脈の長さに上限・書き出しで遅くなる不具合の報告)なので見送り。iOS 27 の Foundation Models に MLX・Core AI 用の差し込み口ができたので、育ったら乗りかえやすい
+- AIを動かす部分は差し替えられる作り(GoukakuAI の `LanguageEngine`)。エンジンを 1 つ足せば、提案・ふり返り・会話・体験帳での補いはそのまま使える
+
+### 使えるモデル(AI/models.json)
+
+| モデル | 日本語 | 速さ | 入れたあと | ダウンロード | 動かすのに | おすすめのメモリ | ライセンス |
+|---|---|---|---|---|---|---|---|
+| Gemma 4 E2B | ●●●●● | ●●●●○ | 2.5GB | 3.3GB | 約 2.9GB | 8GB 以上 | Apache 2.0(Gemma 4) |
+| LFM2.5 1.2B JP | ●●●○○ | ●●●●● | 0.6GB | 0.6GB | 約 0.9GB | 4GB 以上 | LFM Open License v1.0 |
+| Qwen3.5 4B | ●●●○○ | ●●○○○ | 2.2GB | 2.8GB | 約 2.7GB | 8GB 以上 | Apache 2.0 |
+| Qwen3.5 2B | ●●○○○ | ●●●●● | 1.0GB | 1.6GB | 約 1.4GB | 6GB 以上 | Apache 2.0 |
+
+- どれも MLX 形式の 4bit。Hugging Face のリビジョン(コミット)を固定して、毎回同じ中身を取る
+- 画像・音声の部分(`vision_tower` など)は取り除き、文章に使う部分だけを入れる(Gemma 4 E2B は 3.3GB → 2.5GB)
+- 「日本語」は、同じプロンプトで 4 つを動かして読み比べた印象。自動で選ぶときは、動かせるもののうちこれが高いもの(同じなら軽いもの)を使う
+
+CI の Mac(GitHub Actions・Apple M1 の仮想 GPU)で、アプリと同じ MLXEngine・同じプロンプト(金曜の夜・家・少し疲れている・15 分)で動かした結果(2〜3 回分):
+
+| モデル | 読み込み | 生成の速さ | 出力の印象 |
+|---|---|---|---|
+| Gemma 4 E2B | 9〜13 秒 | 毎秒 13〜20 | 日本語がいちばん自然で、いまの様子に合い、書いたことにちゃんとふれる |
+| LFM2.5 1.2B JP | 2〜3 秒 | 毎秒 44〜60 | 速い。言い回しが崩れることがある。家にいる夜に「カフェで」「公園で」と出すことがあり、それははじいて作り直す |
+| Qwen3.5 4B | 15 秒 | 毎秒 6〜19 | ふり返りの返事は自然。提案は言い回しが不自然になりやすい |
+| Qwen3.5 2B | 6〜10 秒 | 毎秒 19 | 提案の日本語がずれやすい(ふり返りの返事は自然) |
+
+仮想 GPU での数字なので、速さは iPhone の実測(上の表)とは別物で、実行ごとのぶれも大きいです。読み込みは初回だけで、そのあとはアプリが裏に回るまで持ち続けます。
+
+Gemma 4 E2B が CI で返したもの(そのまま):
+
+> **提案**:好きな香りの呼吸 ― 好きな香りを意識して深呼吸してみると、心が落ち着くかも(はじめ方:お気に入りのアロマやハーブがあれば、それを深呼吸しながら嗅いでみる・15 分・からだ)<br>
+> **提案**:馴染みのない場所の音の記録 ― 今まで気づかなかった音に耳を澄ませてみる(はじめ方:静かな場所で、意図的に音を聴く・15 分・学ぶ)<br>
+> **ふり返り**(「夕焼けを見に屋上へ」に「空がオレンジから紫に変わるのを10分見ていた。風が気持ちよかった。」と書いたとき):夕焼けの色の変化に心を動かされたのですね。穏やかな気持ちが伝わります。/ 問い:次に、五感で心に触れる瞬間を探してみませんか? / 覚えておきたいこと:自然の移ろいを五感で捉える
+
+### AIの入れ方(3 通り)
+
+1. **アプリの中でダウンロード**(おすすめ):設定 › AI(またははじめの設定の「相棒AI」)で選ぶ。初回だけ通信し、あとは通信なしで動く。途中で止まっても続きから取る。アプリを上書きでインストールしても消えない(iCloud のバックアップには入れない)
+2. **ファイルから取り込む**:MLX 形式のモデルのフォルダ(`config.json`・`tokenizer.json`・`*.safetensors`)を、設定 › AI のファイル App から選ぶか、Mac の Finder やファイル App で「この iPhone 内 › 合格ロック › AIModels」に置く(次に開いたときに取り込む)。目録にないモデルも、MLX が読める形式(Gemma・Qwen・LFM2・Llama・Mistral・Phi など)なら使える
+3. **モデル入りの IPA**:`GoukakuLock-AI-<モデル>.ipa` を入れる。最初から通信なしで使える。起動するとアプリの外にもモデルを残す(APFS のクローンなので容量は増えない)ので、そのあとは AIなし版で上書きしてもモデルは消えない(クローンできない端末では、同梱のまま使う。設定 › AI のモデルの欄に、どちらかが出る)
+
+## ダウンロード
+
+`main` に push するたびに GitHub Actions がビルドします。モデル入りの IPA は、Actions の「Run workflow」(`models` に `all` かモデルの id)か、`v` で始まるタグを push したときに、モデルごとに並べて作ります。どのモデルも、IPA に入れる前に MLX で実際に読み込んで日本語が返ることを確かめています(各実行の Summary に結果が出ます)。
+
+| ファイル | 中身 | 大きさ |
+|---|---|---|
+| `GoukakuLock-Release.ipa` | ふだん使う版(AIなし。モデルはアプリでダウンロードか取り込み) | 約 13MB |
+| `GoukakuLock-Debug.ipa` | デバッグメニューつき。実機テスト(仕様書 第19.3節の T-01〜T-12)用 | 約 21MB |
+| `GoukakuLock-AI-gemma4-e2b.ipa` | Gemma 4 E2B 入り(Release 版) | 約 2.2GB |
+| `GoukakuLock-AI-lfm2.5-1.2b-jp.ipa` | LFM2.5 1.2B JP 入り(Release 版) | 約 0.6GB |
+| `GoukakuLock-AI-qwen3.5-4b.ipa` | Qwen3.5 4B 入り(Release 版) | 約 2.0GB |
+| `GoukakuLock-AI-qwen3.5-2b.ipa` | Qwen3.5 2B 入り(Release 版) | 約 0.9GB |
+
+- **Actions の Artifacts**:各実行の `GoukakuLock-ipa-<番号>`(AIなし版)と `GoukakuLock-AI-<モデル>-<番号>`(モデル入り。90 日残る)
+- **Releases**:タグを push したとき、または「Run workflow」で `release_tag` を入れたとき。GitHub の Releases は 1 ファイル 2GiB までなので、超える IPA は `.ipa.part-aa`・`.ipa.part-ab` に分けて置いています。つなげ方:
+  - Mac・Linux:`cat GoukakuLock-AI-gemma4-e2b.ipa.part-* > GoukakuLock-AI-gemma4-e2b.ipa`
+  - Windows:`copy /b GoukakuLock-AI-gemma4-e2b.ipa.part-aa + GoukakuLock-AI-gemma4-e2b.ipa.part-ab GoukakuLock-AI-gemma4-e2b.ipa`
+  - つないだら `SHA256-<モデル>.txt` と照らし合わせる(`shasum -a 256 <ファイル>`、Windows は `certutil -hashfile <ファイル> SHA256`)
+
+IPA の中には 5 つのバンドルがあります:本体、`GoukakuMonitor`・`GoukakuShieldConfig`・`GoukakuShieldAction`(Family Controls を使う拡張)、`GoukakuWidget`(ウィジェット・Live Activity・コントロール。App Groups だけ)。モデル入りの IPA は、本体の中の `AIModels/<モデル>/` にモデルが入っています。
+
+どれも**未署名**(証明書なしのアドホック署名で、必要なエンタイトルメントだけが入っている)です。このままでは iPhone に入りません。
+
+## 実機に入れる(署名)
+
+### 必要なもの
+
+- 有料の Apple Developer Program(無料の Apple ID では Family Controls を使えません)
+- iOS 18.0 以上の iPhone。相棒AIのモデルは、メモリ 4GB 以上なら LFM2.5 1.2B JP、8GB 以上なら Gemma 4 E2B がめやす。足りない端末でも、Apple Intelligence か体験帳で動きます
+
+自分の iPhone に開発用として入れるだけなら、Family Controls の配布用(Distribution)の申請は要りません。ほかの人に配るなら、4つの Bundle ID それぞれについて申請が要ります(仕様書 第3.3節)。
+
+### 1. Apple Developer のサイトで準備する(Mac は不要)
+
+[Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/) で次を作ります。
+
+1. **App Group**:`group.com.aokijp.goukakulock`
+2. **App ID を5つ**。下の表の Capabilities をオンにし、App Groups には 1 の App Group を割り当てる
+
+   | バンドル | Bundle ID | Capabilities |
+   |---|---|---|
+   | 本体 `GoukakuLock.app` | `com.aokijp.goukakulock` | Family Controls・App Groups・Increased Memory Limit |
+   | `PlugIns/GoukakuMonitor.appex` | `com.aokijp.goukakulock.monitor` | Family Controls・App Groups |
+   | `PlugIns/GoukakuShieldConfig.appex` | `com.aokijp.goukakulock.shieldconfig` | Family Controls・App Groups |
+   | `PlugIns/GoukakuShieldAction.appex` | `com.aokijp.goukakulock.shieldaction` | Family Controls・App Groups |
+   | `PlugIns/GoukakuWidget.appex` | `com.aokijp.goukakulock.widget` | App Groups |
+
+   Increased Memory Limit は、相棒AIが大きめのモデルを読み込むためのもの(特別な申請は要りません)。なくても動きますが、使えるメモリが減るぶん、選ばれるモデルが小さくなることがあります
+
+3. **Apple Development の証明書**(秘密鍵と合わせて `.p12` に書き出す)
+4. **デバイス**(iPhone の UDID)の登録
+5. **Development のプロビジョニングプロファイルを5つ**(上の App ID ごとに1つ)
+
+Bundle ID を自分のものに変える場合は、拡張の ID を「本体の ID + `.monitor` など」にしてください。App Group の ID は、アプリが署名に使われたプロファイルから実行時に読み取るので、5つのプロファイルが同じ App Group を含んでいれば、ID を変えても動きます。
+
+### 2. 署名し直す
+
+5つのバンドルに、それぞれ対応するプロファイルを当てて署名します。例として、Linux・Windows・macOS で動く [zsign](https://github.com/zhlynn/zsign) なら、拡張の分も `-m` を重ねて渡せます。モデル入りの IPA も同じやり方です(大きいので、数十秒〜数分かかります)。
+
+```sh
+zsign -k dev.p12 -p 'p12のパスワード' \
+  -m goukakulock.mobileprovision \
+  -m monitor.mobileprovision \
+  -m shieldconfig.mobileprovision \
+  -m shieldaction.mobileprovision \
+  -m widget.mobileprovision \
+  -o GoukakuLock-signed.ipa GoukakuLock-Release.ipa
+```
+
+署名後、本体と3つの拡張に `com.apple.developer.family-controls` と `com.apple.security.application-groups` が、ウィジェットに `com.apple.security.application-groups` が残っていることを確かめてください。どれか1つでも欠けると、そのバンドルは動きません。本体の `com.apple.developer.kernel.increased-memory-limit` は、プロファイルに入っていれば残ります(なくても動きます)。
+
+### 3. インストールする
+
+署名済みの IPA は、署名をし直さずに入れる方法で入れます(例:zsign の `-i`(内部で ideviceinstaller を使う)、ideviceinstaller、Apple Configurator など)。署名をし直す種類のツールで入れると、拡張ごとのプロファイルが外れることがあります。
+
+### Mac がある場合
+
+```sh
+brew install xcodegen
+xcodegen generate     # project.yml から GoukakuLock.xcodeproj を作り直す
+open GoukakuLock.xcodeproj
+```
+
+各ターゲット(本体と拡張4つ)の Signing & Capabilities で自分の Team を選べば、自動署名が App ID とプロファイルを作ります。iPhone をつないで Run すれば入ります。MLX は Metal を使うので、Xcode 26 では `xcodebuild -downloadComponent MetalToolchain` で Metal のツールを入れておきます。
+
+## 最初に確かめること(実機)
+
+Debug 版を入れて、仕様書 第20章のスパイクのうち SP-02〜SP-08・SP-10・SP-14 を先に確かめてください。手順は第19.3節の T-01〜T-12 で、デバッグメニュー(設定 › デバッグメニュー)を使います。
+
+- **T-01**:日付切替を「今から20分後」に合わせ、端末をロックして待つ → 切替後に対象アプリを開くとシールドが出る → 本体でチェックインすると開ける
+- **T-03**:「緊急解除を短くする」をオンにして申請 → 待機中はシールド、解除中は開ける、終了後は本体を閉じたままでもシールドに戻る
+- **T-05**:「ロックを外す(判定はそのまま)」→ 対象アプリを1分以上使う → トリップワイヤーでロックが戻る
+
+相棒AIは次の順に確かめます(デバッグメニューの「いまのAIの様子」に、選んだAI・理由・メモリ・速さが出ます)。
+
+- **AI-1**:設定 › AI で、選ばれたAIと理由を見る → 体験タブで「体験を3つ見つける」→ 書いている途中の文が出て、カードが 3 つ並ぶ
+- **AI-2**:メモリ 8GB 以上なら Gemma 4 E2B、それより少なければ LFM2.5 1.2B JP をダウンロード → 機内モードにして、提案・やってみた・相棒と話すが動く
+- **AI-3**:モデル入りの IPA を入れて一度起動 → AIなし版で上書きでインストール → 設定 › AI にモデルが「IPA から残したもの」として残っている
+- **AI-4**:相棒と話したあとホームに戻り、20 秒以上待ってから戻る → 次に使うときに読み込み直す(裏ではメモリを手放している)
+
+## ロックまわり(v1.1 まで)
+
+### アプリだからできること
 
 | どこから | できること |
 |---|---|
@@ -62,10 +269,10 @@
 
 ### 実装したもの(フェーズ1)
 
-- S-01 はじめの設定(8手順)、S-02 ホーム、S-03 チェックイン(5分以内の取り消し)、S-04 コミット(必須3つまで)、S-05 記録(◯△✕のカレンダー)、S-06 設定、S-07 緊急解除、S-08 一時停止・見守り・卒業の提案
+- S-01 はじめの設定(v2.0 で相棒AIの手順を足して 9 手順)、S-02 ホーム、S-03 チェックイン(5分以内の取り消し)、S-04 コミット(必須3つまで)、S-05 記録(◯△✕のカレンダー)、S-06 設定、S-07 緊急解除、S-08 一時停止・見守り・卒業の提案
 - 設定を緩められない仕組み(第7.5節):緩める変更は達成後だけ受け付けて翌サイクルから
 - 起動・前面復帰・バックグラウンド更新の処理(第16.4節)、再インストールと時刻改ざんの検知、共有ファイルの復旧
-- デバッグメニュー(Debug 版だけ):日付切替を任意の時刻に、緊急解除を短く、見本(ウィジェット・Live Activity・お祝い)など
+- デバッグメニュー(Debug 版だけ):日付切替を任意の時刻に、緊急解除を短く、見本(ウィジェット・Live Activity・お祝い)、見本のAI など
 
 ### まだないもの
 
@@ -73,107 +280,42 @@
 
 フェーズ2のうち「ドメインの直接指定」だけは入れていません。仕様書の SP-12 のとおり、iOS 26.6 で指定外のサイトまで止まる報告があり、Safari のプライベートブラウズも使えなくなるため、実機で確かめてから足します(買い物サイトは、ロック対象の選択画面でサイトとして選べば止まります)。
 
-## ダウンロード
+## データ
 
-`main` に push するたびに GitHub Actions がビルドします。
-
-- **Actions の Artifacts**:各実行の `GoukakuLock-ipa-<番号>`
-- **Releases**:`v` で始まるタグを push したとき、または Actions の「Run workflow」で `release_tag` を入れたとき
-
-| ファイル | 中身 |
-|---|---|
-| `GoukakuLock-Release.ipa` | ふだん使う版 |
-| `GoukakuLock-Debug.ipa` | デバッグメニューつき。実機テスト(仕様書 第19.3節の T-01〜T-12)用 |
-
-IPA の中には 5 つのバンドルがあります:本体、`GoukakuMonitor`・`GoukakuShieldConfig`・`GoukakuShieldAction`(Family Controls を使う拡張)、`GoukakuWidget`(ウィジェット・Live Activity・コントロール。App Groups だけ)。
-
-どちらも**未署名**(証明書なしのアドホック署名で、必要なエンタイトルメントだけが入っている)です。このままでは iPhone に入りません。
-
-## 実機に入れる(署名)
-
-### 必要なもの
-
-- 有料の Apple Developer Program(無料の Apple ID では Family Controls を使えません)
-- iOS 18.0 以上の iPhone
-
-自分の iPhone に開発用として入れるだけなら、Family Controls の配布用(Distribution)の申請は要りません。ほかの人に配るなら、4つの Bundle ID それぞれについて申請が要ります(仕様書 第3.3節)。
-
-### 1. Apple Developer のサイトで準備する(Mac は不要)
-
-[Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/) で次を作ります。
-
-1. **App Group**:`group.com.aokijp.goukakulock`
-2. **App ID を5つ**。下の表の Capabilities をオンにし、App Groups には 1 の App Group を割り当てる
-
-   | バンドル | Bundle ID | Capabilities |
-   |---|---|---|
-   | 本体 `GoukakuLock.app` | `com.aokijp.goukakulock` | Family Controls・App Groups |
-   | `PlugIns/GoukakuMonitor.appex` | `com.aokijp.goukakulock.monitor` | Family Controls・App Groups |
-   | `PlugIns/GoukakuShieldConfig.appex` | `com.aokijp.goukakulock.shieldconfig` | Family Controls・App Groups |
-   | `PlugIns/GoukakuShieldAction.appex` | `com.aokijp.goukakulock.shieldaction` | Family Controls・App Groups |
-   | `PlugIns/GoukakuWidget.appex` | `com.aokijp.goukakulock.widget` | App Groups |
-
-3. **Apple Development の証明書**(秘密鍵と合わせて `.p12` に書き出す)
-4. **デバイス**(iPhone の UDID)の登録
-5. **Development のプロビジョニングプロファイルを5つ**(上の App ID ごとに1つ)
-
-Bundle ID を自分のものに変える場合は、拡張の ID を「本体の ID + `.monitor` など」にしてください。App Group の ID は、アプリが署名に使われたプロファイルから実行時に読み取るので、5つのプロファイルが同じ App Group を含んでいれば、ID を変えても動きます。
-
-### 2. 署名し直す
-
-5つのバンドルに、それぞれ対応するプロファイルを当てて署名します。例として、Linux・Windows・macOS で動く [zsign](https://github.com/zhlynn/zsign) なら、拡張の分も `-m` を重ねて渡せます。
-
-```sh
-zsign -k dev.p12 -p 'p12のパスワード' \
-  -m goukakulock.mobileprovision \
-  -m monitor.mobileprovision \
-  -m shieldconfig.mobileprovision \
-  -m shieldaction.mobileprovision \
-  -m widget.mobileprovision \
-  -o GoukakuLock-signed.ipa GoukakuLock-Release.ipa
-```
-
-署名後、本体と3つの拡張に `com.apple.developer.family-controls` と `com.apple.security.application-groups` が、ウィジェットに `com.apple.security.application-groups` が残っていることを確かめてください。どれか1つでも欠けると、そのバンドルは動きません。
-
-### 3. インストールする
-
-署名済みの IPA は、署名をし直さずに入れる方法で入れます(例:zsign の `-i`(内部で ideviceinstaller を使う)、ideviceinstaller、Apple Configurator など)。署名をし直す種類のツールで入れると、拡張ごとのプロファイルが外れることがあります。
-
-### Mac がある場合
-
-```sh
-brew install xcodegen
-xcodegen generate     # project.yml から GoukakuLock.xcodeproj を作り直す
-open GoukakuLock.xcodeproj
-```
-
-各ターゲット(本体と拡張4つ)の Signing & Capabilities で自分の Team を選べば、自動署名が App ID とプロファイルを作ります。iPhone をつないで Run すれば入ります。
-
-## 最初に確かめること(実機)
-
-Debug 版を入れて、仕様書 第20章のスパイクのうち SP-02〜SP-08・SP-10・SP-14 を先に確かめてください。手順は第19.3節の T-01〜T-12 で、デバッグメニュー(設定 › デバッグメニュー)を使います。
-
-- **T-01**:日付切替を「今から20分後」に合わせ、端末をロックして待つ → 切替後に対象アプリを開くとシールドが出る → 本体でチェックインすると開ける
-- **T-03**:「緊急解除を短くする」をオンにして申請 → 待機中はシールド、解除中は開ける、終了後は本体を閉じたままでもシールドに戻る
-- **T-05**:「ロックを外す(判定はそのまま)」→ 対象アプリを1分以上使う → トリップワイヤーでロックが戻る
+- すべてこの iPhone の中(SwiftData と App Group のファイル)。どこにも送りません
+- 相棒AIの記録(やってみた体験・相棒の返事・覚えていること・会話)も同じ。設定の「データを書き出す」に入り、「すべてのデータを消す」で消えます
+- 入れたモデルは「すべてのデータを消す」では消えません(設定 › AI で 1 つずつ消せます)
 
 ## 開発
 
 ```
 GoukakuCore/      判定の芯と、状態の言い方(Foundation だけ。swift test で単体テスト 69 件)
+GoukakuAI/        相棒AIの芯(Foundation だけ。Linux でも swift test で単体テスト 45 件):
+                  モデルの目録・使うAIの選び方・プロンプト・出力の読み取りと内容の確認・体験帳(96 の体験)・育ち・safetensors の軽量化
+GoukakuAIMLX/     MLX でモデルを動かす部分(mlx-swift-lm 3.32.3・swift-transformers 1.3.4)と、実際のモデルで確かめるテスト
 GoukakuKit/       GoukakuShared:App Group・ディープリンク・ウィジェット用の数字・Live Activity の型
                   GoukakuKit:ManagedSettings・DeviceActivity・FamilyControls・通知のつなぎ
 Extensions/       Monitor・ShieldConfig・ShieldAction の各拡張
 Widgets/          ウィジェット拡張(Extension/)と、本体の見本でも使うビュー(Views/)
 Shared/UI/        見た目(印・採点の記号・はなまる・色)。本体とウィジェットで共有
 App/              本体アプリ(SwiftUI + SwiftData + App Intents + ActivityKit)
+App/AI/           相棒AI:使うAIを決めて動かす(AIRuntime)・モデルの出し入れ・Apple Intelligence・体験と記録(CompanionModel)
+App/Views/AI/     体験タブ・相棒と話す・いつかの体験・育ち・設定 › AI
+AI/models.json    使えるモデルの目録(CI とアプリが同じものを読む)
 UITests/          シミュレータで画面を一通り動かしてスクリーンショットを残すテスト
 project.yml       XcodeGen の定義(GoukakuLock.xcodeproj はここから生成)
-scripts/          IPA に包むスクリプトなど
-.github/workflows/build.yml   CI(テスト → ビルド → IPA → 画面の通し確認)
+scripts/          IPA に包む・モデルを取る(fetch-model.py)・README の画像を作る(compose-screens.py)
+.github/workflows/build.yml     CI(テスト → ビルド → AIなし版の IPA → 画面の通し確認 → モデルごとの IPA)
+.github/workflows/ai-check.yml  実際のモデルを MLX で動かして、プロンプトの効き目を確かめる
 ```
 
-CI の結果(IPA・ビルドログ・スクリーンショット)は `ci-output` ブランチにも置かれます。
+CI の結果(IPA・ビルドログ・スクリーンショット)は `ci-output` ブランチに、モデルの確認の結果は `ci-output-ai` ブランチに置かれます。
+
+### モデルを足す
+
+1. `AI/models.json` に 1 件足す(`repo` は MLX 形式のリポジトリ、`revision` はコミットの 40 文字、`files`、取り除く部分の `stripPrefixes`、大きさ)。単体テストが、目録の形(リビジョンの長さ・大きさの関係など)を確かめます
+2. Actions の「AI check (MLX)」を、`model` にその id を入れて実行 → `scripts/fetch-model.py` が取得して大きさを照らし合わせ、MLX で読み込み・速さ・提案・ふり返りを `[smoke]` の行に出す(Summary と `ci-output-ai` ブランチ)
+3. `ipa: true` なら、次の「Run workflow」(`models` に `all`)でモデル入りの IPA ができる。アプリの「ダウンロードできるモデル」にも出る
 
 ### スターター(仕様書の付録B)からの変更
 

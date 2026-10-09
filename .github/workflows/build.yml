@@ -11,7 +11,7 @@ name: Build IPA
 
 on:
   push:
-    branches: [main, ai-companion]
+    branches: [main]
     tags: ["v*"]
     paths-ignore: ["**.md", "docs/**"]
   workflow_dispatch:

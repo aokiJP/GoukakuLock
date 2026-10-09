@@ -25,11 +25,13 @@ final class WalkthroughUITests: XCTestCase {
         // 相棒AI(この iPhone で使うAIと、あなたのこと)
         waitFor(app.navigationBars["相棒AI"])
         snap("02-相棒AI")
+        // 「あなたのこと」は任意なので、入れられなくても先へ進む
         let about = textInput()
         scrollTo(about)
-        about.tap()
-        app.typeText("English study. I like walking.")
-        snap("02-相棒AI-あなたのこと")
+        if focus(about) {
+            app.typeText("English study. I like walking.")
+            snap("02-相棒AI-あなたのこと")
+        }
         tap(app.buttons["次へ"])
 
         waitFor(app.buttons["許可なしで進む(デバッグ)"])
@@ -78,7 +80,7 @@ final class WalkthroughUITests: XCTestCase {
         tap(checkIn)
         let note = textInput()
         waitFor(note)
-        note.tap()
+        XCTAssertTrue(focus(note), "一言の欄に入れられない")
         app.typeText("Did 20 words. Self test 8/10")
         snap("12-チェックイン")
         tap(app.buttons["記録する"])
@@ -115,7 +117,7 @@ final class WalkthroughUITests: XCTestCase {
         tap(app.buttons["やってみた"].firstMatch)
         let logNote = textInput()
         waitFor(logNote)
-        logNote.tap()
+        XCTAssertTrue(focus(logNote), "体験の一言の欄に入れられない")
         app.typeText("The sky turned orange to purple.")
         tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
         snap("24-やってみた")
@@ -289,6 +291,18 @@ final class WalkthroughUITests: XCTestCase {
         let types = [XCUIElement.ElementType.textField.rawValue, XCUIElement.ElementType.textView.rawValue]
         return app.descendants(matching: .any)
             .matching(NSPredicate(format: "elementType IN %@", types)).firstMatch
+    }
+
+    /// 欄を押して、キーボードが出るまで待つ(スクロールの直後に押すと、スクロールを止めるだけで欄に入らないことがある)
+    @MainActor
+    private func focus(_ element: XCUIElement) -> Bool {
+        Thread.sleep(forTimeInterval: 0.8)   // スクロールが止まるのを待つ
+        for _ in 0..<3 {
+            element.tap()
+            if app.keyboards.firstMatch.waitForExistence(timeout: 2.5) { return true }
+            Thread.sleep(forTimeInterval: 0.5)
+        }
+        return false
     }
 
     /// 文を含む要素(相棒の書き込みは、まとめて読み上げる1つの要素になるので種類を問わない)

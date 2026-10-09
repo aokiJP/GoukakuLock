@@ -7,7 +7,7 @@ name: AI check (MLX)
 
 on:
   push:
-    branches: [main, ai-companion]
+    branches: [main]
     paths:
       - "GoukakuAI/**"
       - "GoukakuAIMLX/**"

@@ -3,6 +3,11 @@ import Observation
 import UserNotifications
 import GoukakuKit
 
+/// 下のタブ
+enum MainTab: Hashable {
+    case today, experience, history, settings
+}
+
 /// どの画面を開くか(通知・ウィジェット・コントロールセンター・Siri から)
 @MainActor @Observable
 final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
@@ -11,6 +16,8 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
     var openCheckIn = false
     var openEmergency = false
     var openTimer = false
+    /// いま開いているタブ(ホームのカードから「体験」へ移るときなどに使う)
+    var tab: MainTab = .today
 
     /// goukakulock://checkin などを開く
     func handle(url: URL) {

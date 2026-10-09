@@ -217,6 +217,12 @@ final class AppSettings {
     var rampDismissedAt: Date? = nil
     /// 使用時間で判定するアプリの選び直しのたびに増やす(区間の登録し直しの指紋に使う)
     var usageRevision: Int = 0
+    /// 相棒AI:いまの自分(使える時間|場所|調子)
+    var companionContextRaw: String = ""
+    /// 相棒AI:はじめて会った日(育ちの「一緒に過ごした日数」)
+    var companionStartedAt: Date? = nil
+    /// 相棒AI:チェックインのあとにひとこと返す
+    var companionReflectAfterCheckIn: Bool = true
 
     init() {
         self.reminderMinutes = [12 * 60, 20 * 60]
@@ -270,6 +276,7 @@ enum Persistence {
         Schema([
             Habit.self, CheckIn.self, CycleRecord.self, EventLog.self,
             PendingChange.self, EmergencyRecord.self, AppSettings.self, WeeklyReview.self,
+            ExperienceIdea.self, ExperienceLog.self, CompanionNote.self, CompanionMessage.self,
         ])
     }
 

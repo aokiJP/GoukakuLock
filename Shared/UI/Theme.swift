@@ -22,6 +22,8 @@ enum Theme {
     static let rest = dynamic(light: 0x23807A, dark: 0x4CC2B8)
     /// 補助の文字
     static let muted = dynamic(light: 0x5E6778, dark: 0x9AA3B4)
+    /// 鉛筆(相棒AIの書き込み。採点の赤ペンとは分ける)
+    static let pencil = dynamic(light: 0x3D5A80, dark: 0x9DB8E0)
 
     static func dynamic(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: UIColor { traits in

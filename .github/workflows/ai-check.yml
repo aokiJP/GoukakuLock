@@ -25,7 +25,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ai-check-${{ github.ref }}
+  group: ai-check-${{ github.ref }}-${{ inputs.model || 'default' }}
   cancel-in-progress: true
 
 jobs:
@@ -128,7 +128,7 @@ jobs:
           } > "$OUT/status.txt"
           cd "$OUT"
           git init -q
-          git checkout -q -b ci-output-ai
+          git checkout -q -b "ci-output-ai"
           git add -A
           git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "AI check: run ${{ github.run_number }} (${{ job.status }}) for ${{ github.sha }}"

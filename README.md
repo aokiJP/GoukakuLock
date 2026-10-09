@@ -14,34 +14,57 @@
 
 見た目は「答案用紙と赤ペン」:状態は丸い印(はんこ)1つで表し、達成は朱の ◯、最小版は △、未達成は ✕ で記録します。
 
-## いまの状態
+## いまの状態(v1.1)
 
 | 項目 | 状態 |
 |---|---|
-| 判定の芯 GoukakuCore | 単体テスト 65 件が通過(macOS + Xcode 26.6、Linux + Swift 6.3.3) |
-| iOS アプリ(本体+拡張3つ) | Xcode 26.6 / iOS 26.5 SDK でビルド成功。最低 iOS 18.0、iPhone 専用 |
-| 画面の通し確認 | CI で iPhone 17 シミュレータ(iOS 26.5)を使い、はじめの設定 → チェックイン → 記録 → 設定 → 緊急解除 → 一時停止まで動かしてスクリーンショットを残す |
+| 判定の芯 GoukakuCore | 単体テスト 69 件が通過(macOS + Xcode 26.6、Linux + Swift 6.3.3) |
+| iOS アプリ(本体+拡張4つ) | Xcode 26.6 / iOS 26.5 SDK でビルド成功(警告 0)。最低 iOS 18.0、iPhone 専用 |
+| 画面の通し確認 | CI で iPhone 17 シミュレータ(iOS 26.5)を使い、はじめの設定 → チェックイン → はなまる → 合格証 → コミット追加 → 記録 → 設定 → 見本(ウィジェット・Live Activity)→ 集中タイマー → 緊急解除 → 一時停止まで動かしてスクリーンショットを残す |
 | 実機スパイク(第20章) | **未実施**。Screen Time API はシミュレータでは動かないので、ロックそのものは実機で確かめる |
 | SP-01(無料の Apple ID で使えるか) | **使えない**で確定。Apple の DTS が、Personal Team(無料)では Family Controls を使えないと回答している |
 
+### アプリだからできること(v1.1)
+
+| どこから | できること |
+|---|---|
+| ホーム画面・StandBy | ウィジェット(小・中):今日の印、残り時間、連続日数、今日のコミットの ◯/未、直近7日。タップでチェックイン画面 |
+| ロック画面 | ウィジェット(円・長方形・1行):ロック中か、残り時間、今日の進み |
+| コントロールセンター・アクションボタン | 「合格ロックでチェックイン」ボタン |
+| 通知 | リマインドやシールドの通知を長押しして、一言(5文字以上)書けばアプリを開かずに記録。最小版でも記録できる |
+| Siri・ショートカット | 「合格ロックでチェックイン」「合格ロックの今日の状態」「合格ロックで集中タイマー」 |
+| Dynamic Island・Live Activity | 緊急解除(待機と残り)、集中タイマー、稼働型の解除枠の残り時間 |
+
+### 確かめ方(仕様書 フェーズ2)
+
+- **自己申告**:一言 5 文字以上(フェーズ1)
+- **集中タイマー**:アプリを前に出している時間だけを数える。離れると一時停止、厳格モードなら 0 から。実行中は画面を点けたまま
+- **写真**:アプリ内のカメラで撮ったものだけ(ライブラリからは選べない)。位置情報は残さず、90 日で消す
+- **使用時間(自動)**:選んだ学習アプリをその日に合計 N 分使うと、アプリを開かなくても自動で達成(DeviceActivity のしきい値)
+- **稼働型**:いつもはロックし、計れる方法でチェックインするたびに決めた時間だけ外れる(バイト感覚)
+
+### 続けたくなる工夫
+
+- 節目(はじめての達成、連続 3・7・14・21・30・50・100… 日)に、赤ペンの「はなまる」を描くお祝いと触覚
+- 合格証の画像をシェア(載せるのは連続・通算と、本人が選んだときだけ目標の名前)
+- はじめて合格したあと、ウィジェットをまだ置いていなければ、ホームに一度だけ置き方の案内(置けば消える・閉じたら二度と出ない)
+- 連続 7・30・100 日で解放される別アイコン(墨・金・桜)
+- 目標の例から選べる(英単語・過去問・集中勉強・読書・語学アプリ・筋トレ・楽器・プログラミング)
+- この2週間の ◯△✕、週に1回のふり返り(3つだけ)、2週間続いたら「一段上げる」の提案(提案だけ)
+- 3日続けて未達成なら、追い込まずに「下げる・休む・止める」を並べる(フェーズ1から)
+
+安全の床(緊急解除・一時停止・やめる合図・没収しない)はそのまま。依存させる仕掛けではなく、続けるのが楽になる方向だけを足しています。
+
 ### 実装したもの(フェーズ1)
 
-- S-01 はじめの設定(8手順:説明 → Screen Time の許可 → 通知 → ロック対象と常に許可 → 日付切替とロックモード → 最初のコミット → 開始の時期 → 置き場所)
-- S-02 ホーム(状態の印と見出し・次に変わる時刻までの残り・今日のコミット・連続/通算/最長・緊急解除と一時停止・警告の帯・3日連続未達成のときの「立て直し」)
-- S-03 チェックイン(自己申告:一言メモ5文字以上・最小版は週の上限まで・5分以内の取り消し)
-- S-04 コミットの追加・編集・削除(必須3つまで・曜日・最小版・本当の目標のメモ)
-- S-05 記録(月のカレンダーを ◯ △ ✕ 休 などの記号と色で・連続/最長/通算/月の達成率・日ごとの一言・緊急解除の履歴)
-- S-06 設定(ロック対象・ロックモード・日付切替は一時停止中だけ・アプリ内課金の禁止・最小版と休養日の上限・休養日・リマインド・回避ログ・書き出し・全削除)
-- S-07 緊急解除(15分後から2時間・待機中の取り消し・今週の回数)
-- S-08 一時停止・見守りモード・卒業の提案・「やめる合図」の一文
-- 設定を緩められない仕組み(第7.5節):`ChangePolicy` で分類し、緩める変更は達成後だけ受け付けて翌サイクルから反映(予約中の変更として見える・取り消せる)
-- 起動・前面復帰・バックグラウンド更新の処理(第16.4節):受信箱の取り込み、結果の確定、予約した変更の反映、区間の登録の確認、Screen Time の許可の確認、時刻改ざんの検知、リマインドの作り直し、バッジ
-- 再インストールの検知(キーチェーンの印)、共有ファイルの復旧
-- デバッグメニュー(Debug 版だけ):日付切替を任意の時刻に、緊急解除を短く(待機1分・解除15分)、今すぐ判定、ロックだけ外す、state.json・受信箱・登録中の区間の表示、ログの書き出し
+- S-01 はじめの設定(8手順)、S-02 ホーム、S-03 チェックイン(5分以内の取り消し)、S-04 コミット(必須3つまで)、S-05 記録(◯△✕のカレンダー)、S-06 設定、S-07 緊急解除、S-08 一時停止・見守り・卒業の提案
+- 設定を緩められない仕組み(第7.5節):緩める変更は達成後だけ受け付けて翌サイクルから
+- 起動・前面復帰・バックグラウンド更新の処理(第16.4節)、再インストールと時刻改ざんの検知、共有ファイルの復旧
+- デバッグメニュー(Debug 版だけ):日付切替を任意の時刻に、緊急解除を短く、見本(ウィジェット・Live Activity・お祝い)など
 
-### まだないもの(フェーズ2・3)
+### まだないもの(フェーズ3)
 
-写真・タイマー・使用時間・稼働型・ウィジェット・Live Activity・週次レビュー・ドメインの直接指定(以上フェーズ2)、執行役・帳簿・ヘルスケア・場所つきタイマー・ショートカット(以上フェーズ3)。判定の芯(GoukakuCore)はこれらにも対応済みなので、画面と拡張を足せば動く作りです。
+執行役(CloudKit での共有・承認)・帳簿・ヘルスケア・場所つきタイマー。判定の芯はこれらにも対応済みです。
 
 ## ダウンロード
 
@@ -54,6 +77,8 @@
 |---|---|
 | `GoukakuLock-Release.ipa` | ふだん使う版 |
 | `GoukakuLock-Debug.ipa` | デバッグメニューつき。実機テスト(仕様書 第19.3節の T-01〜T-12)用 |
+
+IPA の中には 5 つのバンドルがあります:本体、`GoukakuMonitor`・`GoukakuShieldConfig`・`GoukakuShieldAction`(Family Controls を使う拡張)、`GoukakuWidget`(ウィジェット・Live Activity・コントロール。App Groups だけ)。
 
 どちらも**未署名**(証明書なしのアドホック署名で、必要なエンタイトルメントだけが入っている)です。このままでは iPhone に入りません。
 
@@ -71,24 +96,25 @@
 [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/) で次を作ります。
 
 1. **App Group**:`group.com.aokijp.goukakulock`
-2. **App ID を4つ**。それぞれの Capabilities で **Family Controls** と **App Groups** をオンにし、App Groups には 1 の App Group を割り当てる
+2. **App ID を5つ**。下の表の Capabilities をオンにし、App Groups には 1 の App Group を割り当てる
 
-   | バンドル | Bundle ID |
-   |---|---|
-   | 本体 `GoukakuLock.app` | `com.aokijp.goukakulock` |
-   | `PlugIns/GoukakuMonitor.appex` | `com.aokijp.goukakulock.monitor` |
-   | `PlugIns/GoukakuShieldConfig.appex` | `com.aokijp.goukakulock.shieldconfig` |
-   | `PlugIns/GoukakuShieldAction.appex` | `com.aokijp.goukakulock.shieldaction` |
+   | バンドル | Bundle ID | Capabilities |
+   |---|---|---|
+   | 本体 `GoukakuLock.app` | `com.aokijp.goukakulock` | Family Controls・App Groups |
+   | `PlugIns/GoukakuMonitor.appex` | `com.aokijp.goukakulock.monitor` | Family Controls・App Groups |
+   | `PlugIns/GoukakuShieldConfig.appex` | `com.aokijp.goukakulock.shieldconfig` | Family Controls・App Groups |
+   | `PlugIns/GoukakuShieldAction.appex` | `com.aokijp.goukakulock.shieldaction` | Family Controls・App Groups |
+   | `PlugIns/GoukakuWidget.appex` | `com.aokijp.goukakulock.widget` | App Groups |
 
 3. **Apple Development の証明書**(秘密鍵と合わせて `.p12` に書き出す)
 4. **デバイス**(iPhone の UDID)の登録
-5. **Development のプロビジョニングプロファイルを4つ**(上の App ID ごとに1つ)
+5. **Development のプロビジョニングプロファイルを5つ**(上の App ID ごとに1つ)
 
-Bundle ID を自分のものに変える場合は、拡張の ID を「本体の ID + `.monitor` など」にしてください。App Group の ID は、アプリが署名に使われたプロファイルから実行時に読み取るので、4つのプロファイルが同じ App Group を含んでいれば、ID を変えても動きます。
+Bundle ID を自分のものに変える場合は、拡張の ID を「本体の ID + `.monitor` など」にしてください。App Group の ID は、アプリが署名に使われたプロファイルから実行時に読み取るので、5つのプロファイルが同じ App Group を含んでいれば、ID を変えても動きます。
 
 ### 2. 署名し直す
 
-4つのバンドルに、それぞれ対応するプロファイルを当てて署名します。例として、Linux・Windows・macOS で動く [zsign](https://github.com/zhlynn/zsign) なら、拡張の分も `-m` を重ねて渡せます。
+5つのバンドルに、それぞれ対応するプロファイルを当てて署名します。例として、Linux・Windows・macOS で動く [zsign](https://github.com/zhlynn/zsign) なら、拡張の分も `-m` を重ねて渡せます。
 
 ```sh
 zsign -k dev.p12 -p 'p12のパスワード' \
@@ -96,10 +122,11 @@ zsign -k dev.p12 -p 'p12のパスワード' \
   -m monitor.mobileprovision \
   -m shieldconfig.mobileprovision \
   -m shieldaction.mobileprovision \
+  -m widget.mobileprovision \
   -o GoukakuLock-signed.ipa GoukakuLock-Release.ipa
 ```
 
-署名後、4つのバンドルすべてに `com.apple.developer.family-controls` と `com.apple.security.application-groups` が残っていることを確かめてください。どれか1つでも欠けると、その拡張は動きません。
+署名後、本体と3つの拡張に `com.apple.developer.family-controls` と `com.apple.security.application-groups` が、ウィジェットに `com.apple.security.application-groups` が残っていることを確かめてください。どれか1つでも欠けると、そのバンドルは動きません。
 
 ### 3. インストールする
 
@@ -113,7 +140,7 @@ xcodegen generate     # project.yml から GoukakuLock.xcodeproj を作り直す
 open GoukakuLock.xcodeproj
 ```
 
-各ターゲット(本体と拡張3つ)の Signing & Capabilities で自分の Team を選べば、自動署名が App ID とプロファイルを作ります。iPhone をつないで Run すれば入ります。
+各ターゲット(本体と拡張4つ)の Signing & Capabilities で自分の Team を選べば、自動署名が App ID とプロファイルを作ります。iPhone をつないで Run すれば入ります。
 
 ## 最初に確かめること(実機)
 
@@ -126,10 +153,13 @@ Debug 版を入れて、仕様書 第20章のスパイクのうち SP-02〜SP-08
 ## 開発
 
 ```
-GoukakuCore/      判定の芯(Foundation だけ。swift test で単体テスト 65 件)
-GoukakuKit/       ManagedSettings・DeviceActivity・FamilyControls・通知のつなぎ(本体と拡張3つで共有)
+GoukakuCore/      判定の芯と、状態の言い方(Foundation だけ。swift test で単体テスト 69 件)
+GoukakuKit/       GoukakuShared:App Group・ディープリンク・ウィジェット用の数字・Live Activity の型
+                  GoukakuKit:ManagedSettings・DeviceActivity・FamilyControls・通知のつなぎ
 Extensions/       Monitor・ShieldConfig・ShieldAction の各拡張
-App/              本体アプリ(SwiftUI + SwiftData)
+Widgets/          ウィジェット拡張(Extension/)と、本体の見本でも使うビュー(Views/)
+Shared/UI/        見た目(印・採点の記号・はなまる・色)。本体とウィジェットで共有
+App/              本体アプリ(SwiftUI + SwiftData + App Intents + ActivityKit)
 UITests/          シミュレータで画面を一通り動かしてスクリーンショットを残すテスト
 project.yml       XcodeGen の定義(GoukakuLock.xcodeproj はここから生成)
 scripts/          IPA に包むスクリプトなど
@@ -145,3 +175,5 @@ CI の結果(IPA・ビルドログ・スクリーンショット)は `ci-output`
 - `AppActions`:`clock` を拡張から使えるようにし、`requestEmergency` にデバッグ用の窓を渡せるようにした
 - ShieldAction 拡張:iOS 26 で増えたサブメニューの項目も「閉じる」で受ける
 - ShieldConfiguration 拡張:ボタンとアイコンを本体と同じ朱色に
+- 通知:リマインドとシールドの通知に「一言書いて記録」「最小版で記録」の返信を付けた(`CheckInNotifier.registerCategories`)
+- `AppGroup` などウィジェットも使う部品は GoukakuShared に分けた(GoukakuKit から読み込めば今までどおり使える)

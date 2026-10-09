@@ -78,6 +78,7 @@ final class WalkthroughUITests: XCTestCase {
         snap("15-ホーム-下")
 
         // 合格証
+        scrollTo(app.buttons["合格証をつくる"])
         tap(app.buttons["合格証をつくる"])
         waitFor(app.navigationBars["合格証"])
         snap("16-合格証")
@@ -105,18 +106,21 @@ final class WalkthroughUITests: XCTestCase {
         tap(app.tabBars.buttons["設定"])
         sleep(1)
         snap("21-設定")
+        scrollTo(app.buttons["ウィジェット・Siri・通知から記録する"])
         tap(app.buttons["ウィジェット・Siri・通知から記録する"])
         sleep(1)
         snap("22-使いこなす")
         app.swipeUp()
         snap("23-使いこなす-下")
         app.navigationBars.buttons.element(boundBy: 0).tap()
+        scrollTo(app.buttons["アイコン"])
         tap(app.buttons["アイコン"])
         sleep(1)
         snap("24-アイコン")
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        app.swipeDown()
-        tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'ロックモード'")).firstMatch)
+        let lockMode = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'ロックモード'")).firstMatch
+        scrollBackTo(lockMode)
+        tap(lockMode)
         tap(app.buttons["稼働型(勉強で時間を稼ぐ)"])
         sleep(1)
         snap("25-稼働型")
@@ -125,6 +129,7 @@ final class WalkthroughUITests: XCTestCase {
         // デバッグの見本(ウィジェット・Live Activity・お祝い・記録の画面)
         scrollTo(app.buttons["デバッグメニュー"])
         tap(app.buttons["デバッグメニュー"])
+        scrollTo(app.buttons["ウィジェット・Live Activity・お祝い"])
         tap(app.buttons["ウィジェット・Live Activity・お祝い"])
         sleep(1)
         snap("26-見本-ウィジェット")
@@ -157,7 +162,7 @@ final class WalkthroughUITests: XCTestCase {
 
         // S-07 緊急解除・S-08 一時停止
         tap(app.tabBars.buttons["今日"])
-        app.swipeUp()
+        scrollTo(app.buttons["緊急解除"])
         tap(app.buttons["緊急解除"])
         waitFor(app.buttons["緊急解除を申請する"])
         snap("34-緊急解除")
@@ -167,17 +172,20 @@ final class WalkthroughUITests: XCTestCase {
         snap("35-一時停止")
     }
 
+    @MainActor
     private func waitFor(_ element: XCUIElement, timeout: TimeInterval = 10,
                          file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(element.waitForExistence(timeout: timeout), "見つからない: \(element)", file: file, line: line)
     }
 
+    @MainActor
     private func tap(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         waitFor(element, file: file, line: line)
         element.tap()
     }
 
     /// 見えるところまで上へスクロールする
+    @MainActor
     private func scrollTo(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         var tries = 0
         while (!element.exists || !element.isHittable) && tries < 8 {
@@ -187,6 +195,18 @@ final class WalkthroughUITests: XCTestCase {
         XCTAssertTrue(element.exists, "スクロールしても見つからない: \(element)", file: file, line: line)
     }
 
+    /// 見えるところまで下へ(画面の上のほうへ)戻る
+    @MainActor
+    private func scrollBackTo(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        var tries = 0
+        while (!element.exists || !element.isHittable) && tries < 8 {
+            app.swipeDown()
+            tries += 1
+        }
+        XCTAssertTrue(element.exists, "スクロールしても見つからない: \(element)", file: file, line: line)
+    }
+
+    @MainActor
     private func snap(_ name: String) {
         Thread.sleep(forTimeInterval: 0.8)   // 遷移のアニメーションを待つ
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())

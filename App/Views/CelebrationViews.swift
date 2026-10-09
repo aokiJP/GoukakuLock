@@ -93,20 +93,24 @@ struct CertificateCard: View {
                 }
             }
             .padding(.top, 18)
-            VStack(spacing: 14) {
+            VStack(spacing: 12) {
                 Text("合 格 証")
                     .font(.system(size: 34, weight: .heavy, design: .serif))
                     .foregroundStyle(Color(red: 0.11, green: 0.14, blue: 0.20))
-                    .padding(.top, 26)
+                    .padding(.top, 24)
+                // 先生が点数を花丸で囲むように、日数を花びらの輪で囲む
                 ZStack {
-                    HanamaruView(progress: 1)
-                        .frame(width: 170, height: 170)
+                    HanamaruView(progress: 1, lineWidthRatio: 0.028, spiral: false)
+                        .frame(width: 196, height: 196)
                     VStack(spacing: 0) {
                         Text("\(streak)")
-                            .font(.system(size: 54, weight: .bold, design: .serif))
+                            .font(.system(size: 56, weight: .bold, design: .serif))
+                            .minimumScaleFactor(0.6)
+                            .lineLimit(1)
                         Text("日連続")
                             .font(.system(size: 16, weight: .semibold, design: .serif))
                     }
+                    .frame(width: 112)
                     .foregroundStyle(Color(red: 0.11, green: 0.14, blue: 0.20))
                 }
                 if let goal, !goal.isEmpty {

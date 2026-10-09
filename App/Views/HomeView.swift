@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 import GoukakuCore
 import GoukakuKit
 
@@ -42,6 +43,7 @@ struct HomeView: View {
                     todaySection
                     RecentStrip()
                     StreakRow(onShare: { sheet = .share })
+                    WidgetNudgeCard()
                     if model.rampSuggestionDue {
                         RampCard()
                     }
@@ -533,5 +535,65 @@ struct WarningBanners: View {
         .padding(12)
         .background(Theme.seal.opacity(0.08), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Theme.seal.opacity(0.35)))
+    }
+}
+
+/// はじめて合格したあと、まだウィジェットを置いていない人に一度だけ出す案内。
+/// 置いてあれば出さない。閉じたら二度と出さない。
+struct WidgetNudgeCard: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("nudge.widget.dismissed") private var dismissed = false
+    @State private var installed: Bool?
+
+    var body: some View {
+        Group {
+            if !dismissed, installed == false, model.stats().total > 0 {
+                RuledBox {
+                    HStack(alignment: .top, spacing: 14) {
+                        WidgetPreviewFrame(entry: model.widgetPreviewEntry(), family: .systemSmall)
+                            .scaleEffect(0.56)
+                            .frame(width: 88, height: 88)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("ホーム画面に置こう")
+                                .font(Theme.heading(.headline))
+                                .foregroundStyle(Theme.ink)
+                            Text("開かなくても残り時間が見え、タップ1回でチェックインできます。")
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                            NavigationLink("置き方を見る") { TipsView() }
+                                .font(.subheadline.weight(.semibold))
+                                .tint(Theme.seal)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        withAnimation { dismissed = true }
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Theme.muted)
+                            .padding(10)
+                    }
+                    .accessibilityLabel("この案内を閉じる")
+                }
+                .transition(.opacity)
+            }
+        }
+        .task(id: scenePhase) {
+            // ウィジェットを置いて戻ってきたら消えるよう、前面に戻るたびに確かめる
+            guard !dismissed, scenePhase == .active else { return }
+            installed = await Self.hasInstalledWidget()
+        }
+    }
+
+    /// ホーム画面・ロック画面に、このアプリのウィジェットが1つでも置いてあるか(問い合わせはメインスレッドの外で)
+    nonisolated static func hasInstalledWidget() async -> Bool {
+        let configurations = (try? await WidgetCenter.shared.currentConfigurations()) ?? []
+        return !configurations.isEmpty
     }
 }

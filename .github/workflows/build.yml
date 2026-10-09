@@ -134,8 +134,9 @@ jobs:
             dist/SHA256SUMS.txt
           body: |
             未署名(アドホック署名)の IPA です。実機に入れるには、有料の Apple Developer Program の証明書と、
-            4つの Bundle ID(本体・monitor・shieldconfig・shieldaction)それぞれに Family Controls と App Groups を付けた
-            プロビジョニングプロファイルで署名し直してください。手順は README の「インストール」を見てください。
+            5つの Bundle ID のプロビジョニングプロファイルで署名し直してください。
+            本体・monitor・shieldconfig・shieldaction の4つには Family Controls と App Groups、widget には App Groups を付けます。
+            手順は README の「インストール」を見てください。
 
             - GoukakuLock-Release.ipa:ふだん使う版
             - GoukakuLock-Debug.ipa:デバッグメニューつき(実機テスト T-01〜T-12 用)
@@ -151,8 +152,9 @@ jobs:
           cp build/*.log "$OUT/" 2>/dev/null || true
           if [ -d build/screenshots ]; then mkdir -p "$OUT/screenshots" && cp build/screenshots/* "$OUT/screenshots/" 2>/dev/null || true; fi
           [ -f build/uitest.log ] && grep -nE "error:|failed|Fail|XCTAssert|見つからない" build/uitest.log | head -n 200 > "$OUT/uitest-errors.txt" || true
-          for f in build/xcodebuild-*.log; do
-            [ -f "$f" ] && grep -nE "error:|warning: .*(Sendable|actor|isolated|deprecated)" "$f" | head -n 300 > "$OUT/$(basename "$f" .log)-errors.txt" || true
+          # コンパイラのエラーと警告をすべて抜き出す(appintentsmetadataprocessor の「抽出を省略」の知らせは除く)
+          for f in build/xcodebuild-*.log build/uitest.log; do
+            [ -f "$f" ] && grep -E "(error|warning):" "$f" | grep -v "appintentsmetadataprocessor" | sort -u | head -n 300 > "$OUT/$(basename "$f" .log)-diagnostics.txt" || true
           done
           {
             echo "run=${{ github.run_number }}"

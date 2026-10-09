@@ -49,18 +49,21 @@ struct DepositView: View {
         .alert(deposit.message ?? "", isPresented: Binding(get: { deposit.message != nil }, set: { if !$0 { deposit.message = nil } })) {
             Button("OK", role: .cancel) {}
         }
-        .confirmationDialog("預け金をやめますか?", isPresented: Binding(get: { cancelTarget != nil }, set: { if !$0 { cancelTarget = nil } }),
+        .confirmationDialog(cancelTarget?.isCanceled == true ? "返金をもう一度頼みますか?" : "預け金をやめますか?",
+                            isPresented: Binding(get: { cancelTarget != nil }, set: { if !$0 { cancelTarget = nil } }),
                             titleVisibility: .visible, presenting: cancelTarget) { week in
-            Button("やめる(明日からの\(Fmt.yen(deposit.cancelableAmount(week)))を返してもらう)", role: .destructive) {
+            Button(week.isCanceled
+                   ? "明日からの\(Fmt.yen(deposit.cancelableAmount(week)))の返金を頼む"
+                   : "やめる(明日からの\(Fmt.yen(deposit.cancelableAmount(week)))を返してもらう)", role: .destructive) {
                 Task { await deposit.cancel(week) }
             }
         } message: { _ in
             Text("今日までの分は、これまでどおり結果しだいです(今日達成すれば返ってきます)。明日からの分を返金し、次の週も預けません。\n\(AppConstants.quitSignal)")
         }
         .confirmationDialog("このサーバーとのつながりを外しますか?", isPresented: $confirmDisconnect, titleVisibility: .visible) {
-            Button("外す", role: .destructive) { deposit.disconnect() }
+            Button("外す", role: .destructive) { Task { await deposit.disconnect() } }
         } message: {
-            Text("預けたお金と返金の約束は、サーバーと Stripe に残ります。外したあとにつなぎ直すと、別の登録になり、いまの預け金はこの iPhone から見えなくなります。")
+            Text("外す前に、「次の週も自動で預ける」をすべて止めます(いまの週はそのまま)。預けたお金と返金の約束は、サーバーと Stripe に残ります。外したあとにつなぎ直すと別の登録になり、いまの預け金の返金はこの iPhone から頼めなくなります。")
         }
     }
 
@@ -103,21 +106,27 @@ struct DepositView: View {
             if let hint = DepositHomeCard.todayHint(marks: marks, daily: week.daily) {
                 Text(hint).font(.footnote).foregroundStyle(Theme.pencil)
             }
-            if week.next == nil {
+            if week.isCanceled {
+                Label("やめました。次の週は預けません", systemImage: "stop.circle")
+                    .font(.footnote)
+                    .foregroundStyle(Theme.muted)
+            } else if week.next == nil {
                 Toggle("次の週も自動で預ける", isOn: Binding(
                     get: { week.renew },
                     set: { on in Task { await deposit.setRenew(on, for: week) } }
                 ))
                 .disabled(deposit.isSample)
-                if deposit.cancelableAmount(week) > 0 {
-                    Button("やめる(明日からの分を返してもらう)", role: .destructive) { cancelTarget = week }
-                        .font(.footnote)
-                        .disabled(deposit.isSample)
-                }
             } else {
                 Label("次の週も預けています", systemImage: "arrow.turn.down.right")
                     .font(.footnote)
                     .foregroundStyle(Theme.muted)
+            }
+            // やめたのに返金がうまくいかなかったときも、ここからもう一度頼める
+            if deposit.cancelableAmount(week) > 0 {
+                Button(week.isCanceled ? "明日からの分の返金を、もう一度頼む" : "やめる(明日からの分を返してもらう)",
+                       role: .destructive) { cancelTarget = week }
+                    .font(.footnote)
+                    .disabled(deposit.isSample)
             }
         } header: {
             HStack {
@@ -127,8 +136,8 @@ struct DepositView: View {
                 }
             }
         } footer: {
-            if week.renew && week.next == nil {
-                Text("この週が終わると、同じカードで次の7日分(\(Fmt.yen(week.total)))を自動で預けます。止めるのはいつでもでき、止めてもこの週はそのままです。")
+            if week.renew && week.next == nil && !week.isCanceled {
+                Text("この週が終わると、同じカードで次の7日分(\(Fmt.yen(week.total)))を自動で預けます(この週にアプリを一度も開かなかったときは続けません)。止めるのはいつでもでき、止めてもこの週はそのままです。")
             }
         }
     }

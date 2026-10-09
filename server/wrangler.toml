@@ -2,7 +2,7 @@
 # 秘密の値は wrangler.toml に書かず、`npx wrangler secret put <名前>` か GitHub Actions の「Deploy deposit server」で入れる:
 #   STRIPE_SECRET_KEY   Stripe の秘密鍵(sk_test_… / sk_live_…。制限付きキー rk_… でもよい)
 #   TOKEN_SECRET        端末の合い言葉に署名する鍵(長いランダムな文字列)
-#   REGISTRATION_CODE   (任意)招待コード。決めると、コードを知っている人だけが登録できる
+#   REGISTRATION_CODE   招待コード。決めると、コードを知っている人だけが登録できる(テストモードでは任意。本番のキーでは必須で、ないとだれも登録できない)
 name = "goukaku-deposit"
 main = "src/index.js"
 compatibility_date = "2025-09-01"

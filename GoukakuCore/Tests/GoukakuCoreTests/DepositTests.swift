@@ -19,10 +19,11 @@ final class DepositTests: XCTestCase {
     }
 
     func testRefundableOutcomesFollowTheAppJudgement() {
-        for o: CycleOutcome in [.achieved, .minimum, .pendingReview, .rest, .noCommit, .notStarted] {
+        for o: CycleOutcome in [.achieved, .minimum, .rest, .noCommit, .notStarted] {
             XCTAssertTrue(DepositRules.isRefundable(o), o.rawValue)
         }
-        for o: CycleOutcome in [.paused, .missed, .inProgress] {
+        // 事後承認待ちは、却下されると未達成に戻るので、決まるまで返さない
+        for o: CycleOutcome in [.paused, .missed, .inProgress, .pendingReview] {
             XCTAssertFalse(DepositRules.isRefundable(o), o.rawValue)
         }
     }

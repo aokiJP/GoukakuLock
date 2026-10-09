@@ -14,10 +14,11 @@ async function hmac(secret, data) {
   return new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(data)));
 }
 
-function sameText(a, b) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+/** 長さと中身を、かかる時間がそろうように比べる(合い言葉・招待コード) */
+export function sameText(a, b) {
+  const n = Math.max(a.length, b.length);
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < n; i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   return diff === 0;
 }
 

@@ -117,18 +117,30 @@ final class DepositModel {
         DepositRules.plan(startingAt: app.nextCycle, calendar: app.cycleCalendar)
     }
 
-    /// 新しく預けられるか(すでにある週と日が重ならない)
+    /// 自動で続く予定の週(終わったら、同じカードで次の7日を預ける)
+    private func willRenew(_ week: DepositWeek) -> Bool {
+        week.renew && week.next == nil && week.renewError == nil && week.status != .closed
+    }
+
+    /// 新しく預けられるか(すでにある週と日が重ならず、前の週から自動で続く予定の日でもない)
     var canStartNew: Bool {
         guard connected, config?.ready == true, !app.needsOnboarding else { return false }
         let keys = Set(nextPlan.map(\.key))
-        return !weeks.contains { week in
+        let overlaps = weeks.contains { week in
             week.status != .closed && week.status != .ended && week.days.contains { keys.contains($0.key) }
         }
+        // 自動で続く週は、終わると次の7日(日付 +7)を預ける。その日にちとも重ならないこと(サーバーと同じ決まり)
+        let cal = app.cycleCalendar
+        let renewKeys = Set(weeks.filter(willRenew).flatMap { week in
+            week.days.compactMap { $0.cycle.map { cal.cycle($0, offsetBy: DepositRules.days).description } }
+        })
+        return !overlaps && renewKeys.isDisjoint(with: keys)
     }
 
-    /// 自動で続けられなかった週(カードの確認が要るなど)
+    /// 自動で続けられなかった週(カードの確認が要るなど)。そのあとに自分で預け直した週があれば出さない
     var renewalProblem: (week: DepositWeek, reason: String)? {
         guard let week = weeks.first(where: { $0.renewError != nil && $0.next == nil }) else { return nil }
+        if weeks.contains(where: { $0.id != week.id && $0.startsAt >= week.endsAt.addingTimeInterval(-3600) }) { return nil }
         return (week, Self.renewErrorText(week.renewError ?? ""))
     }
 
@@ -137,6 +149,7 @@ final class DepositModel {
         case "authentication_required": return "カード会社の本人確認(3D セキュア)が要るため、自動では預けられませんでした"
         case "card_declined", "card_error", "insufficient_funds", "expired_card": return "カードが通らなかったため、自動では預けられませんでした"
         case "late": return "週が終わってから時間がたったため、自動では続けませんでした"
+        case "inactive": return "この週に一度もアプリが開かれなかったので、自動では続けませんでした"
         case "no_payment_method": return "カードが保存されていないため、自動では預けられませんでした"
         default: return "自動では預けられませんでした(\(code))"
         }
@@ -190,13 +203,33 @@ final class DepositModel {
         }
     }
 
-    /// この iPhone の登録を忘れる(サーバーの預け金はそのまま。同じサーバーにつなぎ直すと、別の登録になる)
-    func disconnect() {
+    /// この iPhone の登録を忘れる。先に「次の週も自動で預ける」をすべて止める
+    /// (外したあとは返金を知らせられないので、続けると預けたまま戻らなくなるため)。いまの週はそのまま
+    func disconnect() async {
+        guard !isSample else { return }
+        var note = "自動で続けるのは止めた"
+        if let api, token != nil {
+            do {
+                // 画面の様子が古くても止めもれがないよう、サーバーから読み直してから止める
+                let state = try await api.state()
+                for week in state.deposits where willRenew(week) {
+                    _ = try await api.setRenew(depositID: week.id, on: false)
+                }
+            } catch let error as DepositServerError where error.status == 401 {
+                // 合い言葉が通らないので止められない。外すのは止めない
+                // (サーバーは、アプリがつながらない週のあとは自動で続けない)
+                note = "合い言葉が通らず、自動で続けるのは止められなかった"
+                message = "サーバーが合い言葉を受けつけないため、自動で続けるのは止められませんでした。アプリがつながらない週が終わると、サーバーは自動では続けません。"
+            } catch {
+                message = "自動で続けるのを止められなかったので、外していません(\(Self.describe(error)))"
+                return
+            }
+        }
         if let account { Keychain.delete(account: account) }
         connected = false
         weeks = []
         config = nil
-        app.log("deposit", "預け金のサーバーとのつながりを外した")
+        app.log("deposit", "預け金のサーバーとのつながりを外した(\(note))")
         app.save()
     }
 
@@ -213,38 +246,66 @@ final class DepositModel {
             let state = try await api.state()
             config = state.config
             weeks = state.deposits
+            try await sendHeartbeat(api)
             try await reportFinishedDays(api)
             lastSync = Date()
         } catch let error as DepositServerError where error.status == 401 {
-            // サーバーの鍵(TOKEN_SECRET)が変わった:つなぎ直してもらう
-            if let account { Keychain.delete(account: account) }
-            connected = false
-            message = error.message
+            // 合い言葉が通らない(サーバーの TOKEN_SECRET が変わったなど)。合い言葉は消さずに残す
+            // (サーバーの鍵を元に戻せば、そのまま続けられる。消すと預け金を知らせる手立てがなくなる)
+            message = "預け金のサーバーが、この iPhone の合い言葉を受けつけません。サーバーの TOKEN_SECRET を元に戻してください(\(error.message))"
         } catch {
             // 圏外などは静かに(次の機会にもう一度)
         }
     }
 
+    /// 自動で続く予定の週に「この週もアプリがつながった」と、次の週の日の始まり(この iPhone の暦で計算)を知らせる。
+    /// サーバーは、その週に一度もつながらなかった預け金を自動では続けない(合い言葉をなくしたまま預け続けないように)
+    private func sendHeartbeat(_ api: DepositAPI) async throws {
+        let cal = app.cycleCalendar
+        // weeks の写しを回す(待っているあいだに、ほかの同期やつながりを外す操作で weeks が入れかわってもよいように)
+        for week in weeks where willRenew(week) && week.status != .ended {
+            guard let last = week.days.last?.cycle else { continue }
+            let next = DepositRules.plan(startingAt: cal.cycle(last, offsetBy: 1), calendar: cal)
+            do {
+                replace(try await api.seen(depositID: week.id, next: next))
+            } catch let error as DepositServerError where error.status == 400 {
+                // 次の週の日付がサーバーの筋に合わない(暦を大きく変えた など):つながった印だけ送る
+                if let updated = try? await api.seen(depositID: week.id, next: nil) { replace(updated) }
+            } catch let error as DepositServerError where error.status == 401 {
+                throw error
+            } catch {
+                // 圏外・Stripe の不調など:印は次の機会に。返金の知らせは続ける
+                continue
+            }
+        }
+    }
+
+    /// 結果が決まった日の返金を頼む。1日うまくいかなくても、ほかの日は続けて頼む
     private func reportFinishedDays(_ api: DepositAPI) async throws {
         let outcomes = app.outcomeMap()
         let cal = app.cycleCalendar
         let now = Date()
-        for index in weeks.indices where weeks[index].acceptsReports {
-            for day in weeks[index].days where !day.refunded {
+        for week in weeks where week.acceptsReports {
+            for day in week.days where !day.refunded {
                 guard let cycle = day.cycle, let outcome = outcomes[cycle] else { continue }
                 let lastCheckIn = app.summary(for: cycle)?.counted.map(\.at).max()
                 guard DepositRules.shouldReport(outcome: outcome, cycleEnd: cal.end(of: cycle), lastCheckIn: lastCheckIn,
                                                 alreadyRefunded: day.refunded, now: now) else { continue }
                 do {
-                    let updated = try await api.report(depositID: weeks[index].id, day: day.key, outcome: outcome)
-                    if let i = weeks.firstIndex(where: { $0.id == updated.id }) { weeks[i] = updated }
-                    app.log("deposit", "預け金:\(day.key) の分(\(Fmt.yen(weeks[index].daily)))の返金を頼んだ")
+                    replace(try await api.report(depositID: week.id, day: day.key, outcome: outcome))
+                    app.log("deposit", "預け金:\(day.key) の分(\(Fmt.yen(week.daily)))の返金を頼んだ")
                     app.save()
-                } catch let error as DepositServerError where ["too_early", "closed", "not_refundable"].contains(error.code) {
+                } catch let error as DepositServerError where error.status != 401 {
+                    // この日だけの問題(まだ始まっていない・締め切った・Stripe が返金を断った など):次の日へ
                     continue
                 }
             }
         }
+    }
+
+    /// サーバーから届いた週で、同じ id の週を置きかえる(もう画面にない週なら何もしない)
+    private func replace(_ updated: DepositWeek) {
+        if let i = weeks.firstIndex(where: { $0.id == updated.id }) { weeks[i] = updated }
     }
 
     // MARK: 預ける
@@ -300,8 +361,7 @@ final class DepositModel {
     func setRenew(_ on: Bool, for week: DepositWeek) async {
         guard !isSample, let api else { return }
         do {
-            let updated = try await api.setRenew(depositID: week.id, on: on)
-            if let i = weeks.firstIndex(where: { $0.id == updated.id }) { weeks[i] = updated }
+            replace(try await api.setRenew(depositID: week.id, on: on))
             app.log("deposit", on ? "預け金:次の週も自動で預ける" : "預け金:自動で続けるのを止めた")
             app.save()
         } catch {
@@ -314,7 +374,7 @@ final class DepositModel {
         guard !isSample, let api else { return }
         do {
             let updated = try await api.cancel(depositID: week.id)
-            if let i = weeks.firstIndex(where: { $0.id == updated.id }) { weeks[i] = updated }
+            replace(updated)
             let returned = updated.days.filter { $0.outcome == "canceled" }.reduce(0) { $0 + $1.refundedAmount }
             app.log("deposit", "預け金をやめた(明日からの分 \(Fmt.yen(returned)) を返金)")
             app.save()
@@ -322,7 +382,13 @@ final class DepositModel {
                 ? "やめました。明日からの\(Fmt.yen(returned))を返金します。今日までの分は、これまでどおりです。"
                 : "やめました。次の週は預けません。"
         } catch {
-            message = Self.describe(error)
+            // サーバーは返金より先に「自動で続ける」を止める。読み直して、どこまで済んだかを伝える
+            await sync(force: true)
+            if weeks.first(where: { $0.id == week.id })?.isCanceled == true {
+                message = "次の週は預けないようにしましたが、明日からの分の返金がうまくいきませんでした(\(Self.describe(error)))。少したってから、もう一度頼んでください。"
+            } else {
+                message = Self.describe(error)
+            }
         }
     }
 

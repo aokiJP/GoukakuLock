@@ -37,12 +37,13 @@ public enum DepositRules {
     /// チェックインを取り消せる時間(これが過ぎた達成は、日付が変わる前でも返金してよい)
     public static let undoWindow: TimeInterval = 5 * 60
 
-    /// 返金する結果か。達成・最小版・休養日・予定のない日は返す。未達成と一時停止は返さない
+    /// 返金する結果か。達成・最小版・休養日・予定のない日は返す。未達成と一時停止は返さない。
+    /// 事後承認待ちは、却下されると未達成に戻るので、承認されて達成になるまで返さない(サーバーも同じ)
     public static func isRefundable(_ outcome: CycleOutcome) -> Bool {
         switch outcome {
-        case .achieved, .minimum, .pendingReview, .rest, .noCommit, .notStarted:
+        case .achieved, .minimum, .rest, .noCommit, .notStarted:
             return true
-        case .paused, .missed, .inProgress:
+        case .paused, .missed, .inProgress, .pendingReview:
             return false
         }
     }

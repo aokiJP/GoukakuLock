@@ -32,6 +32,7 @@ export function createFakeStripe({ now = () => Math.floor(Date.now() / 1000) } =
   const paymentMethods = new Map();
   const idempotency = new Map();
   const calls = [];
+  const hooks = {};
 
   const reply = (status, body) =>
     new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -75,6 +76,9 @@ export function createFakeStripe({ now = () => Math.floor(Date.now() / 1000) } =
         pi.status = "requires_payment_method";
         intents.set(id, pi);
         return error(402, "card_declined", "Your card was declined.", { payment_intent: pi });
+      }
+      if (pm.detached) {
+        return error(400, "payment_method_unexpected_state", "The PaymentMethod is detached.");
       }
       pi.status = "succeeded";
     }
@@ -127,7 +131,10 @@ export function createFakeStripe({ now = () => Math.floor(Date.now() / 1000) } =
       const limit = Number(params.limit || 10);
       const data = all.slice(start, start + limit);
       const hasMore = start + limit < all.length;
-      return reply(200, { object: "search_result", data, has_more: hasMore, next_page: hasMore ? String(start + limit) : null });
+      // 検索の結果は、その時点の写し(本物の Search は少し遅れる。hooks.afterSearch で、写したあとに変えられる)
+      const response = reply(200, { object: "search_result", data, has_more: hasMore, next_page: hasMore ? String(start + limit) : null });
+      hooks.afterSearch?.();
+      return response;
     }
     if (method === "GET" && path === "/payment_intents") {
       const data = [...intents.values()].filter((pi) => !params.customer || pi.customer === params.customer).reverse();
@@ -159,7 +166,10 @@ export function createFakeStripe({ now = () => Math.floor(Date.now() / 1000) } =
       const pi = intents.get(params.payment_intent);
       if (!pi) return remember(error(404, "resource_missing", "No such payment_intent"));
       if (pi.status !== "succeeded") return remember(error(400, "charge_not_refundable", "Not paid"));
-      const already = [...refunds.values()].filter((r) => r.payment_intent === pi.id).reduce((s, r) => s + r.amount, 0);
+      if (hooks.failRefunds) return error(400, "charge_disputed", "This charge is disputed.");
+      const already = [...refunds.values()]
+        .filter((r) => r.payment_intent === pi.id && r.status !== "failed" && r.status !== "canceled")
+        .reduce((s, r) => s + r.amount, 0);
       const amount = Number(params.amount ?? pi.amount - already);
       if (amount + already > pi.amount) return remember(error(400, "charge_already_refunded", "Refund exceeds amount"));
       const refund = { id: nextId("re"), object: "refund", amount, payment_intent: pi.id, status: "succeeded", reason: params.reason ?? null, metadata: {}, created: now() };
@@ -176,14 +186,22 @@ export function createFakeStripe({ now = () => Math.floor(Date.now() / 1000) } =
     intents,
     refunds,
     customers,
+    hooks,
     /** アプリの Stripe の画面で払ったことにする */
-    pay(piId, { requiresAuth = false, declines = false } = {}) {
+    pay(piId, { requiresAuth = false, declines = false, detached = false } = {}) {
       const pi = intents.get(piId);
-      const pm = { id: nextId("pm"), requiresAuth, declines };
+      const pm = { id: nextId("pm"), requiresAuth, declines, detached };
       paymentMethods.set(pm.id, pm);
       pi.status = "succeeded";
       pi.payment_method = pm.id;
       return pm;
+    },
+    /** 返金を1件、そのまま置く(失敗した返金など) */
+    addRefund(piId, { day, amount, status }) {
+      const refund = { id: nextId("re"), object: "refund", amount, payment_intent: piId, status, reason: null,
+                       metadata: { app: "goukakulock", day, outcome: "achieved" }, created: now() };
+      refunds.set(refund.id, refund);
+      return refund;
     },
     paymentMethod(id) {
       return paymentMethods.get(id);

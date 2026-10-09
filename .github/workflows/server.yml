@@ -4,7 +4,9 @@ name: Deposit server
 # デプロイは「Run workflow」で deploy にチェックを入れたときだけ。要るもの(Settings › Secrets and variables › Actions):
 #   Secrets:   CLOUDFLARE_API_TOKEN(Workers を編集できるトークン)・CLOUDFLARE_ACCOUNT_ID
 #              STRIPE_SECRET_KEY(sk_test_… / sk_live_…)・DEPOSIT_TOKEN_SECRET(長いランダムな文字列)
-#   Variables: STRIPE_PUBLISHABLE_KEY(pk_test_… / pk_live_…)・DEPOSIT_REGISTRATION_CODE(任意。招待コード)
+#              DEPOSIT_REGISTRATION_CODE(招待コード。テストモードでは任意、本番では必須。
+#                                        ログに出ないよう Secrets に置き、Workers にも secret として入れる)
+#   Variables: STRIPE_PUBLISHABLE_KEY(pk_test_… / pk_live_…)
 
 on:
   push:
@@ -50,6 +52,8 @@ jobs:
           SK: ${{ secrets.STRIPE_SECRET_KEY }}
           TS: ${{ secrets.DEPOSIT_TOKEN_SECRET }}
           PK: ${{ vars.STRIPE_PUBLISHABLE_KEY }}
+          RC: ${{ secrets.DEPOSIT_REGISTRATION_CODE }}
+          RC_VAR: ${{ vars.DEPOSIT_REGISTRATION_CODE }}
         run: |
           missing=""
           [ -n "$CF_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
@@ -67,7 +71,16 @@ jobs:
             echo "::error::秘密鍵と公開鍵のモード(テスト/本番)がそろっていません"
             exit 1
           fi
+          if [ -n "$RC_VAR" ]; then
+            echo "::error::招待コードは Variables ではなく Secrets の DEPOSIT_REGISTRATION_CODE に入れてください(Variables はログに出るため)"
+            exit 1
+          fi
+          if [ "$mode" = live ] && [ -z "$RC" ]; then
+            echo "::error::本番のキーでは、招待コード(Secrets の DEPOSIT_REGISTRATION_CODE)が要ります(URL を知った人が、あなたの Stripe で支払いを作れないように)"
+            exit 1
+          fi
           echo "Stripe: $mode モード" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$RC" ]; then echo "招待コード:あり" >> "$GITHUB_STEP_SUMMARY"; else echo "招待コード:なし(だれでも登録できる)" >> "$GITHUB_STEP_SUMMARY"; fi
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -80,10 +93,22 @@ jobs:
           command: >-
             deploy
             --var STRIPE_PUBLISHABLE_KEY:${{ vars.STRIPE_PUBLISHABLE_KEY }}
-            --var REGISTRATION_CODE:${{ vars.DEPOSIT_REGISTRATION_CODE }}
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           TOKEN_SECRET: ${{ secrets.DEPOSIT_TOKEN_SECRET }}
+      # 招待コードは、決めたときだけ secret として入れる(デプロイのあとに入れるので、そのあいだ本番は登録を受けつけない側に倒れる)
+      - name: Invitation code
+        working-directory: server
+        env:
+          RC: ${{ secrets.DEPOSIT_REGISTRATION_CODE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$RC" ]; then
+            echo "招待コードなし"
+            exit 0
+          fi
+          printf '%s' "$RC" | npx --yes wrangler@4.141.0 secret put REGISTRATION_CODE
       - name: Summary
         run: |
           echo "デプロイしました。アプリの 設定 › 預け金 に、Workers の URL(https://goukaku-deposit.<あなたのサブドメイン>.workers.dev)を入れてください。" >> "$GITHUB_STEP_SUMMARY"

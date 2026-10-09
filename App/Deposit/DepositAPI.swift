@@ -48,10 +48,17 @@ struct DepositWeek: Codable, Equatable, Identifiable {
     var next: String?
     var prev: String?
     var renewError: String?
+    /// やめた(やめる合図)時刻。やめた週からは自動で続けない
+    var canceledAt: Date?
+    /// この週にアプリが最後につながった時刻(自動で続けるのは、その週につながったときだけ)
+    var seenAt: Date?
     var livemode: Bool
 
     /// 返金の知らせをまだ受け付けているか
     var acceptsReports: Bool { status == .active || status == .ended }
+
+    /// やめた週か
+    var isCanceled: Bool { canceledAt != nil }
 
     /// 「10/6〜10/12」(最初の日〜最後の日。終わりの時刻は次の日の日付切替なので使わない)
     var rangeText: String {
@@ -160,6 +167,22 @@ struct DepositAPI {
     /// やめる(まだ始まっていない日の分を返してもらい、自動で続けるのも止める)
     func cancel(depositID: String) async throws -> DepositWeek {
         try await send("POST", "/v1/deposits/\(escape(depositID))/cancel", body: [String: String]())
+    }
+
+    /// この週にアプリがつながった印と、次の週の日の始まり(アプリの暦で計算したもの)を知らせる。
+    /// サーバーは、その週に一度もつながらなかった預け金を自動では続けない
+    func seen(depositID: String, next: [DepositDay]?) async throws -> DepositWeek {
+        struct Body: Encodable {
+            struct Day: Encodable { var key: String; var startsAt: Int }
+            struct Next: Encodable { var days: [Day]; var endsAt: Int }
+            var next: Next?
+        }
+        let body = Body(next: next.flatMap { days in
+            guard let last = days.last else { return nil }
+            return Body.Next(days: days.map { .init(key: $0.key, startsAt: Int($0.startsAt.timeIntervalSince1970)) },
+                             endsAt: Int(last.endsAt.timeIntervalSince1970))
+        })
+        return try await send("POST", "/v1/deposits/\(escape(depositID))/seen", body: body)
     }
 
     // MARK: 中身

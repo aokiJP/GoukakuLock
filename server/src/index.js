@@ -8,6 +8,7 @@
 //   POST /v1/deposits/:id/days/:day     その日の結果を知らせる(達成なら、その日の分を返金)
 //   POST /v1/deposits/:id/renew         次の週も自動で預けるか
 //   POST /v1/deposits/:id/cancel        やめる(まだ始まっていない日の分を返し、自動で続けるのも止める)
+//   POST /v1/deposits/:id/seen          アプリがつながった印と、次の週の日の始まり(自動で続けるのは、その週につながったときだけ)
 //   (Cron)                              週が終わった預け金を、保存したカードで次の週へ
 
 import { stripeClient, StripeError } from "./stripe.js";
@@ -83,6 +84,10 @@ export async function handle(request, env, deps = {}) {
     m = path.match(/^\/v1\/deposits\/([^/]+)\/cancel$/);
     if (method === "POST" && m) {
       return json(await service.cancel(customerId, decodeURIComponent(m[1])));
+    }
+    m = path.match(/^\/v1\/deposits\/([^/]+)\/seen$/);
+    if (method === "POST" && m) {
+      return json(await service.seen(customerId, decodeURIComponent(m[1]), await readBody(request)));
     }
     throw new HttpError(404, "not_found", "見つかりません");
   } catch (error) {

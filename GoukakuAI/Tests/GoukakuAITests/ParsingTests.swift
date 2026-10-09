@@ -128,6 +128,15 @@ final class ParsingTests: XCTestCase {
         XCTAssertEqual(ExperienceParser.tailoredLine(from: "ひとこと: 夜の静けさの中なら、音が近く感じられるかもしれません。ゆっくりどうぞ。", title: title),
                        "夜の静けさの中なら、音が近く感じられるかもしれません")
         XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 今日の出来事を紙に書き留めながら、散歩をしながら空を見上げてみると、夕焼けがゆっくりと色づいていきますね", title: "今日の出来事を4コマにする"))
+        // 体験の中身にふれていないひとことは使わない(CI の LFM2.5:「1曲だけ聴く」に「今夜の散歩は楽しいかも」)
+        XCTAssertNil(ExperienceParser.tailoredLine(from: "ひとこと: 今夜の散歩は楽しいかもしれません",
+                                                   title: "ほかのことをせずに1曲だけ聴く", firstStep: "イヤホンをして、目を閉じる"))
+        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 疲れた夜には、いつもの曲が少しちがって聞こえるかも",
+                                                      title: "ほかのことをせずに1曲だけ聴く", firstStep: "イヤホンをして、目を閉じる"))
+        XCTAssertNotNil(ExperienceParser.tailoredLine(from: "ひとこと: 今日の出来事を4コマにまとめると、ちがう見方で一日をふり返れるかも",
+                                                      title: "今日の出来事を4コマにする", firstStep: "紙に四角を4つ描く"))
+        XCTAssertTrue(TextCheck.sharesContentWord("イヤホンで聴くと、音が近いかも", with: "イヤホンをして、目を閉じる"))
+        XCTAssertTrue(TextCheck.sharesContentWord("なんでも", with: "のんびりする"), "ひらがなだけの体験は問わない")
         // 手本を写した「日曜の朝」は、金曜の夜には使わない
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!

@@ -138,9 +138,13 @@ final class BrainTests: XCTestCase {
     }
 
     func testSmallModelsTailorLibraryExperiences() async throws {
-        let line = "英語の勉強のあとに、耳と心が少しほどけるかも"
+        // 体験の名前を読んで、それにふれたひとことを返す(中身にふれていないひとことは使わないため)
         let recorder = Recorder()
-        let engine = ScriptedEngine { request in recorder.add(request); return "ひとこと: " + line }
+        let engine = ScriptedEngine { request in
+            recorder.add(request)
+            let title = request.prompt.components(separatedBy: "\n").first { $0.hasPrefix("体験: ") }?.dropFirst(4) ?? ""
+            return "ひとこと: 「\(title)」の時間に、英語の勉強のあとの耳と心が少しほどけるかも"
+        }
         let tuning = GenerationTuning(contextItems: 3, chatTurns: 3, useHints: false, suggestionTemperature: 0.7,
                                       freeSuggestions: false)
         let brain = CompanionBrain(engine: engine, tuning: tuning)
@@ -149,7 +153,7 @@ final class BrainTests: XCTestCase {
         for v in result.values {
             XCTAssertTrue(v.isTailored, "体験帳の体験に、相棒のひとことを添える")
             XCTAssertTrue(v.isFromAI)
-            XCTAssertEqual(v.line, line)
+            XCTAssertTrue(v.line.contains(v.title) && v.line.hasSuffix("ほどけるかも"), v.line)
             XCTAssertTrue(TimeBudget.fifteen.allows(v.duration))
             XCTAssertNotEqual(v.category, .outside)
             XCTAssertTrue(ContextFit.fits(v, context: nightAtHome))
@@ -171,7 +175,8 @@ final class BrainTests: XCTestCase {
         // コミットの工夫・いつかの体験も同じ
         let reframes = try await collect(brain.reframes(commit: "英単語20個", context: nightAtHome, avoid: []))
         XCTAssertEqual(reframes.values.first?.title, "覚えた言葉で今日を1文にする")
-        XCTAssertEqual(reframes.values.first?.line, line)
+        XCTAssertEqual(reframes.values.first?.line.hasPrefix("「覚えた言葉で今日を1文にする」の時間に"), true,
+                       reframes.values.first?.line ?? "")
         XCTAssertTrue(recorder.all.contains { $0.prompt.contains("続けている「英単語20個」") })
         let someday = try await collect(brain.someday(context: nightAtHome, theme: "旅", avoid: [], seed: 4))
         XCTAssertFalse(someday.values.isEmpty)

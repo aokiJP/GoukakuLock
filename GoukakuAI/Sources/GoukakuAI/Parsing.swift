@@ -257,7 +257,8 @@ public enum ExperienceParser {
     /// 体験帳の体験に添えるひとことを読む(短く・日本語で・安全なもの。体験の名前をくり返しただけのものは使わない)。
     /// 頼んだとおり「〜かも」で終わる1文だけを使う(CI で、だらだら続く文や「日曜の朝に」のずれが出たため)。
     /// context があれば、ちがう曜日を書いたものも使わない
-    public static func tailoredLine(from raw: String, title: String, context: CompanionContext? = nil) -> String? {
+    public static func tailoredLine(from raw: String, title: String, firstStep: String = "",
+                                    context: CompanionContext? = nil) -> String? {
         let text = OutputCleaner.clean(raw)
         guard !text.isEmpty else { return nil }
         let lines = text.components(separatedBy: .newlines)
@@ -275,7 +276,13 @@ public enum ExperienceParser {
             }
         }
         guard var value = found else { return nil }
-        value = value.trimmingCharacters(in: CharacterSet(charactersIn: "「」『』\"' \u{3000}"))
+        value = value.trimmingCharacters(in: CharacterSet(charactersIn: " \u{3000}"))
+        // 全体を囲むかっこだけ外す(途中の「」は残す)
+        for (open, close) in [("「", "」"), ("『", "』"), ("\"", "\""), ("'", "'")]
+        where value.count >= 2 && value.hasPrefix(open) && value.hasSuffix(close) {
+            value = String(value.dropFirst().dropLast())
+            break
+        }
         // 「〜かも」までで切る(「かもしれません」「かもね」も)。なければ使わない
         guard let kamo = value.range(of: "かも") else { return nil }
         var end = kamo.upperBound
@@ -286,6 +293,9 @@ public enum ExperienceParser {
         value = String(value[..<end])
         guard value.count >= 8, value.count <= 80, TextCheck.hasJapanese(value),
               ContentGuard.isAcceptable(text: value) else { return nil }
+        // 体験の中身にふれているか(漢字かカタカナの言葉を1つは同じくする。CI で「1曲だけ聴く」に
+        // 「今夜の散歩は楽しいかも」と、別の話を添えたことがあるため)
+        guard TextCheck.sharesContentWord(value, with: title + " " + firstStep) else { return nil }
         if let context {
             let days = ["日曜", "月曜", "火曜", "水曜", "木曜", "金曜", "土曜"]
             let today = days[(context.weekday - 1 + 7) % 7]
@@ -347,6 +357,40 @@ public enum ExperienceParser {
 
 /// 文字の種類を調べる
 public enum TextCheck {
+    /// 漢字(々を含む)
+    static func isKanji(_ c: Character) -> Bool {
+        c.unicodeScalars.allSatisfy { (0x4E00...0x9FFF).contains($0.value) || (0x3400...0x4DBF).contains($0.value) || $0.value == 0x3005 }
+    }
+
+    /// カタカナ(ーを含む)
+    static func isKatakana(_ c: Character) -> Bool {
+        c.unicodeScalars.allSatisfy { (0x30A1...0x30FA).contains($0.value) || $0.value == 0x30FC }
+    }
+
+    /// 中身を表す言葉(漢字1字ずつ・2字以上のカタカナのまとまり)
+    static func contentWords(_ text: String) -> Set<String> {
+        var words = Set<String>()
+        var katakana = ""
+        for c in text {
+            if isKatakana(c) {
+                katakana.append(c)
+                continue
+            }
+            if katakana.count >= 2 { words.insert(katakana) }
+            katakana = ""
+            if isKanji(c) { words.insert(String(c)) }
+        }
+        if katakana.count >= 2 { words.insert(katakana) }
+        return words
+    }
+
+    /// a が b と、中身を表す言葉を1つでも同じくするか(b に言葉がなければ問わない)
+    public static func sharesContentWord(_ a: String, with b: String) -> Bool {
+        let base = contentWords(b)
+        guard !base.isEmpty else { return true }
+        return !contentWords(a).isDisjoint(with: base)
+    }
+
     /// ひらがな・カタカナ・漢字を1文字以上含むか
     public static func hasJapanese(_ text: String) -> Bool {
         text.unicodeScalars.contains { s in

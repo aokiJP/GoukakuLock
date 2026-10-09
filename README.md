@@ -309,8 +309,8 @@ App/Views/AI/     体験タブ・相棒と話す・いつかの体験・育ち�
 AI/models.json    使えるモデルの目録(CI とアプリが同じものを読む)
 UITests/          シミュレータで画面を一通り動かしてスクリーンショットを残すテスト
 project.yml       XcodeGen の定義(GoukakuLock.xcodeproj はここから生成)
-scripts/          IPA に包む・モデルを取る(fetch-model.py)・README の画像を作る(compose-screens.py)
-.github/workflows/build.yml     CI(テスト → ビルド → AIなし版の IPA → 画面の通し確認 → モデルごとの IPA)
+scripts/          IPA に包む・モデルを取る(fetch-model.py)・画面の通し確認(ui-walkthrough.sh・launch-probe.sh)・README の画像を作る(compose-screens.py)
+.github/workflows/build.yml     CI(テスト → ビルド → AIなし版の IPA。同時に画面の通し確認。ビルドが終わりしだいモデルごとの IPA を並べて作る)
 .github/workflows/ai-check.yml  実際のモデルを MLX で動かして、プロンプトの効き目を確かめる
 ```
 

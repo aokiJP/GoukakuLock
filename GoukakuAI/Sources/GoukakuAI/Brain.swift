@@ -308,7 +308,8 @@ public struct CompanionBrain: Sendable {
             if attempt > 0 { request.temperature = 0.5 }
             var raw = ""
             for try await piece in engine.generate(request) { raw += piece }
-            if let line = ExperienceParser.tailoredLine(from: raw, title: base.title, context: context) {
+            if let line = ExperienceParser.tailoredLine(from: raw, title: base.title, firstStep: base.firstStep,
+                                                        context: context) {
                 var draft = base
                 draft.line = line
                 if case .library(let id) = base.origin {

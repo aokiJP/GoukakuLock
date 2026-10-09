@@ -2,7 +2,7 @@ import XCTest
 
 /// シミュレータで画面を一通り動かし、各画面のスクリーンショットを残す(DEBUG ビルドで実行)。
 /// Screen Time の許可はシミュレータでは得られないので、はじめの設定の「デバッグ」の抜け道を使う。
-/// シミュレータでは MLX が動かないので、相棒AIは「見本のAI」(実機の Gemma 4 E2B が返した文)で動かす。
+/// シミュレータでは MLX が動かないので、相棒AIは「見本のAI」(Gemma 4 E2B の出力をもとにした決まった文)で動かす。
 final class WalkthroughUITests: XCTestCase {
     private var app: XCUIApplication!
 
@@ -25,14 +25,18 @@ final class WalkthroughUITests: XCTestCase {
         // 相棒AI(この iPhone で使うAIと、あなたのこと)
         waitFor(app.navigationBars["相棒AI"])
         snap("02-相棒AI")
-        // 「あなたのこと」は任意なので、入れられなくても先へ進む
+        // 「あなたのこと」は任意なので、入れられなくても先へ進む。
+        // いちばん下の欄で「次へ」の帯に隠れやすいので、下までスクロールしてから押す
+        app.swipeUp()
+        app.swipeUp()
         let about = textInput()
-        scrollTo(about)
-        if focus(about) {
+        if about.waitForExistence(timeout: 3), focus(about) {
             app.typeText("English study. I like walking.")
             snap("02-相棒AI-あなたのこと")
         }
-        tap(app.buttons["次へ"])
+        if app.navigationBars["相棒AI"].exists {
+            tap(app.buttons["次へ"])
+        }
 
         waitFor(app.buttons["許可なしで進む(デバッグ)"])
         snap("03-ScreenTimeの許可")
@@ -115,11 +119,12 @@ final class WalkthroughUITests: XCTestCase {
         scrollTo(app.buttons["やってみた"].firstMatch)
         snap("23-体験-やってみる")
         tap(app.buttons["やってみた"].firstMatch)
+        // 気持ちを先に選ぶ(キーボードが出たあとだと、下の欄が隠れる)
+        tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
         let logNote = textInput()
         waitFor(logNote)
         XCTAssertTrue(focus(logNote), "体験の一言の欄に入れられない")
         app.typeText("The sky turned orange to purple.")
-        tap(app.buttons.matching(NSPredicate(format: "label CONTAINS 'おだやか'")).firstMatch)
         snap("24-やってみた")
         tap(app.buttons["記録する"])
         waitFor(app.staticTexts["体験の地図に、ひとつ増えました"], timeout: 10)
@@ -298,7 +303,9 @@ final class WalkthroughUITests: XCTestCase {
     private func focus(_ element: XCUIElement) -> Bool {
         Thread.sleep(forTimeInterval: 0.8)   // スクロールが止まるのを待つ
         for _ in 0..<3 {
-            element.tap()
+            guard element.exists else { return false }
+            // 欄の上のほうを押す(下のほうはボタンの帯に重なることがある)
+            element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
             if app.keyboards.firstMatch.waitForExistence(timeout: 2.5) { return true }
             Thread.sleep(forTimeInterval: 0.5)
         }

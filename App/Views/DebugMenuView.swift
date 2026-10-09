@@ -87,7 +87,7 @@ struct DebugMenuView: View {
             } header: {
                 Text("相棒AI")
             } footer: {
-                Text("シミュレータでは MLX が動かないので、見本のAI(実機の Gemma 4 E2B が返した文)で画面の流れを確かめられます。")
+                Text("シミュレータでは MLX が動かないので、見本のAI(Gemma 4 E2B の出力をもとにした決まった文)で画面の流れを確かめられます。")
             }
             Section("中身を見る") {
                 Button("state.json") { output = stateJSON() }

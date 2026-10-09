@@ -122,7 +122,7 @@ final class AIRuntime {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uiTestingScriptedAI") || UserDefaults.standard.bool(forKey: "debug.sampleAI") {
             next = RouteDecision(choice: .rules, tuning: GenerationTuning(),
-                                 reasons: ["見本のAI(シミュレータでの画面確認用。実機の Gemma 4 E2B が返した文を使う)"], skipped: [])
+                                 reasons: ["見本のAI(シミュレータでの画面確認用。Gemma 4 E2B の出力をもとにした決まった文を返す)"], skipped: [])
             if engine?.info.id != SampleAIInfo.id { engine = SampleAI.engine }
             decision = next
             phase = .ready

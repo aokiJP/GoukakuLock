@@ -8,7 +8,7 @@ enum SampleAIInfo {
 
 #if DEBUG
 /// シミュレータでの画面確認用の「見本のAI」(DEBUG ビルドだけ)。
-/// シミュレータでは MLX が動かないので、実機と同じ Gemma 4 E2B が手元で返した文を、頼みの種類ごとに返す。
+/// シミュレータでは MLX が動かないので、Gemma 4 E2B の出力をもとにした決まった文を、頼みの種類ごとに返す。
 /// 画面の流れ(生成中の表示 → カード → ふり返り)を本物と同じ道すじで通すためのもの
 enum SampleAI {
     static let engine = ScriptedEngine(info: EngineInfo(kind: .mlx, id: SampleAIInfo.id, name: "見本のAI")) { request in

@@ -155,11 +155,13 @@ final class DepositModel {
         }
     }
 
-    /// 週の各日の見え方(アプリの判定を使う。見本はサーバーの結果を使う)
+    /// 週の各日の見え方(アプリの判定を使う。見本は見本の結果を先に使い、ない日(今日)はアプリの判定)
     func marks(for week: DepositWeek, now: Date = Date()) -> [DepositDayMark] {
-        let outcomes = isSample ? [:] : app.outcomeMap()
+        let outcomes = app.outcomeMap()
         return week.days.map { day in
-            let outcome = day.cycle.flatMap { outcomes[$0] } ?? day.outcome.flatMap(CycleOutcome.init(rawValue:))
+            let mine = day.cycle.flatMap { outcomes[$0] }
+            let server = day.outcome.flatMap(CycleOutcome.init(rawValue:))
+            let outcome = isSample ? (server ?? mine) : (mine ?? server)
             return DepositRules.mark(startsAt: day.startsAt, endsAt: day.endsAt, refunded: day.refunded,
                                      outcome: outcome, now: now)
         }

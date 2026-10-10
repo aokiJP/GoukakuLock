@@ -1,0 +1,1199 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project GoukakuLock.xcodeproj -scheme GoukakuLock -configuration Debug -destination id=88931AEA-62E6-447F-8697-DCE00A671384 -derivedDataPath build/DerivedData-Sim -resultBundlePath build/UITests.xcresult -skipPackagePluginValidation -skipMacroValidation
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.7.2
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  GoukakuAI: /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuAI
+  GoukakuKit: /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuKit
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  GoukakuCore: /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuCore
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.3
+  mlx-swift: https://github.com/ml-explore/mlx-swift @ 0.32.3
+  GoukakuAIMLX: /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuAIMLX
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.13.0
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.1
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm @ 3.32.3
+  swift-transformers: https://github.com/huggingface/swift-transformers @ 1.3.4
+  Stripe: https://github.com/stripe/stripe-ios-spm @ 26.13.0
+
+Writing result bundle at path:
+	/Users/runner/work/GoukakuLock/GoukakuLock/build/UITests.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:88931AEA-62E6-447F-8697-DCE00A671384, OS:26.5, name:iPhone 17 }
+{ platform:iOS Simulator, arch:x86_64, id:88931AEA-62E6-447F-8697-DCE00A671384, OS:26.5, name:iPhone 17 }
+2026-10-10 00:52:14.510891+0000 GoukakuLockUITests-Runner[51373:136817] [Default] Running tests...
+objc[51373]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x106aa8310) and /Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x106b30398). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'All tests' started at 2026-10-10 00:52:28.130.
+Test Suite 'GoukakuLockUITests.xctest' started at 2026-10-10 00:52:28.132.
+Test Suite 'WalkthroughUITests' started at 2026-10-10 00:52:28.132.
+Test Case '-[GoukakuLockUITests.WalkthroughUITests testWalkthrough]' started.
+    t =     0.00s Start Test at 2026-10-10 00:52:28.133
+    t =     1.22s Set Up
+    t =     1.23s Open com.aokijp.goukakulock
+    t =     1.23s     Launch com.aokijp.goukakulock
+2026-10-10 00:52:30.279 xcodebuild[49034:130482] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-10 00:52:30.279 xcodebuild[49034:130482] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     9.24s         Setting up automation session
+    t =    12.78s         Wait for com.aokijp.goukakulock to idle
+    t =    16.19s Waiting 10.0s for "わかった" Button to exist
+    t =    17.21s     Checking `Expect predicate `existsNoRetry == 1` for object "わかった" Button`
+    t =    17.21s         Checking existence of `"わかった" Button`
+    t =    19.22s Added attachment named '01-はじめに'
+    t =    19.22s Waiting 10.0s for "わかった" Button to exist
+    t =    20.23s     Checking `Expect predicate `existsNoRetry == 1` for object "わかった" Button`
+    t =    20.23s         Checking existence of `"わかった" Button`
+    t =    20.54s Tap "わかった" Button
+    t =    20.54s     Wait for com.aokijp.goukakulock to idle
+    t =    20.55s     Find the "わかった" Button
+    t =    20.62s     Check for interrupting elements affecting "わかった" Button
+    t =    20.72s     Synthesize event
+    t =    21.24s     Wait for com.aokijp.goukakulock to idle
+    t =    21.81s Waiting 10.0s for "相棒AI" NavigationBar to exist
+    t =    22.82s     Checking `Expect predicate `existsNoRetry == 1` for object "相棒AI" NavigationBar`
+    t =    22.82s         Checking existence of `"相棒AI" NavigationBar`
+    t =    24.19s Added attachment named '02-相棒AI'
+    t =    24.19s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =    24.19s     Wait for com.aokijp.goukakulock to idle
+    t =    24.20s     Find the Target Application 'com.aokijp.goukakulock'
+    t =    24.24s     Check for interrupting elements affecting "合格ロック" Application
+    t =    24.30s     Synthesize event
+    t =    24.73s     Wait for com.aokijp.goukakulock to idle
+    t =    25.19s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =    25.19s     Wait for com.aokijp.goukakulock to idle
+    t =    25.19s     Find the Target Application 'com.aokijp.goukakulock'
+    t =    25.27s     Check for interrupting elements affecting "合格ロック" Application
+    t =    25.35s     Synthesize event
+    t =    25.80s     Wait for com.aokijp.goukakulock to idle
+    t =    26.29s Waiting 3.0s for Any (First Match) to exist
+    t =    27.29s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =    27.30s         Checking existence of `Any (First Match)`
+    t =    28.53s Checking existence of `Any (First Match)`
+    t =    29.02s Tap Any (First Match)[0.50, 0.30]
+    t =    29.02s     Wait for com.aokijp.goukakulock to idle
+    t =    29.02s     Find the Any (First Match)
+    t =    30.91s     Check for interrupting elements affecting "例:英語を勉強している・散歩が好き・いつか一人旅をしたい" TextField
+    t =    31.11s     Synthesize event
+    t =    31.12s         Find the "例:英語を勉強している・散歩が好き・いつか一人旅をしたい" TextField
+    t =    36.19s         Find the "例:英語を勉強している・散歩が好き・いつか一人旅をしたい" TextField
+    t =    39.09s         Find the "例:英語を勉強している・散歩が好き・いつか一人旅をしたい" TextField
+    t =    41.51s     Wait for com.aokijp.goukakulock to idle
+    t =    43.84s Waiting 2.5s for Keyboard (First Match) to exist
+    t =    44.86s     Checking `Expect predicate `existsNoRetry == 1` for object Keyboard (First Match)`
+    t =    44.87s         Checking existence of `Keyboard (First Match)`
+    t =    45.86s Type 'English study. I l...' into Target Application 'com.aokijp.goukakulock'
+    t =    45.87s     Wait for com.aokijp.goukakulock to idle
+    t =    45.96s     Find the Target Application 'com.aokijp.goukakulock'
+    t =    46.28s     Check for interrupting elements affecting "合格ロック" Application
+    t =    47.06s     Synthesize event
+    t =    47.06s         Get number of matches for: Elements containing elements matching predicate 'hasKeyboardFocus == 1'
+    t =    47.95s     Wait for com.aokijp.goukakulock to idle
+    t =    48.92s Added attachment named '02-相棒AI-あなたのこと'
+    t =    48.92s Checking existence of `"相棒AI" NavigationBar`
+    t =    49.00s Waiting 10.0s for "次へ" Button to exist
+    t =    50.01s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    50.01s         Checking existence of `"次へ" Button`
+    t =    50.11s Tap "次へ" Button
+    t =    50.11s     Wait for com.aokijp.goukakulock to idle
+    t =    50.11s     Find the "次へ" Button
+    t =    50.21s     Check for interrupting elements affecting "次へ" Button
+    t =    50.28s     Synthesize event
+    t =    50.60s     Wait for com.aokijp.goukakulock to idle
+    t =    50.65s Waiting 10.0s for "許可なしで進む(デバッグ)" Button to exist
+    t =    51.69s     Checking `Expect predicate `existsNoRetry == 1` for object "許可なしで進む(デバッグ)" Button`
+    t =    51.70s         Checking existence of `"許可なしで進む(デバッグ)" Button`
+    t =    52.70s Added attachment named '03-ScreenTimeの許可'
+    t =    52.70s Waiting 10.0s for "許可なしで進む(デバッグ)" Button to exist
+    t =    53.76s     Checking `Expect predicate `existsNoRetry == 1` for object "許可なしで進む(デバッグ)" Button`
+    t =    53.76s         Checking existence of `"許可なしで進む(デバッグ)" Button`
+    t =    54.09s Tap "許可なしで進む(デバッグ)" Button
+    t =    54.09s     Wait for com.aokijp.goukakulock to idle
+    t =    54.09s     Find the "許可なしで進む(デバッグ)" Button
+    t =    54.28s     Check for interrupting elements affecting "許可なしで進む(デバッグ)" Button
+    t =    54.42s     Synthesize event
+    t =    54.79s     Wait for com.aokijp.goukakulock to idle
+    t =    55.20s Waiting 10.0s for "通知を許可する" Button to exist
+    t =    56.23s     Checking `Expect predicate `existsNoRetry == 1` for object "通知を許可する" Button`
+    t =    56.23s         Checking existence of `"通知を許可する" Button`
+    t =    57.25s Added attachment named '04-通知'
+    t =    57.25s Waiting 10.0s for "次へ" Button to exist
+    t =    58.28s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    58.28s         Checking existence of `"次へ" Button`
+    t =    58.31s Tap "次へ" Button
+    t =    58.31s     Wait for com.aokijp.goukakulock to idle
+    t =    58.31s     Find the "次へ" Button
+    t =    58.38s     Check for interrupting elements affecting "次へ" Button
+    t =    58.51s     Synthesize event
+    t =    58.96s     Wait for com.aokijp.goukakulock to idle
+    t =    59.11s Waiting 10.0s for "対象を選ばずに進む(デバッグ)" Button to exist
+    t =    60.16s     Checking `Expect predicate `existsNoRetry == 1` for object "対象を選ばずに進む(デバッグ)" Button`
+    t =    60.16s         Checking existence of `"対象を選ばずに進む(デバッグ)" Button`
+    t =    61.25s Added attachment named '05-ロック対象'
+    t =    61.25s Waiting 10.0s for "対象を選ばずに進む(デバッグ)" Button to exist
+    t =    62.28s     Checking `Expect predicate `existsNoRetry == 1` for object "対象を選ばずに進む(デバッグ)" Button`
+    t =    62.28s         Checking existence of `"対象を選ばずに進む(デバッグ)" Button`
+    t =    62.57s Tap "対象を選ばずに進む(デバッグ)" Button
+    t =    62.57s     Wait for com.aokijp.goukakulock to idle
+    t =    62.58s     Find the "対象を選ばずに進む(デバッグ)" Button
+    t =    62.71s     Check for interrupting elements affecting "対象を選ばずに進む(デバッグ)" Button
+    t =    62.87s     Synthesize event
+    t =    63.26s     Wait for com.aokijp.goukakulock to idle
+    t =    63.43s Waiting 10.0s for "次へ" Button to exist
+    t =    64.46s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    64.46s         Checking existence of `"次へ" Button`
+    t =    65.60s Added attachment named '06-時刻とモード'
+    t =    65.60s Waiting 10.0s for "次へ" Button to exist
+    t =    66.63s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    66.63s         Checking existence of `"次へ" Button`
+    t =    66.70s Tap "次へ" Button
+    t =    66.70s     Wait for com.aokijp.goukakulock to idle
+    t =    66.70s     Find the "次へ" Button
+    t =    66.82s     Check for interrupting elements affecting "次へ" Button
+    t =    66.91s     Synthesize event
+    t =    67.26s     Wait for com.aokijp.goukakulock to idle
+    t =    67.53s Waiting 10.0s for "次へ" Button to exist
+    t =    68.58s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    68.58s         Checking existence of `"次へ" Button`
+    t =    70.49s Added attachment named '07-最初のコミット'
+    t =    70.49s Waiting 10.0s for "次へ" Button to exist
+    t =    71.53s     Checking `Expect predicate `existsNoRetry == 1` for object "次へ" Button`
+    t =    71.53s         Checking existence of `"次へ" Button`
+    t =    71.68s Tap "次へ" Button
+    t =    71.68s     Wait for com.aokijp.goukakulock to idle
+    t =    71.69s     Find the "次へ" Button
+    t =    71.83s     Check for interrupting elements affecting "次へ" Button
+    t =    71.98s     Synthesize event
+    t =    72.31s     Wait for com.aokijp.goukakulock to idle
+    t =    72.32s Waiting 10.0s for "start.now" Button to exist
+    t =    73.34s     Checking `Expect predicate `existsNoRetry == 1` for object "start.now" Button`
+    t =    73.35s         Checking existence of `"start.now" Button`
+    t =    74.61s Added attachment named '08-開始'
+    t =    74.61s Waiting 10.0s for "start.now" Button to exist
+    t =    75.64s     Checking `Expect predicate `existsNoRetry == 1` for object "start.now" Button`
+    t =    75.64s         Checking existence of `"start.now" Button`
+    t =    75.79s Tap "start.now" Button
+    t =    75.79s     Wait for com.aokijp.goukakulock to idle
+    t =    75.79s     Find the "start.now" Button
+    t =    76.08s     Check for interrupting elements affecting "start.now" Button
+    t =    76.23s     Synthesize event
+    t =    76.71s     Wait for com.aokijp.goukakulock to idle
+    t =    77.10s Waiting 10.0s for "今すぐ始める" Button to exist
+    t =    78.13s     Checking `Expect predicate `existsNoRetry == 1` for object "今すぐ始める" Button`
+    t =    78.13s         Checking existence of `"今すぐ始める" Button`
+    t =    78.32s Tap "今すぐ始める" Button
+    t =    78.32s     Wait for com.aokijp.goukakulock to idle
+    t =    78.34s     Find the "今すぐ始める" Button
+    t =    78.59s     Check for interrupting elements affecting "今すぐ始める" Button
+    t =    78.76s     Synthesize event
+    t =    79.10s     Wait for com.aokijp.goukakulock to idle
+    t =    79.71s Waiting 10.0s for "はじめる" Button to exist
+    t =    80.73s     Checking `Expect predicate `existsNoRetry == 1` for object "はじめる" Button`
+    t =    80.73s         Checking existence of `"はじめる" Button`
+    t =    81.84s Added attachment named '09-置き場所'
+    t =    81.85s Waiting 10.0s for "はじめる" Button to exist
+    t =    82.89s     Checking `Expect predicate `existsNoRetry == 1` for object "はじめる" Button`
+    t =    82.89s         Checking existence of `"はじめる" Button`
+    t =    82.97s Tap "はじめる" Button
+    t =    82.97s     Wait for com.aokijp.goukakulock to idle
+    t =    82.97s     Find the "はじめる" Button
+    t =    83.02s     Check for interrupting elements affecting "はじめる" Button
+    t =    83.09s     Synthesize event
+    t =    83.40s     Wait for com.aokijp.goukakulock to idle
+    t =    85.67s Waiting 15.0s for "チェックイン" Button to exist
+    t =    86.73s     Checking `Expect predicate `existsNoRetry == 1` for object "チェックイン" Button`
+    t =    86.73s         Checking existence of `"チェックイン" Button`
+    t =    88.10s Added attachment named '10-ホーム-未達成'
+    t =    88.10s Checking existence of `"companion.reframe" Button`
+    t =    88.35s Find the "companion.reframe" Button
+    t =    88.59s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =    88.60s     Wait for com.aokijp.goukakulock to idle
+    t =    88.60s     Find the Target Application 'com.aokijp.goukakulock'
+    t =    88.71s     Check for interrupting elements affecting "合格ロック" Application
+    t =    88.84s     Synthesize event
+    t =    89.28s     Wait for com.aokijp.goukakulock to idle
+    t =    91.15s Checking existence of `"companion.reframe" Button`
+    t =    91.53s Find the "companion.reframe" Button
+    t =    92.01s Checking existence of `"companion.reframe" Button`
+    t =    92.30s Waiting 10.0s for "companion.reframe" Button to exist
+    t =    93.33s     Checking `Expect predicate `existsNoRetry == 1` for object "companion.reframe" Button`
+    t =    93.33s         Checking existence of `"companion.reframe" Button`
+    t =    93.61s Tap "companion.reframe" Button
+    t =    93.61s     Wait for com.aokijp.goukakulock to idle
+    t =    93.61s     Find the "companion.reframe" Button
+    t =    93.91s     Check for interrupting elements affecting "companion.reframe" Button
+    t =    94.10s     Synthesize event
+    t =    94.42s     Wait for com.aokijp.goukakulock to idle
+    t =    94.46s Waiting 20.0s for Any (First Match) to exist
+    t =    95.49s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =    95.49s         Checking existence of `Any (First Match)`
+    t =    98.54s Added attachment named '11-ホーム-相棒から'
+    t =    98.54s Swipe down Target Application 'com.aokijp.goukakulock'
+    t =    98.54s     Wait for com.aokijp.goukakulock to idle
+    t =    98.55s     Find the Target Application 'com.aokijp.goukakulock'
+    t =    98.73s     Check for interrupting elements affecting "合格ロック" Application
+    t =    98.85s     Synthesize event
+    t =    99.35s     Wait for com.aokijp.goukakulock to idle
+    t =   100.76s Waiting 10.0s for "チェックイン" Button to exist
+    t =   101.79s     Checking `Expect predicate `existsNoRetry == 1` for object "チェックイン" Button`
+    t =   101.80s         Checking existence of `"チェックイン" Button`
+    t =   101.98s Tap "チェックイン" Button
+    t =   101.99s     Wait for com.aokijp.goukakulock to idle
+    t =   101.99s     Find the "チェックイン" Button
+    t =   102.22s     Check for interrupting elements affecting "チェックイン" Button
+    t =   102.43s     Synthesize event
+    t =   102.78s     Wait for com.aokijp.goukakulock to idle
+    t =   103.52s Waiting 10.0s for Any (First Match) to exist
+    t =   104.56s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   104.57s         Checking existence of `Any (First Match)`
+    t =   106.48s Checking existence of `Any (First Match)`
+    t =   107.00s Tap Any (First Match)[0.50, 0.30]
+    t =   107.00s     Wait for com.aokijp.goukakulock to idle
+    t =   107.00s     Find the Any (First Match)
+    t =   107.54s     Check for interrupting elements affecting "例:単語20個、自作テストで8割" TextField
+    t =   107.85s     Synthesize event
+    t =   107.86s         Find the "例:単語20個、自作テストで8割" TextField
+    t =   108.59s         Find the "例:単語20個、自作テストで8割" TextField
+    t =   109.14s         Find the "例:単語20個、自作テストで8割" TextField
+    t =   110.00s     Wait for com.aokijp.goukakulock to idle
+    t =   110.01s Waiting 2.5s for Keyboard (First Match) to exist
+    t =   111.06s     Checking `Expect predicate `existsNoRetry == 1` for object Keyboard (First Match)`
+    t =   111.07s         Checking existence of `Keyboard (First Match)`
+    t =   111.56s Type 'Did 20 words. Self...' into Target Application 'com.aokijp.goukakulock'
+    t =   111.56s     Wait for com.aokijp.goukakulock to idle
+    t =   111.57s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   111.89s     Check for interrupting elements affecting "合格ロック" Application
+    t =   112.17s     Synthesize event
+    t =   112.18s         Get number of matches for: Elements containing elements matching predicate 'hasKeyboardFocus == 1'
+    t =   113.33s     Wait for com.aokijp.goukakulock to idle
+    t =   114.88s Added attachment named '12-チェックイン'
+    t =   114.88s Waiting 10.0s for "記録する" Button to exist
+    t =   115.93s     Checking `Expect predicate `existsNoRetry == 1` for object "記録する" Button`
+    t =   115.93s         Checking existence of `"記録する" Button`
+    t =   116.22s Tap "記録する" Button
+    t =   116.22s     Wait for com.aokijp.goukakulock to idle
+    t =   116.23s     Find the "記録する" Button
+    t =   116.57s     Check for interrupting elements affecting "記録する" Button
+    t =   116.80s     Synthesize event
+    t =   117.14s     Wait for com.aokijp.goukakulock to idle
+    t =   117.93s Waiting 10.0s for "記録しました" StaticText to exist
+    t =   118.94s     Checking `Expect predicate `existsNoRetry == 1` for object "記録しました" StaticText`
+    t =   118.94s         Checking existence of `"記録しました" StaticText`
+    t =   120.00s Waiting 20.0s for Any (First Match) to exist
+    t =   121.05s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   121.05s         Checking existence of `Any (First Match)`
+    t =   122.37s Added attachment named '13-記録しました-相棒'
+    t =   122.37s Waiting 10.0s for "閉じる" Button to exist
+    t =   123.41s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   123.41s         Checking existence of `"閉じる" Button`
+    t =   123.54s Tap "閉じる" Button
+    t =   123.54s     Wait for com.aokijp.goukakulock to idle
+    t =   123.54s     Find the "閉じる" Button
+    t =   123.64s     Check for interrupting elements affecting "閉じる" Button
+    t =   123.85s     Synthesize event
+    t =   123.88s         Scroll element to visible
+    t =   123.89s         Find the "閉じる" Button
+    t =   124.11s         Computed hit point {-1, -1} after scrolling to visible
+    t =   124.44s     Wait for com.aokijp.goukakulock to idle
+    t =   124.54s Waiting 8.0s for "はじめての合格" StaticText to exist
+    t =   125.59s     Checking `Expect predicate `existsNoRetry == 1` for object "はじめての合格" StaticText`
+    t =   125.60s         Checking existence of `"はじめての合格" StaticText`
+    t =   128.40s Added attachment named '14-はじめての合格'
+    t =   128.40s Waiting 10.0s for "閉じる" Button to exist
+    t =   129.46s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   129.46s         Checking existence of `"閉じる" Button`
+    t =   129.65s Tap "閉じる" Button
+    t =   129.65s     Wait for com.aokijp.goukakulock to idle
+    t =   129.65s     Find the "閉じる" Button
+    t =   129.71s     Check for interrupting elements affecting "閉じる" Button
+    t =   129.87s     Synthesize event
+    t =   130.19s     Wait for com.aokijp.goukakulock to idle
+    t =   130.91s Waiting 10.0s for "緊急解除" Button to exist
+    t =   131.93s     Checking `Expect predicate `existsNoRetry == 1` for object "緊急解除" Button`
+    t =   131.93s         Checking existence of `"緊急解除" Button`
+    t =   133.22s Added attachment named '15-ホーム-達成'
+    t =   133.22s Waiting 3.0s for "deposit.home" Button to exist
+    t =   134.26s     Checking `Expect predicate `existsNoRetry == 1` for object "deposit.home" Button`
+    t =   134.26s         Checking existence of `"deposit.home" Button`
+    t =   134.56s Checking existence of `"deposit.home" Button`
+    t =   135.03s Find the "deposit.home" Button
+    t =   135.29s Checking existence of `"deposit.home" Button`
+    t =   136.82s Added attachment named '16-ホーム-預け金'
+    t =   136.83s Waiting 10.0s for "体験" Button to exist
+    t =   137.86s     Checking `Expect predicate `existsNoRetry == 1` for object "体験" Button`
+    t =   137.86s         Checking existence of `"体験" Button`
+    t =   138.09s Tap "体験" Button
+    t =   138.10s     Wait for com.aokijp.goukakulock to idle
+    t =   138.10s     Find the "体験" Button
+    t =   138.32s     Check for interrupting elements affecting "sparkles" Button
+    t =   138.49s     Synthesize event
+    t =   138.86s     Wait for com.aokijp.goukakulock to idle
+    t =   141.11s Waiting 10.0s for "companion.suggest" Button to exist
+    t =   142.13s     Checking `Expect predicate `existsNoRetry == 1` for object "companion.suggest" Button`
+    t =   142.13s         Checking existence of `"companion.suggest" Button`
+    t =   143.39s Added attachment named '20-体験'
+    t =   143.40s Waiting 10.0s for "companion.suggest" Button to exist
+    t =   144.41s     Checking `Expect predicate `existsNoRetry == 1` for object "companion.suggest" Button`
+    t =   144.41s         Checking existence of `"companion.suggest" Button`
+    t =   144.55s Tap "companion.suggest" Button
+    t =   144.55s     Wait for com.aokijp.goukakulock to idle
+    t =   144.56s     Find the "companion.suggest" Button
+    t =   144.77s     Check for interrupting elements affecting "companion.suggest" Button
+    t =   144.87s     Synthesize event
+    t =   145.20s     Wait for com.aokijp.goukakulock to idle
+    t =   146.94s Waiting 30.0s for "やってみる" Button to exist
+    t =   147.95s     Checking `Expect predicate `existsNoRetry == 1` for object "やってみる" Button`
+    t =   147.95s         Checking existence of `"やってみる" Button`
+    t =   148.40s Waiting 30.0s for Button (Element at index 2) to exist
+    t =   149.43s     Checking `Expect predicate `existsNoRetry == 1` for object Button (Element at index 2)`
+    t =   149.43s         Checking existence of `Button (Element at index 2)`
+    t =   151.65s Added attachment named '21-体験-見つけた'
+    t =   151.65s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   151.65s     Wait for com.aokijp.goukakulock to idle
+    t =   151.66s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   151.74s     Check for interrupting elements affecting "合格ロック" Application
+    t =   151.83s     Synthesize event
+    t =   152.29s     Wait for com.aokijp.goukakulock to idle
+    t =   155.91s Added attachment named '22-体験-見つけた-下'
+    t =   155.91s Checking existence of `NavigationBar (First Match)`
+    t =   156.01s Find the NavigationBar (First Match)
+    t =   156.06s Checking existence of `TabBar (First Match)`
+    t =   156.09s Find the TabBar (First Match)
+    t =   156.14s Get all elements bound by index for: Elements matching predicate 'label == "やってみる"'
+    t =   156.25s Checking existence of `Button (Element at index 0)`
+    t =   156.34s Find the Button (Element at index 0)
+    t =   156.51s Checking existence of `Button (Element at index 1)`
+    t =   156.60s Find the Button (Element at index 1)
+    t =   156.77s Find the "やってみる" Button
+    t =   156.88s Find the "やってみる" Button
+    t =   157.01s Waiting 10.0s for "やってみる" Button to exist
+    t =   158.06s     Checking `Expect predicate `existsNoRetry == 1` for object "やってみる" Button`
+    t =   158.06s         Checking existence of `"やってみる" Button`
+    t =   158.20s Tap "やってみる" Button
+    t =   158.20s     Wait for com.aokijp.goukakulock to idle
+    t =   158.20s     Find the "やってみる" Button
+    t =   158.32s     Check for interrupting elements affecting "やってみる" Button
+    t =   158.42s     Synthesize event
+    t =   158.74s     Wait for com.aokijp.goukakulock to idle
+    t =   158.75s Checking existence of `"やってみた" Button`
+    t =   159.16s Find the "やってみた" Button
+    t =   159.80s Checking existence of `"やってみた" Button`
+    t =   161.08s Added attachment named '23-体験-やってみる'
+    t =   161.08s Waiting 10.0s for "やってみた" Button to exist
+    t =   162.13s     Checking `Expect predicate `existsNoRetry == 1` for object "やってみた" Button`
+    t =   162.13s         Checking existence of `"やってみた" Button`
+    t =   168.26s Tap "やってみた" Button
+    t =   168.26s     Wait for com.aokijp.goukakulock to idle
+    t =   168.27s     Find the "やってみた" Button
+    t =   168.70s     Check for interrupting elements affecting "やってみた" Button
+    t =   168.85s     Synthesize event
+    t =   169.19s     Wait for com.aokijp.goukakulock to idle
+    t =   169.86s Waiting 10.0s for Button (First Match) to exist
+    t =   170.91s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =   170.91s         Checking existence of `Button (First Match)`
+    t =   171.18s Tap Button (First Match)
+    t =   171.18s     Wait for com.aokijp.goukakulock to idle
+    t =   171.18s     Find the Button (First Match)
+    t =   171.44s     Check for interrupting elements affecting "おだやか" Button
+    t =   171.58s     Synthesize event
+    t =   171.88s     Wait for com.aokijp.goukakulock to idle
+    t =   171.89s Waiting 10.0s for Any (First Match) to exist
+    t =   172.91s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   172.91s         Checking existence of `Any (First Match)`
+    t =   173.95s Checking existence of `Any (First Match)`
+    t =   174.20s Tap Any (First Match)[0.50, 0.30]
+    t =   174.20s     Wait for com.aokijp.goukakulock to idle
+    t =   174.21s     Find the Any (First Match)
+    t =   174.47s     Check for interrupting elements affecting "例:空の色がオレンジから紫に変わった" TextField
+    t =   174.63s     Synthesize event
+    t =   174.64s         Find the "例:空の色がオレンジから紫に変わった" TextField
+    t =   175.04s         Find the "例:空の色がオレンジから紫に変わった" TextField
+    t =   175.31s         Find the "例:空の色がオレンジから紫に変わった" TextField
+    t =   175.85s     Wait for com.aokijp.goukakulock to idle
+    t =   176.35s Waiting 2.5s for Keyboard (First Match) to exist
+    t =   177.40s     Checking `Expect predicate `existsNoRetry == 1` for object Keyboard (First Match)`
+    t =   177.40s         Checking existence of `Keyboard (First Match)`
+    t =   177.44s Type 'The sky turned ora...' into Target Application 'com.aokijp.goukakulock'
+    t =   177.44s     Wait for com.aokijp.goukakulock to idle
+    t =   177.44s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   177.66s     Check for interrupting elements affecting "合格ロック" Application
+    t =   177.84s     Synthesize event
+    t =   177.84s         Get number of matches for: Elements containing elements matching predicate 'hasKeyboardFocus == 1'
+    t =   178.76s     Wait for com.aokijp.goukakulock to idle
+    t =   179.95s Added attachment named '24-やってみた'
+    t =   179.95s Waiting 10.0s for "記録する" Button to exist
+    t =   181.02s     Checking `Expect predicate `existsNoRetry == 1` for object "記録する" Button`
+    t =   181.02s         Checking existence of `"記録する" Button`
+    t =   181.34s Tap "記録する" Button
+    t =   181.34s     Wait for com.aokijp.goukakulock to idle
+    t =   181.36s     Find the "記録する" Button
+    t =   181.70s     Check for interrupting elements affecting "記録する" Button
+    t =   181.91s     Synthesize event
+    t =   182.25s     Wait for com.aokijp.goukakulock to idle
+    t =   182.50s Waiting 10.0s for "体験の地図に、ひとつ増えました" StaticText to exist
+    t =   183.59s     Checking `Expect predicate `existsNoRetry == 1` for object "体験の地図に、ひとつ増えました" StaticText`
+    t =   183.59s         Checking existence of `"体験の地図に、ひとつ増えました" StaticText`
+    t =   184.93s Waiting 20.0s for "覚えてもらう" Button to exist
+    t =   185.96s     Checking `Expect predicate `existsNoRetry == 1` for object "覚えてもらう" Button`
+    t =   185.96s         Checking existence of `"覚えてもらう" Button`
+    t =   187.32s Added attachment named '25-相棒の返事'
+    t =   187.33s Get all elements bound by index for: Elements matching predicate 'label == "覚えてもらう"'
+    t =   187.57s Checking existence of `Button (Element at index 0)`
+    t =   187.74s Find the Button (Element at index 0)
+    t =   187.92s Waiting 10.0s for "覚えてもらう" Button to exist
+    t =   188.96s     Checking `Expect predicate `existsNoRetry == 1` for object "覚えてもらう" Button`
+    t =   188.96s         Checking existence of `"覚えてもらう" Button`
+    t =   189.13s Tap "覚えてもらう" Button
+    t =   189.13s     Wait for com.aokijp.goukakulock to idle
+    t =   189.13s     Find the "覚えてもらう" Button
+    t =   189.26s     Check for interrupting elements affecting "覚えてもらう" Button
+    t =   189.38s     Synthesize event
+    t =   189.74s     Wait for com.aokijp.goukakulock to idle
+    t =   189.75s Waiting 10.0s for "閉じる" Button to exist
+    t =   190.79s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   190.79s         Checking existence of `"閉じる" Button`
+    t =   190.93s Tap "閉じる" Button
+    t =   190.93s     Wait for com.aokijp.goukakulock to idle
+    t =   190.93s     Find the "閉じる" Button
+    t =   191.10s     Check for interrupting elements affecting "閉じる" Button
+    t =   191.26s     Synthesize event
+    t =   191.59s     Wait for com.aokijp.goukakulock to idle
+    t =   192.44s Checking existence of `Button (First Match)`
+    t =   192.78s Find the Button (First Match)
+    t =   193.13s Checking existence of `"相棒と話す、どんな体験をしてみたいか、話しながら考える" Button`
+    t =   193.41s Waiting 10.0s for Button (First Match) to exist
+    t =   194.46s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =   194.46s         Checking existence of `Button (First Match)`
+    t =   194.60s Tap Button (First Match)
+    t =   194.60s     Wait for com.aokijp.goukakulock to idle
+    t =   194.61s     Find the Button (First Match)
+    t =   194.72s     Check for interrupting elements affecting "相棒と話す、どんな体験をしてみたいか、話しながら考える" Button
+    t =   194.85s     Synthesize event
+    t =   195.16s     Wait for com.aokijp.goukakulock to idle
+    t =   195.33s Waiting 10.0s for "この週末、何をしてみよう" Button to exist
+    t =   196.39s     Checking `Expect predicate `existsNoRetry == 1` for object "この週末、何をしてみよう" Button`
+    t =   196.40s         Checking existence of `"この週末、何をしてみよう" Button`
+    t =   197.87s Added attachment named '26-相棒と話す'
+    t =   197.88s Waiting 10.0s for "この週末、何をしてみよう" Button to exist
+    t =   198.93s     Checking `Expect predicate `existsNoRetry == 1` for object "この週末、何をしてみよう" Button`
+    t =   198.93s         Checking existence of `"この週末、何をしてみよう" Button`
+    t =   199.05s Tap "この週末、何をしてみよう" Button
+    t =   199.05s     Wait for com.aokijp.goukakulock to idle
+    t =   199.05s     Find the "この週末、何をしてみよう" Button
+    t =   199.14s     Check for interrupting elements affecting "この週末、何をしてみよう" Button
+    t =   199.21s     Synthesize event
+    t =   199.54s     Wait for com.aokijp.goukakulock to idle
+    t =   199.56s Waiting 20.0s for Any (First Match) to exist
+    t =   200.59s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   200.59s         Checking existence of `Any (First Match)`
+    t =   201.83s Added attachment named '27-相棒と話す-返事'
+    t =   201.83s Tap Button (Element at index 0)
+    t =   201.83s     Wait for com.aokijp.goukakulock to idle
+    t =   201.83s     Find the Button (Element at index 0)
+    t =   201.93s     Check for interrupting elements affecting "BackButton" Button
+    t =   202.01s     Synthesize event
+    t =   202.33s     Wait for com.aokijp.goukakulock to idle
+    t =   203.07s Waiting 10.0s for Button (First Match) to exist
+    t =   204.14s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =   204.15s         Checking existence of `Button (First Match)`
+    t =   204.29s Tap Button (First Match)
+    t =   204.29s     Wait for com.aokijp.goukakulock to idle
+    t =   204.29s     Find the Button (First Match)
+    t =   204.48s     Check for interrupting elements affecting "いつかの体験、人生のどこかで味わってみたいことを集める" Button
+    t =   204.58s     Synthesize event
+    t =   204.62s         Scroll element to visible
+    t =   204.62s         Find the "いつかの体験、人生のどこかで味わってみたいことを集める" Button
+    t =   204.88s         Computed hit point {201, 638} after scrolling to visible
+    t =   205.19s     Wait for com.aokijp.goukakulock to idle
+    t =   206.19s Waiting 10.0s for "いつかの体験を考える" Button to exist
+    t =   207.26s     Checking `Expect predicate `existsNoRetry == 1` for object "いつかの体験を考える" Button`
+    t =   207.26s         Checking existence of `"いつかの体験を考える" Button`
+    t =   207.38s Tap "いつかの体験を考える" Button
+    t =   207.38s     Wait for com.aokijp.goukakulock to idle
+    t =   207.38s     Find the "いつかの体験を考える" Button
+    t =   207.44s     Check for interrupting elements affecting "いつかの体験を考える" Button
+    t =   207.50s     Synthesize event
+    t =   207.85s     Wait for com.aokijp.goukakulock to idle
+    t =   207.90s Waiting 30.0s for "とっておく" Button to exist
+    t =   208.94s     Checking `Expect predicate `existsNoRetry == 1` for object "とっておく" Button`
+    t =   208.94s         Checking existence of `"とっておく" Button`
+    t =   209.13s Waiting 30.0s for Button (Element at index 2) to exist
+    t =   210.16s     Checking `Expect predicate `existsNoRetry == 1` for object Button (Element at index 2)`
+    t =   210.16s         Checking existence of `Button (Element at index 2)`
+    t =   211.20s Added attachment named '28-いつかの体験'
+    t =   211.21s Waiting 10.0s for "とっておく" Button to exist
+    t =   212.22s     Checking `Expect predicate `existsNoRetry == 1` for object "とっておく" Button`
+    t =   212.22s         Checking existence of `"とっておく" Button`
+    t =   212.40s Tap "とっておく" Button
+    t =   212.40s     Wait for com.aokijp.goukakulock to idle
+    t =   212.40s     Find the "とっておく" Button
+    t =   212.56s     Check for interrupting elements affecting "とっておく" Button
+    t =   212.66s     Synthesize event
+    t =   212.98s     Wait for com.aokijp.goukakulock to idle
+    t =   213.01s Tap Button (Element at index 0)
+    t =   213.01s     Wait for com.aokijp.goukakulock to idle
+    t =   213.01s     Find the Button (Element at index 0)
+    t =   213.22s     Check for interrupting elements affecting "BackButton" Button
+    t =   213.42s     Synthesize event
+    t =   213.86s     Wait for com.aokijp.goukakulock to idle
+    t =   214.77s Waiting 10.0s for Button (First Match) to exist
+    t =   215.79s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =   215.79s         Checking existence of `Button (First Match)`
+    t =   216.02s Tap Button (First Match)
+    t =   216.02s     Wait for com.aokijp.goukakulock to idle
+    t =   216.02s     Find the Button (First Match)
+    t =   216.26s     Check for interrupting elements affecting "育ち、体験の地図 1/8・相棒の理解「はじめまして」" Button
+    t =   216.37s     Synthesize event
+    t =   216.70s     Wait for com.aokijp.goukakulock to idle
+    t =   216.85s Waiting 10.0s for "育ち" NavigationBar to exist
+    t =   217.90s     Checking `Expect predicate `existsNoRetry == 1` for object "育ち" NavigationBar`
+    t =   217.90s         Checking existence of `"育ち" NavigationBar`
+    t =   219.19s Added attachment named '29-育ち'
+    t =   219.19s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   219.19s     Wait for com.aokijp.goukakulock to idle
+    t =   219.19s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   219.28s     Check for interrupting elements affecting "合格ロック" Application
+    t =   219.36s     Synthesize event
+    t =   219.80s     Wait for com.aokijp.goukakulock to idle
+    t =   221.59s Added attachment named '30-育ち-下'
+    t =   221.59s Tap Button (Element at index 0)
+    t =   221.59s     Wait for com.aokijp.goukakulock to idle
+    t =   221.83s     Find the Button (Element at index 0)
+    t =   221.96s     Check for interrupting elements affecting "BackButton" Button
+    t =   222.08s     Synthesize event
+    t =   222.42s     Wait for com.aokijp.goukakulock to idle
+    t =   223.37s Swipe down Target Application 'com.aokijp.goukakulock'
+    t =   223.37s     Wait for com.aokijp.goukakulock to idle
+    t =   223.39s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   223.58s     Check for interrupting elements affecting "合格ロック" Application
+    t =   223.71s     Synthesize event
+    t =   224.20s     Wait for com.aokijp.goukakulock to idle
+    t =   227.21s Waiting 10.0s for "AI" Button to exist
+    t =   228.24s     Checking `Expect predicate `existsNoRetry == 1` for object "AI" Button`
+    t =   228.24s         Checking existence of `"AI" Button`
+    t =   228.41s Tap "AI" Button
+    t =   228.41s     Wait for com.aokijp.goukakulock to idle
+    t =   228.42s     Find the "AI" Button
+    t =   228.62s     Check for interrupting elements affecting "AI" Button
+    t =   228.74s     Synthesize event
+    t =   229.07s     Wait for com.aokijp.goukakulock to idle
+    t =   230.41s Waiting 10.0s for "AI" NavigationBar to exist
+    t =   231.42s     Checking `Expect predicate `existsNoRetry == 1` for object "AI" NavigationBar`
+    t =   231.42s         Checking existence of `"AI" NavigationBar`
+    t =   232.64s Added attachment named '31-AIの設定'
+    t =   232.65s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   232.65s     Wait for com.aokijp.goukakulock to idle
+    t =   232.65s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   232.74s     Check for interrupting elements affecting "合格ロック" Application
+    t =   232.85s     Synthesize event
+    t =   233.30s     Wait for com.aokijp.goukakulock to idle
+    t =   236.48s Added attachment named '32-AIの設定-モデル'
+    t =   236.48s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   236.48s     Wait for com.aokijp.goukakulock to idle
+    t =   236.67s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   236.76s     Check for interrupting elements affecting "合格ロック" Application
+    t =   236.86s     Synthesize event
+    t =   237.30s     Wait for com.aokijp.goukakulock to idle
+    t =   241.50s Added attachment named '33-AIの設定-下'
+    t =   241.50s Tap Button (Element at index 0)
+    t =   241.50s     Wait for com.aokijp.goukakulock to idle
+    t =   241.50s     Find the Button (Element at index 0)
+    t =   241.63s     Check for interrupting elements affecting "BackButton" Button
+    t =   241.74s     Synthesize event
+    t =   242.05s     Wait for com.aokijp.goukakulock to idle
+    t =   242.95s Waiting 10.0s for "今日" Button to exist
+    t =   243.98s     Checking `Expect predicate `existsNoRetry == 1` for object "今日" Button`
+    t =   243.98s         Checking existence of `"今日" Button`
+    t =   244.08s Tap "今日" Button
+    t =   244.08s     Wait for com.aokijp.goukakulock to idle
+    t =   244.08s     Find the "今日" Button
+    t =   244.17s     Check for interrupting elements affecting "checkmark.seal" Button
+    t =   244.24s     Synthesize event
+    t =   244.54s     Wait for com.aokijp.goukakulock to idle
+    t =   246.17s Checking existence of `"合格証をつくる" Button`
+    t =   246.37s Find the "合格証をつくる" Button
+    t =   246.61s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   246.61s     Wait for com.aokijp.goukakulock to idle
+    t =   246.61s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   246.71s     Check for interrupting elements affecting "合格ロック" Application
+    t =   246.82s     Synthesize event
+    t =   247.28s     Wait for com.aokijp.goukakulock to idle
+    t =   249.38s Checking existence of `"合格証をつくる" Button`
+    t =   249.58s Find the "合格証をつくる" Button
+    t =   249.80s Checking existence of `"合格証をつくる" Button`
+    t =   249.97s Waiting 10.0s for "合格証をつくる" Button to exist
+    t =   251.00s     Checking `Expect predicate `existsNoRetry == 1` for object "合格証をつくる" Button`
+    t =   251.00s         Checking existence of `"合格証をつくる" Button`
+    t =   251.25s Tap "合格証をつくる" Button
+    t =   251.25s     Wait for com.aokijp.goukakulock to idle
+    t =   251.26s     Find the "合格証をつくる" Button
+    t =   251.44s     Check for interrupting elements affecting "合格証をつくる" Button
+    t =   251.57s     Synthesize event
+    t =   251.89s     Wait for com.aokijp.goukakulock to idle
+    t =   252.31s Waiting 10.0s for "合格証" NavigationBar to exist
+    t =   253.33s     Checking `Expect predicate `existsNoRetry == 1` for object "合格証" NavigationBar`
+    t =   253.33s         Checking existence of `"合格証" NavigationBar`
+    t =   254.53s Added attachment named '34-合格証'
+    t =   254.53s Waiting 10.0s for "閉じる" Button to exist
+    t =   255.54s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   255.55s         Checking existence of `"閉じる" Button`
+    t =   255.68s Tap "閉じる" Button
+    t =   255.68s     Wait for com.aokijp.goukakulock to idle
+    t =   255.68s     Find the "閉じる" Button
+    t =   255.79s     Check for interrupting elements affecting "閉じる" Button
+    t =   255.96s     Synthesize event
+    t =   256.30s     Wait for com.aokijp.goukakulock to idle
+    t =   257.15s Swipe down Target Application 'com.aokijp.goukakulock'
+    t =   257.15s     Wait for com.aokijp.goukakulock to idle
+    t =   257.16s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   257.32s     Check for interrupting elements affecting "合格ロック" Application
+    t =   257.42s     Synthesize event
+    t =   257.88s     Wait for com.aokijp.goukakulock to idle
+    t =   259.64s Swipe down Target Application 'com.aokijp.goukakulock'
+    t =   259.64s     Wait for com.aokijp.goukakulock to idle
+    t =   259.65s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   259.78s     Check for interrupting elements affecting "合格ロック" Application
+    t =   259.90s     Synthesize event
+    t =   260.35s     Wait for com.aokijp.goukakulock to idle
+    t =   261.36s Waiting 10.0s for "コミット" Button to exist
+    t =   262.41s     Checking `Expect predicate `existsNoRetry == 1` for object "コミット" Button`
+    t =   262.41s         Checking existence of `"コミット" Button`
+    t =   262.60s Tap "コミット" Button
+    t =   262.60s     Wait for com.aokijp.goukakulock to idle
+    t =   262.60s     Find the "コミット" Button
+    t =   262.80s     Check for interrupting elements affecting "コミット" Button
+    t =   262.92s     Synthesize event
+    t =   263.23s     Wait for com.aokijp.goukakulock to idle
+    t =   264.30s Waiting 10.0s for "追加" Button to exist
+    t =   265.33s     Checking `Expect predicate `existsNoRetry == 1` for object "追加" Button`
+    t =   265.33s         Checking existence of `"追加" Button`
+    t =   265.42s Tap "追加" Button
+    t =   265.42s     Wait for com.aokijp.goukakulock to idle
+    t =   265.42s     Find the "追加" Button
+    t =   265.51s     Check for interrupting elements affecting "追加" Button
+    t =   265.57s     Synthesize event
+    t =   265.90s     Wait for com.aokijp.goukakulock to idle
+    t =   267.04s Waiting 10.0s for "集中勉強" Button to exist
+    t =   268.13s     Checking `Expect predicate `existsNoRetry == 1` for object "集中勉強" Button`
+    t =   268.13s         Checking existence of `"集中勉強" Button`
+    t =   268.34s Tap "集中勉強" Button
+    t =   268.34s     Wait for com.aokijp.goukakulock to idle
+    t =   268.34s     Find the "集中勉強" Button
+    t =   268.49s     Check for interrupting elements affecting "集中勉強" Button
+    t =   268.60s     Synthesize event
+    t =   268.91s     Wait for com.aokijp.goukakulock to idle
+    t =   269.94s Added attachment named '35-コミットを追加'
+    t =   269.94s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   269.94s     Wait for com.aokijp.goukakulock to idle
+    t =   269.95s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   270.07s     Check for interrupting elements affecting "合格ロック" Application
+    t =   270.18s     Synthesize event
+    t =   270.62s     Wait for com.aokijp.goukakulock to idle
+    t =   273.18s Added attachment named '36-確かめ方'
+    t =   273.18s Waiting 10.0s for "保存" Button to exist
+    t =   274.21s     Checking `Expect predicate `existsNoRetry == 1` for object "保存" Button`
+    t =   274.21s         Checking existence of `"保存" Button`
+    t =   274.35s Tap "保存" Button
+    t =   274.35s     Wait for com.aokijp.goukakulock to idle
+    t =   274.35s     Find the "保存" Button
+    t =   274.51s     Check for interrupting elements affecting "保存" Button
+    t =   274.63s     Synthesize event
+    t =   274.97s     Wait for com.aokijp.goukakulock to idle
+    t =   276.24s Waiting 10.0s for "OK" Button to exist
+    t =   277.26s     Checking `Expect predicate `existsNoRetry == 1` for object "OK" Button`
+    t =   277.26s         Checking existence of `"OK" Button`
+    t =   277.38s Tap "OK" Button
+    t =   277.38s     Wait for com.aokijp.goukakulock to idle
+    t =   277.39s     Find the "OK" Button
+    t =   277.48s     Check for interrupting elements affecting "OK" Button
+    t =   277.61s     Synthesize event
+    t =   277.92s     Wait for com.aokijp.goukakulock to idle
+    t =   279.45s Added attachment named '37-コミット一覧'
+    t =   279.45s Tap Button (Element at index 0)
+    t =   279.45s     Wait for com.aokijp.goukakulock to idle
+    t =   279.46s     Find the Button (Element at index 0)
+    t =   279.58s     Check for interrupting elements affecting "BackButton" Button
+    t =   279.68s     Synthesize event
+    t =   280.02s     Wait for com.aokijp.goukakulock to idle
+    t =   280.82s Waiting 10.0s for "記録" Button to exist
+    t =   281.87s     Checking `Expect predicate `existsNoRetry == 1` for object "記録" Button`
+    t =   281.87s         Checking existence of `"記録" Button`
+    t =   282.09s Tap "記録" Button
+    t =   282.09s     Wait for com.aokijp.goukakulock to idle
+    t =   282.10s     Find the "記録" Button
+    t =   282.28s     Check for interrupting elements affecting "calendar" Button
+    t =   282.46s     Synthesize event
+    t =   282.79s     Wait for com.aokijp.goukakulock to idle
+    t =   286.66s Added attachment named '40-記録'
+    t =   286.66s Waiting 10.0s for "設定" Button to exist
+    t =   287.69s     Checking `Expect predicate `existsNoRetry == 1` for object "設定" Button`
+    t =   287.69s         Checking existence of `"設定" Button`
+    t =   287.83s Tap "設定" Button
+    t =   287.83s     Wait for com.aokijp.goukakulock to idle
+    t =   287.84s     Find the "設定" Button
+    t =   287.92s     Check for interrupting elements affecting "gearshape" Button
+    t =   287.98s     Synthesize event
+    t =   288.28s     Wait for com.aokijp.goukakulock to idle
+    t =   292.02s Added attachment named '41-設定'
+    t =   292.02s Checking existence of `"settings.deposit" Button`
+    t =   292.17s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   292.17s     Wait for com.aokijp.goukakulock to idle
+    t =   292.17s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   292.26s     Check for interrupting elements affecting "合格ロック" Application
+    t =   292.34s     Synthesize event
+    t =   292.82s     Wait for com.aokijp.goukakulock to idle
+    t =   295.05s Checking existence of `"settings.deposit" Button`
+    t =   295.25s Find the "settings.deposit" Button
+    t =   295.44s Checking existence of `"settings.deposit" Button`
+    t =   295.58s Waiting 10.0s for "settings.deposit" Button to exist
+    t =   296.59s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.deposit" Button`
+    t =   296.59s         Checking existence of `"settings.deposit" Button`
+    t =   296.81s Tap "settings.deposit" Button
+    t =   296.81s     Wait for com.aokijp.goukakulock to idle
+    t =   296.81s     Find the "settings.deposit" Button
+    t =   297.05s     Check for interrupting elements affecting "settings.deposit" Button
+    t =   297.28s     Synthesize event
+    t =   297.61s     Wait for com.aokijp.goukakulock to idle
+    t =   297.80s Waiting 10.0s for "預け金" NavigationBar to exist
+    t =   298.83s     Checking `Expect predicate `existsNoRetry == 1` for object "預け金" NavigationBar`
+    t =   298.83s         Checking existence of `"預け金" NavigationBar`
+    t =   300.30s Added attachment named '38-預け金'
+    t =   300.31s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   300.31s     Wait for com.aokijp.goukakulock to idle
+    t =   300.31s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   300.38s     Check for interrupting elements affecting "合格ロック" Application
+    t =   300.46s     Synthesize event
+    t =   300.90s     Wait for com.aokijp.goukakulock to idle
+    t =   304.08s Added attachment named '39-預け金-下'
+    t =   304.08s Tap Button (Element at index 0)
+    t =   304.08s     Wait for com.aokijp.goukakulock to idle
+    t =   304.30s     Find the Button (Element at index 0)
+    t =   304.83s     Check for interrupting elements affecting "BackButton" Button
+    t =   305.03s     Synthesize event
+    t =   305.43s     Wait for com.aokijp.goukakulock to idle
+    t =   306.04s Checking existence of `"settings.deposit" Button`
+    t =   306.32s Find the "settings.deposit" Button
+    t =   306.59s Checking existence of `"settings.deposit" Button`
+    t =   306.73s Checking existence of `"ウィジェット・Siri・通知から記録する" Button`
+    t =   306.95s Find the "ウィジェット・Siri・通知から記録する" Button
+    t =   307.13s Checking existence of `"ウィジェット・Siri・通知から記録する" Button`
+    t =   307.27s Waiting 10.0s for "ウィジェット・Siri・通知から記録する" Button to exist
+    t =   308.28s     Checking `Expect predicate `existsNoRetry == 1` for object "ウィジェット・Siri・通知から記録する" Button`
+    t =   308.28s         Checking existence of `"ウィジェット・Siri・通知から記録する" Button`
+    t =   308.48s Tap "ウィジェット・Siri・通知から記録する" Button
+    t =   308.48s     Wait for com.aokijp.goukakulock to idle
+    t =   308.51s     Find the "ウィジェット・Siri・通知から記録する" Button
+    t =   308.72s     Check for interrupting elements affecting "ウィジェット・Siri・通知から記録する" Button
+    t =   308.86s     Synthesize event
+    t =   309.20s     Wait for com.aokijp.goukakulock to idle
+    t =   311.33s Added attachment named '42-使いこなす'
+    t =   311.34s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   311.34s     Wait for com.aokijp.goukakulock to idle
+    t =   311.34s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   311.49s     Check for interrupting elements affecting "合格ロック" Application
+    t =   311.63s     Synthesize event
+    t =   312.08s     Wait for com.aokijp.goukakulock to idle
+    t =   315.29s Added attachment named '43-使いこなす-下'
+    t =   315.30s Tap Button (Element at index 0)
+    t =   315.30s     Wait for com.aokijp.goukakulock to idle
+    t =   315.46s     Find the Button (Element at index 0)
+    t =   315.57s     Check for interrupting elements affecting "BackButton" Button
+    t =   315.67s     Synthesize event
+    t =   315.99s     Wait for com.aokijp.goukakulock to idle
+    t =   316.62s Checking existence of `"アイコン" Button`
+    t =   316.80s Find the "アイコン" Button
+    t =   316.95s Checking existence of `"アイコン" Button`
+    t =   317.05s Waiting 10.0s for "アイコン" Button to exist
+    t =   318.08s     Checking `Expect predicate `existsNoRetry == 1` for object "アイコン" Button`
+    t =   318.08s         Checking existence of `"アイコン" Button`
+    t =   318.17s Tap "アイコン" Button
+    t =   318.17s     Wait for com.aokijp.goukakulock to idle
+    t =   318.18s     Find the "アイコン" Button
+    t =   318.29s     Check for interrupting elements affecting "アイコン" Button
+    t =   318.39s     Synthesize event
+    t =   318.70s     Wait for com.aokijp.goukakulock to idle
+    t =   321.69s Added attachment named '44-アイコン'
+    t =   321.69s Tap Button (Element at index 0)
+    t =   321.69s     Wait for com.aokijp.goukakulock to idle
+    t =   321.69s     Find the Button (Element at index 0)
+    t =   321.77s     Check for interrupting elements affecting "BackButton" Button
+    t =   321.85s     Synthesize event
+    t =   322.19s     Wait for com.aokijp.goukakulock to idle
+    t =   322.73s Checking existence of `Button (First Match)`
+    t =   324.19s Swipe down Target Application 'com.aokijp.goukakulock'
+    t =   324.19s     Wait for com.aokijp.goukakulock to idle
+    t =   324.21s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   324.30s     Check for interrupting elements affecting "合格ロック" Application
+    t =   324.41s     Synthesize event
+    t =   324.89s     Wait for com.aokijp.goukakulock to idle
+    t =   327.07s Checking existence of `Button (First Match)`
+    t =   328.07s Find the Button (First Match)
+    t =   328.89s Checking existence of `"ロックモード、朝から" Button`
+    t =   329.71s Waiting 10.0s for "ロックモード、朝から" Button to exist
+    t =   330.73s     Checking `Expect predicate `existsNoRetry == 1` for object "ロックモード、朝から" Button`
+    t =   330.73s         Checking existence of `"ロックモード、朝から" Button`
+    t =   331.14s Tap "ロックモード、朝から" Button
+    t =   331.14s     Wait for com.aokijp.goukakulock to idle
+    t =   331.15s     Find the "ロックモード、朝から" Button
+    t =   332.02s     Check for interrupting elements affecting "ロックモード、朝から" Button
+    t =   332.23s     Synthesize event
+    t =   332.63s     Wait for com.aokijp.goukakulock to idle
+    t =   333.72s Waiting 10.0s for "稼働型(勉強で時間を稼ぐ)" Button to exist
+    t =   334.74s     Checking `Expect predicate `existsNoRetry == 1` for object "稼働型(勉強で時間を稼ぐ)" Button`
+    t =   334.75s         Checking existence of `"稼働型(勉強で時間を稼ぐ)" Button`
+    t =   334.85s Tap "稼働型(勉強で時間を稼ぐ)" Button
+    t =   334.85s     Wait for com.aokijp.goukakulock to idle
+    t =   334.86s     Find the "稼働型(勉強で時間を稼ぐ)" Button
+    t =   334.93s     Check for interrupting elements affecting "稼働型(勉強で時間を稼ぐ)" Button
+    t =   335.02s     Synthesize event
+    t =   335.35s     Wait for com.aokijp.goukakulock to idle
+    t =   337.67s Added attachment named '45-稼働型'
+    t =   337.68s Tap Button (Element at index 0)
+    t =   337.68s     Wait for com.aokijp.goukakulock to idle
+    t =   337.68s     Find the Button (Element at index 0)
+    t =   337.78s     Check for interrupting elements affecting "BackButton" Button
+    t =   337.86s     Synthesize event
+    t =   338.18s     Wait for com.aokijp.goukakulock to idle
+    t =   338.77s Checking existence of `"デバッグメニュー" Button`
+    t =   339.16s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   339.16s     Wait for com.aokijp.goukakulock to idle
+    t =   339.20s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   339.57s     Check for interrupting elements affecting "合格ロック" Application
+    t =   339.76s     Synthesize event
+    t =   340.21s     Wait for com.aokijp.goukakulock to idle
+    t =   342.33s Checking existence of `"デバッグメニュー" Button`
+    t =   342.78s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   342.78s     Wait for com.aokijp.goukakulock to idle
+    t =   342.79s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   342.93s     Check for interrupting elements affecting "合格ロック" Application
+    t =   343.07s     Synthesize event
+    t =   343.52s     Wait for com.aokijp.goukakulock to idle
+    t =   345.63s Checking existence of `"デバッグメニュー" Button`
+    t =   345.87s Find the "デバッグメニュー" Button
+    t =   345.98s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   345.98s     Wait for com.aokijp.goukakulock to idle
+    t =   345.99s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   346.05s     Check for interrupting elements affecting "合格ロック" Application
+    t =   346.12s     Synthesize event
+    t =   346.55s     Wait for com.aokijp.goukakulock to idle
+    t =   347.19s Checking existence of `"デバッグメニュー" Button`
+    t =   347.31s Find the "デバッグメニュー" Button
+    t =   347.42s Checking existence of `"デバッグメニュー" Button`
+    t =   347.50s Waiting 10.0s for "デバッグメニュー" Button to exist
+    t =   348.53s     Checking `Expect predicate `existsNoRetry == 1` for object "デバッグメニュー" Button`
+    t =   348.53s         Checking existence of `"デバッグメニュー" Button`
+    t =   348.63s Tap "デバッグメニュー" Button
+    t =   348.63s     Wait for com.aokijp.goukakulock to idle
+    t =   348.64s     Find the "デバッグメニュー" Button
+    t =   348.72s     Check for interrupting elements affecting "デバッグメニュー" Button
+    t =   348.79s     Synthesize event
+    t =   349.11s     Wait for com.aokijp.goukakulock to idle
+    t =   349.24s Checking existence of `"ウィジェット・Live Activity・お祝い" Button`
+    t =   349.59s Find the "ウィジェット・Live Activity・お祝い" Button
+    t =   350.26s Checking existence of `"ウィジェット・Live Activity・お祝い" Button`
+    t =   350.73s Waiting 10.0s for "ウィジェット・Live Activity・お祝い" Button to exist
+    t =   351.75s     Checking `Expect predicate `existsNoRetry == 1` for object "ウィジェット・Live Activity・お祝い" Button`
+    t =   351.75s         Checking existence of `"ウィジェット・Live Activity・お祝い" Button`
+    t =   351.85s Tap "ウィジェット・Live Activity・お祝い" Button
+    t =   351.85s     Wait for com.aokijp.goukakulock to idle
+    t =   351.85s     Find the "ウィジェット・Live Activity・お祝い" Button
+    t =   351.94s     Check for interrupting elements affecting "ウィジェット・Live Activity・お祝い" Button
+    t =   352.01s     Synthesize event
+    t =   352.32s     Wait for com.aokijp.goukakulock to idle
+    t =   354.77s Added attachment named '46-見本-ウィジェット'
+    t =   354.78s Checking existence of `"ウィジェット(見本:ロック中)" StaticText`
+    t =   355.03s Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   355.29s Checking existence of `"ウィジェット(見本:ロック中)" StaticText`
+    t =   355.48s Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   355.67s Find the Target Application 'com.aokijp.goukakulock'
+    t =   355.74s Press Target Application 'com.aokijp.goukakulock'[0.50, 0.60] for 0.1 seconds, then drag to Target Application 'com.aokijp.goukakulock'[0.50, 0.30] with velocity of 250.00 pixels per second, and then hold for 0.2 seconds 
+    t =   355.74s     Wait for com.aokijp.goukakulock to idle
+    t =   355.75s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   355.81s     Check for interrupting elements affecting "合格ロック" Application
+    t =   355.89s     Synthesize event
+    t =   355.89s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   355.97s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   356.04s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   356.10s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   356.18s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   357.79s     Wait for com.aokijp.goukakulock to idle
+    t =   357.83s Press "ウィジェット(見本:ロック中)" StaticText[0.50, 0.50] for 0.1 seconds, then drag to Target Application 'com.aokijp.goukakulock'[0.50, 0.16] with velocity of 250.00 pixels per second, and then hold for 0.3 seconds 
+    t =   357.83s     Wait for com.aokijp.goukakulock to idle
+    t =   357.83s     Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   358.17s     Check for interrupting elements affecting "ウィジェット(見本:ロック中)" StaticText
+    t =   358.37s     Synthesize event
+    t =   358.38s         Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   358.77s         Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   359.06s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   359.14s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   359.23s         Find the "ウィジェット(見本:ロック中)" StaticText
+    t =   361.45s     Wait for com.aokijp.goukakulock to idle
+    t =   362.90s Added attachment named '47-見本-ウィジェット2'
+    t =   362.91s Checking existence of `"Live Activity" StaticText`
+    t =   363.20s Find the "Live Activity" StaticText
+    t =   363.48s Checking existence of `"Live Activity" StaticText`
+    t =   363.76s Find the "Live Activity" StaticText
+    t =   364.07s Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.20s Press Target Application 'com.aokijp.goukakulock'[0.50, 0.60] for 0.1 seconds, then drag to Target Application 'com.aokijp.goukakulock'[0.50, 0.30] with velocity of 250.00 pixels per second, and then hold for 0.2 seconds 
+    t =   364.20s     Wait for com.aokijp.goukakulock to idle
+    t =   364.21s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.34s     Check for interrupting elements affecting "合格ロック" Application
+    t =   364.48s     Synthesize event
+    t =   364.48s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.56s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.67s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.80s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   364.94s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   366.62s     Wait for com.aokijp.goukakulock to idle
+    t =   366.78s Press "Live Activity" StaticText[0.50, 0.50] for 0.1 seconds, then drag to Target Application 'com.aokijp.goukakulock'[0.50, 0.16] with velocity of 250.00 pixels per second, and then hold for 0.3 seconds 
+    t =   366.78s     Wait for com.aokijp.goukakulock to idle
+    t =   366.78s     Find the "Live Activity" StaticText
+    t =   367.07s     Check for interrupting elements affecting "Live Activity" StaticText
+    t =   367.18s     Synthesize event
+    t =   367.18s         Find the "Live Activity" StaticText
+    t =   367.50s         Find the "Live Activity" StaticText
+    t =   367.77s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   367.88s         Find the Target Application 'com.aokijp.goukakulock'
+    t =   367.97s         Find the "Live Activity" StaticText
+    t =   369.98s     Wait for com.aokijp.goukakulock to idle
+    t =   371.09s Added attachment named '48-見本-LiveActivity'
+    t =   371.09s Checking existence of `"集中タイマー(見本)" Button`
+    t =   371.29s Find the "集中タイマー(見本)" Button
+    t =   371.47s Checking existence of `"集中タイマー(見本)" Button`
+    t =   371.64s Waiting 10.0s for "集中タイマー(見本)" Button to exist
+    t =   372.66s     Checking `Expect predicate `existsNoRetry == 1` for object "集中タイマー(見本)" Button`
+    t =   372.66s         Checking existence of `"集中タイマー(見本)" Button`
+    t =   372.83s Tap "集中タイマー(見本)" Button
+    t =   372.83s     Wait for com.aokijp.goukakulock to idle
+    t =   372.84s     Find the "集中タイマー(見本)" Button
+    t =   373.00s     Check for interrupting elements affecting "集中タイマー(見本)" Button
+    t =   373.23s     Synthesize event
+    t =   373.57s     Wait for com.aokijp.goukakulock to idle
+    t =   374.40s Waiting 10.0s for "はじめる" Button to exist
+    t =   375.47s     Checking `Expect predicate `existsNoRetry == 1` for object "はじめる" Button`
+    t =   375.47s         Checking existence of `"はじめる" Button`
+    t =   375.67s Tap "はじめる" Button
+    t =   375.67s     Wait for com.aokijp.goukakulock to idle
+    t =   375.68s     Find the "はじめる" Button
+    t =   375.74s     Check for interrupting elements affecting "はじめる" Button
+    t =   375.79s     Synthesize event
+    t =   376.09s     Wait for com.aokijp.goukakulock to idle
+    t =   380.14s Added attachment named '49-集中タイマー'
+    t =   380.15s Waiting 10.0s for "やめる" Button to exist
+    t =   381.19s     Checking `Expect predicate `existsNoRetry == 1` for object "やめる" Button`
+    t =   381.19s         Checking existence of `"やめる" Button`
+    t =   381.50s Tap "やめる" Button
+    t =   381.50s     Wait for com.aokijp.goukakulock to idle
+    t =   381.50s     Find the "やめる" Button
+    t =   381.70s     Check for interrupting elements affecting "やめる" Button
+    t =   381.95s     Synthesize event
+    t =   382.35s     Wait for com.aokijp.goukakulock to idle
+    t =   383.10s Waiting 10.0s for "写真で記録(見本)" Button to exist
+    t =   384.14s     Checking `Expect predicate `existsNoRetry == 1` for object "写真で記録(見本)" Button`
+    t =   384.14s         Checking existence of `"写真で記録(見本)" Button`
+    t =   384.42s Tap "写真で記録(見本)" Button
+    t =   384.42s     Wait for com.aokijp.goukakulock to idle
+    t =   384.43s     Find the "写真で記録(見本)" Button
+    t =   384.71s     Check for interrupting elements affecting "写真で記録(見本)" Button
+    t =   384.87s     Synthesize event
+    t =   385.17s     Wait for com.aokijp.goukakulock to idle
+    t =   387.36s Added attachment named '50-写真で記録'
+    t =   387.36s Waiting 10.0s for "閉じる" Button to exist
+    t =   388.39s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   388.39s         Checking existence of `"閉じる" Button`
+    t =   388.54s Tap "閉じる" Button
+    t =   388.54s     Wait for com.aokijp.goukakulock to idle
+    t =   388.55s     Find the "閉じる" Button
+    t =   388.68s     Check for interrupting elements affecting "閉じる" Button
+    t =   388.81s     Synthesize event
+    t =   389.13s     Wait for com.aokijp.goukakulock to idle
+    t =   389.89s Checking existence of `"はなまるを出す(7日連続)" Button`
+    t =   390.33s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   390.33s     Wait for com.aokijp.goukakulock to idle
+    t =   390.34s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   390.47s     Check for interrupting elements affecting "合格ロック" Application
+    t =   390.63s     Synthesize event
+    t =   391.09s     Wait for com.aokijp.goukakulock to idle
+    t =   393.41s Checking existence of `"はなまるを出す(7日連続)" Button`
+    t =   393.56s Find the "はなまるを出す(7日連続)" Button
+    t =   393.67s Checking existence of `"はなまるを出す(7日連続)" Button`
+    t =   393.76s Waiting 10.0s for "はなまるを出す(7日連続)" Button to exist
+    t =   394.83s     Checking `Expect predicate `existsNoRetry == 1` for object "はなまるを出す(7日連続)" Button`
+    t =   394.83s         Checking existence of `"はなまるを出す(7日連続)" Button`
+    t =   395.67s Tap "はなまるを出す(7日連続)" Button
+    t =   395.67s     Wait for com.aokijp.goukakulock to idle
+    t =   395.67s     Find the "はなまるを出す(7日連続)" Button
+    t =   395.78s     Check for interrupting elements affecting "はなまるを出す(7日連続)" Button
+    t =   395.95s     Synthesize event
+    t =   396.30s     Wait for com.aokijp.goukakulock to idle
+    t =   396.60s Waiting 10.0s for "7日連続" StaticText to exist
+    t =   397.62s     Checking `Expect predicate `existsNoRetry == 1` for object "7日連続" StaticText`
+    t =   397.62s         Checking existence of `"7日連続" StaticText`
+    t =   400.75s Added attachment named '51-はなまる-7日'
+    t =   400.75s Waiting 10.0s for "閉じる" Button to exist
+    t =   401.79s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   401.80s         Checking existence of `"閉じる" Button`
+    t =   402.03s Tap "閉じる" Button
+    t =   402.03s     Wait for com.aokijp.goukakulock to idle
+    t =   402.04s     Find the "閉じる" Button
+    t =   402.11s     Check for interrupting elements affecting "閉じる" Button
+    t =   402.23s     Synthesize event
+    t =   402.56s     Wait for com.aokijp.goukakulock to idle
+    t =   403.31s Waiting 10.0s for "週のふり返りを開く" Button to exist
+    t =   404.35s     Checking `Expect predicate `existsNoRetry == 1` for object "週のふり返りを開く" Button`
+    t =   404.35s         Checking existence of `"週のふり返りを開く" Button`
+    t =   404.43s Tap "週のふり返りを開く" Button
+    t =   404.43s     Wait for com.aokijp.goukakulock to idle
+    t =   404.44s     Find the "週のふり返りを開く" Button
+    t =   404.55s     Check for interrupting elements affecting "週のふり返りを開く" Button
+    t =   404.65s     Synthesize event
+    t =   404.98s     Wait for com.aokijp.goukakulock to idle
+    t =   405.99s Waiting 10.0s for "相棒に手紙を書いてもらう" Button to exist
+    t =   406.99s     Checking `Expect predicate `existsNoRetry == 1` for object "相棒に手紙を書いてもらう" Button`
+    t =   407.00s         Checking existence of `"相棒に手紙を書いてもらう" Button`
+    t =   407.24s Waiting 10.0s for "相棒に手紙を書いてもらう" Button to exist
+    t =   408.26s     Checking `Expect predicate `existsNoRetry == 1` for object "相棒に手紙を書いてもらう" Button`
+    t =   408.26s         Checking existence of `"相棒に手紙を書いてもらう" Button`
+    t =   408.42s Tap "相棒に手紙を書いてもらう" Button
+    t =   408.42s     Wait for com.aokijp.goukakulock to idle
+    t =   408.42s     Find the "相棒に手紙を書いてもらう" Button
+    t =   408.58s     Check for interrupting elements affecting "相棒に手紙を書いてもらう" Button
+    t =   408.75s     Synthesize event
+    t =   409.06s     Wait for com.aokijp.goukakulock to idle
+    t =   409.41s Waiting 20.0s for Any (First Match) to exist
+    t =   410.48s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   410.48s         Checking existence of `Any (First Match)`
+    t =   411.96s Added attachment named '52-週のふり返り-手紙'
+    t =   411.97s Waiting 10.0s for "あとで" Button to exist
+    t =   413.00s     Checking `Expect predicate `existsNoRetry == 1` for object "あとで" Button`
+    t =   413.00s         Checking existence of `"あとで" Button`
+    t =   413.17s Tap "あとで" Button
+    t =   413.17s     Wait for com.aokijp.goukakulock to idle
+    t =   413.17s     Find the "あとで" Button
+    t =   413.34s     Check for interrupting elements affecting "あとで" Button
+    t =   413.51s     Synthesize event
+    t =   413.87s     Wait for com.aokijp.goukakulock to idle
+    t =   414.86s Checking existence of `"合 格 証" StaticText`
+    t =   415.00s Find the "合 格 証" StaticText
+    t =   415.09s Checking existence of `"合 格 証" StaticText`
+    t =   416.09s Added attachment named '53-合格証-見本'
+    t =   416.09s Waiting 10.0s for "今日" Button to exist
+    t =   417.15s     Checking `Expect predicate `existsNoRetry == 1` for object "今日" Button`
+    t =   417.15s         Checking existence of `"今日" Button`
+    t =   417.23s Tap "今日" Button
+    t =   417.23s     Wait for com.aokijp.goukakulock to idle
+    t =   417.23s     Find the "今日" Button
+    t =   417.30s     Check for interrupting elements affecting "checkmark.seal" Button
+    t =   417.37s     Synthesize event
+    t =   417.68s     Wait for com.aokijp.goukakulock to idle
+    t =   419.37s Checking existence of `"緊急解除" Button`
+    t =   419.49s Find the "緊急解除" Button
+    t =   419.63s Swipe up Target Application 'com.aokijp.goukakulock'
+    t =   419.63s     Wait for com.aokijp.goukakulock to idle
+    t =   419.63s     Find the Target Application 'com.aokijp.goukakulock'
+    t =   419.72s     Check for interrupting elements affecting "合格ロック" Application
+    t =   419.83s     Synthesize event
+    t =   420.26s     Wait for com.aokijp.goukakulock to idle
+    t =   422.04s Checking existence of `"緊急解除" Button`
+    t =   422.32s Find the "緊急解除" Button
+    t =   422.59s Checking existence of `"緊急解除" Button`
+    t =   422.78s Waiting 10.0s for "緊急解除" Button to exist
+    t =   423.79s     Checking `Expect predicate `existsNoRetry == 1` for object "緊急解除" Button`
+    t =   423.80s         Checking existence of `"緊急解除" Button`
+    t =   423.93s Tap "緊急解除" Button
+    t =   423.93s     Wait for com.aokijp.goukakulock to idle
+    t =   423.94s     Find the "緊急解除" Button
+    t =   424.05s     Check for interrupting elements affecting "緊急解除" Button
+    t =   424.13s     Synthesize event
+    t =   424.42s     Wait for com.aokijp.goukakulock to idle
+    t =   424.86s Waiting 10.0s for "緊急解除を申請する" Button to exist
+    t =   425.90s     Checking `Expect predicate `existsNoRetry == 1` for object "緊急解除を申請する" Button`
+    t =   425.90s         Checking existence of `"緊急解除を申請する" Button`
+    t =   427.01s Added attachment named '54-緊急解除'
+    t =   427.01s Waiting 10.0s for "閉じる" Button to exist
+    t =   428.03s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   428.03s         Checking existence of `"閉じる" Button`
+    t =   428.09s Tap "閉じる" Button
+    t =   428.09s     Wait for com.aokijp.goukakulock to idle
+    t =   428.09s     Find the "閉じる" Button
+    t =   428.15s     Check for interrupting elements affecting "閉じる" Button
+    t =   428.28s     Synthesize event
+    t =   428.59s     Wait for com.aokijp.goukakulock to idle
+    t =   429.35s Waiting 10.0s for "一時停止" Button to exist
+    t =   430.39s     Checking `Expect predicate `existsNoRetry == 1` for object "一時停止" Button`
+    t =   430.40s         Checking existence of `"一時停止" Button`
+    t =   430.51s Tap "一時停止" Button
+    t =   430.51s     Wait for com.aokijp.goukakulock to idle
+    t =   430.51s     Find the "一時停止" Button
+    t =   430.62s     Check for interrupting elements affecting "一時停止" Button
+    t =   430.70s     Synthesize event
+    t =   431.00s     Wait for com.aokijp.goukakulock to idle
+    t =   433.41s Added attachment named '55-一時停止'
+    t =   433.41s Waiting 10.0s for "閉じる" Button to exist
+    t =   434.46s     Checking `Expect predicate `existsNoRetry == 1` for object "閉じる" Button`
+    t =   434.47s         Checking existence of `"閉じる" Button`
+    t =   434.61s Tap "閉じる" Button
+    t =   434.61s     Wait for com.aokijp.goukakulock to idle
+    t =   434.61s     Find the "閉じる" Button
+    t =   434.69s     Check for interrupting elements affecting "閉じる" Button
+    t =   434.86s     Synthesize event
+    t =   435.18s     Wait for com.aokijp.goukakulock to idle
+    t =   435.94s Pressing Home button
+    t =   436.77s Waiting 10.0s for "合格ロック" Icon to exist
+    t =   437.84s     Checking `Expect predicate `existsNoRetry == 1` for object "合格ロック" Icon`
+    t =   437.85s         Checking existence of `"合格ロック" Icon`
+    t =   438.26s Find the "合格ロック" Icon
+    t =   438.32s Press "合格ロック" Icon for 1.4 seconds
+    t =   438.32s     Wait for com.apple.springboard to idle
+    t =   438.33s     Find the "合格ロック" Icon
+    t =   438.38s     Check for interrupting elements affecting "合格ロック" Icon
+    t =   438.43s     Synthesize event
+    t =   440.20s     Wait for com.apple.springboard to idle
+    t =   500.28s App animations complete notification not received, will attempt to continue.
+    t =   500.30s Waiting 10.0s for Button (First Match) to exist
+    t =   501.33s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =   501.33s         Checking existence of `Button (First Match)`
+    t =   501.68s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   501.68s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   503.02s Added attachment named '56-クイックアクション'
+    t =   503.03s Tap Button (First Match)
+    t =   503.03s     Wait for com.apple.springboard to idle
+    t =   563.06s App animations complete notification not received, will attempt to continue.
+    t =   563.07s     Find the Button (First Match)
+    t =   563.24s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   563.24s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   563.25s     Check for interrupting elements affecting "com.aokijp.goukakulock.quick.checkin" Button
+    t =   563.46s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   563.46s Ignoring failure to get hierarchy for remote element in process 66551 (Error getting main window kAXErrorServerNotFound)
+    t =   563.47s     Synthesize event
+    t =   564.44s     Wait for com.apple.springboard to idle
+    t =   565.51s Waiting 15.0s for "チェックイン" NavigationBar to exist
+    t =   566.59s     Checking `Expect predicate `existsNoRetry == 1` for object "チェックイン" NavigationBar`
+    t =   566.60s         Checking existence of `"チェックイン" NavigationBar`
+    t =   569.03s Added attachment named '57-クイックアクションから'
+    t =   569.05s Tear Down
+Test Case '-[GoukakuLockUITests.WalkthroughUITests testWalkthrough]' passed (570.050 seconds).
+Test Suite 'WalkthroughUITests' passed at 2026-10-10 01:01:58.190.
+	 Executed 1 test, with 0 failures (0 unexpected) in 570.050 (570.058) seconds
+Test Suite 'GoukakuLockUITests.xctest' passed at 2026-10-10 01:01:58.191.
+	 Executed 1 test, with 0 failures (0 unexpected) in 570.050 (570.059) seconds
+Test Suite 'All tests' passed at 2026-10-10 01:01:58.191.
+	 Executed 1 test, with 0 failures (0 unexpected) in 570.050 (570.061) seconds
+2026-10-10 01:02:16.263385+0000 GoukakuLockUITests-Runner[51373:170459] [Default] Xcode took 18.02 seconds to acknowledge that testing finished.
+2026-10-10 01:02:26.558 xcodebuild[49034:130482] [MT] IDETestOperationsObserverDebug: 620.906 elapsed -- Testing started completed.
+2026-10-10 01:02:26.558 xcodebuild[49034:130482] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-10 01:02:26.558 xcodebuild[49034:130482] [MT] IDETestOperationsObserverDebug: 620.906 sec, +620.906 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/GoukakuLock/GoukakuLock/build/UITests.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

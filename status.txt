@@ -1,0 +1,7 @@
+run=41
+sha=565d370395dae2c4c24f7227643b98c73b4e4e8e
+ref=refs/heads/main
+status=success
+uitest=success
+models=[gemma4-e2b, qwen3.5-4b, lfm2.5-1.2b-jp, qwen3.5-2b]
+time=2026-10-10T01:04:23Z

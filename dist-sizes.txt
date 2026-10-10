@@ -1,0 +1,6 @@
+total 106952
+drwxr-xr-x   5 runner  staff       160 Oct 10 00:47 .
+drwxr-xr-x  24 runner  staff       768 Oct 10 00:47 ..
+-rw-r--r--   1 runner  staff  32587247 Oct 10 00:47 GoukakuLock-Debug.ipa
+-rw-r--r--   1 runner  staff  21015105 Oct 10 00:47 GoukakuLock-Release.ipa
+-rw-r--r--   1 runner  staff       178 Oct 10 00:47 SHA256SUMS.txt

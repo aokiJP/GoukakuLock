@@ -1,0 +1,444 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Failed to stat path '/Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application Support/default.store', errno 2 / No such file or directory.
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create denied
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Failed to statfs file; errno 2 / No such file or directory.
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for file system
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system type: 		0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system flags: 		0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total data blocks: 		0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free data blocks: 		0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free blocks for nonsuperuser:	0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total i-nodes: 			0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system ID: 		0, 0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free i-nodes: 			0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Owner UID: 			0
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Filesystem type name:
+2026-10-10 00:49:35.885 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount on name:
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount from name: 		\134M-D\134M-|\134^C\134M^@\134^A
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Failed to stat path '/Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application Support', errno 2 / No such file or directory.
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create denied
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Failed to statfs file; errno 2 / No such file or directory.
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for file system
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system type: 		0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system flags: 		0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total data blocks: 		0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free data blocks: 		0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free blocks for nonsuperuser:	0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total i-nodes: 			0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system ID: 		0, 0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free i-nodes: 			0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Owner UID: 			0
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Filesystem type name:
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount on name:
+2026-10-10 00:49:35.886 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount from name: 		\134M-D\134M-|\134^C\134M^@\134^A
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		3040168
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for file system
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system type: 		0x1a
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system flags: 		0x4909000
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   MNT_JOURNALED
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total data blocks: 		83758080
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free data blocks: 		23885159
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free blocks for nonsuperuser:	23885159
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Total i-nodes: 			957363173
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File system ID: 		0x100000e, 0x1a
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Free i-nodes: 			955406360
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Owner UID: 			0
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Filesystem type name: 		apfs
+2026-10-10 00:49:35.887 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount on name: 			/System/Volumes/Data
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Mount from name: 		/dev/disk2s5
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		3040166
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2304 bytes
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969231
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.888 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969037
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		224 bytes
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969030
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.889 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		384 bytes
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2285042
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   775
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.890 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2285041
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2016 bytes
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2263005
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.891 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2262957
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2262946
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2688 bytes
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		35809
+2026-10-10 00:49:35.892 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   700
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		1312 bytes
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		35800
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   750
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		18483
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		0
+2026-10-10 00:49:35.893 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		80
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: ---------------------------
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		704 bytes
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   file is not a symbolic link
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create allowed
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Logging status information for directory path: /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application Support
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Executing as effective user 501
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		704 bytes
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		0
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.894 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not writeable with errno 30
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		18483
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		0
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		80
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not writeable with errno 13
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		1312 bytes
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		35800
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   750
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library
+2026-10-10 00:49:35.895 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2688 bytes
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		35809
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   700
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2262946
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2262957
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.896 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2016 bytes
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2263005
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		160 bytes
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2285041
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.897 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		384 bytes
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2285042
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   775
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		224 bytes
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969030
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.898 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969037
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.899 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		2304 bytes
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		2969231
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		3040166
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.900 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Information for /Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Device ID: 	0
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Device ID: 		16777230
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Size: 		128 bytes
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File inode: 		3040168
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File user ID: 		501
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File group ID: 		20
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   File Permissions:
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: d
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   755
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is not a symbolic link
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is readable
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   component is writeable
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Failed to stat path '/Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application Support', errno 2 / No such file or directory.
+2026-10-10 00:49:35.901 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error:   Sandbox access to file-write-create denied
+2026-10-10 00:49:35.903 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: addPersistentStoreWithType:configuration:URL:options:error: returned error NSCocoaErrorDomain (512)
+2026-10-10 00:49:35.904 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: userInfo:
+2026-10-10 00:49:35.904 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: 	reason : Failed to create file; code = 2
+2026-10-10 00:49:35.904 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: storeType: SQLite
+2026-10-10 00:49:35.904 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: configuration: default
+2026-10-10 00:49:35.904 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: URL: file:///Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application%20Support/default.store
+2026-10-10 00:49:35.909 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: <NSPersistentStoreCoordinator: 0x1025c0c80>: Attempting recovery from error encountered during addPersistentStore: 0x102460cf0 Error Domain=NSCocoaErrorDomain Code=512 "ファイルを保存できませんでした。" UserInfo={reason=Failed to create file; code = 2}
+2026-10-10 00:49:35.909 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: During recovery, parent directory path reported as missing
+2026-10-10 00:49:35.925 E  GoukakuLock[45056:1d9e5] [com.apple.coredata:error] CoreData: error: Recovery attempt while adding <NSPersistentStoreDescription: 0x102460cf0> (type: SQLite, url: file:///Users/runner/Library/Developer/CoreSimulator/Devices/88931AEA-62E6-447F-8697-DCE00A671384/data/Containers/Shared/AppGroup/C98972D5-1CCC-4D15-9BD2-2EF8E7ECDCC3/Library/Application%20Support/default.store) was successful!

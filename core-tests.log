@@ -1,0 +1,219 @@
+Building for debugging...
+[0/7] /Users/runner/work/GoukakuLock/GoukakuLock/GoukakuCore/.build/arm64-apple-macosx/debug/GoukakuCorePackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/16] Emitting module GoukakuCore
+[7/16] Compiling GoukakuCore Helpers.swift
+[8/16] Compiling GoukakuCore History.swift
+[9/16] Compiling GoukakuCore LockEngine.swift
+[10/16] Compiling GoukakuCore Models.swift
+[11/16] Compiling GoukakuCore ClockText.swift
+[12/16] Compiling GoukakuCore CycleCalendar.swift
+[13/16] Compiling GoukakuCore CycleID.swift
+[14/16] Compiling GoukakuCore Deposit.swift
+[15/20] Compiling GoukakuCore Policies.swift
+[16/20] Compiling GoukakuCore SchedulePlanner.swift
+[17/20] Compiling GoukakuCore SharedStateStore.swift
+[18/20] Compiling GoukakuCore StatusSummary.swift
+[19/26] Compiling GoukakuCoreTests LockEngineTests.swift
+[20/26] Compiling GoukakuCoreTests PlannerAndPolicyTests.swift
+[21/26] Emitting module GoukakuCoreTests
+[22/26] Compiling GoukakuCoreTests DepositTests.swift
+[23/26] Compiling GoukakuCoreTests HelperTests.swift
+[24/26] Compiling GoukakuCoreTests HistoryAndCalendarTests.swift
+[25/28] Compiling GoukakuCoreTests StatusSummaryTests.swift
+[26/28] Compiling GoukakuCoreTests TestSupport.swift
+[27/30] Compiling GoukakuCorePackageTests runner.swift
+[28/30] Emitting module GoukakuCorePackageTests
+[28/30] Write Objects.LinkFileList
+[29/30] Linking GoukakuCorePackageTests
+Build complete! (26.36s)
+Test Suite 'All tests' started at 2026-10-10 00:28:59.256.
+Test Suite 'GoukakuCorePackageTests.xctest' started at 2026-10-10 00:28:59.258.
+Test Suite 'AutoAchievementTests' started at 2026-10-10 00:28:59.258.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testCreatesAchievementWhenPlausible]' started.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testCreatesAchievementWhenPlausible]' passed (0.004 seconds).
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testEarnModeGrantsWindow]' started.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testEarnModeGrantsWindow]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsAfterMidnightBecauseIntervalEndsAt2359]' started.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsAfterMidnightBecauseIntervalEndsAt2359]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsDuplicatesAndWrongMethod]' started.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsDuplicatesAndWrongMethod]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsPrematureFire]' started.
+Test Case '-[GoukakuCoreTests.AutoAchievementTests testRejectsPrematureFire]' passed (0.000 seconds).
+Test Suite 'AutoAchievementTests' passed at 2026-10-10 00:28:59.264.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'CycleCalendarTests' started at 2026-10-10 00:28:59.264.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testBoundary]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testBoundary]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testCycleIDCoding]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testCycleIDCoding]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testEveryInstantBelongsToExactlyOneCycleEvenAcrossDST]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testEveryInstantBelongsToExactlyOneCycleEvenAcrossDST]' passed (0.271 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testMidnightDayStart]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testMidnightDayStart]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testMinuteOfDayInsideCycle]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testMinuteOfDayInsideCycle]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testOffsetsAcrossMonthAndYear]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testOffsetsAcrossMonthAndYear]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testWeekdayAndWeekStart]' started.
+Test Case '-[GoukakuCoreTests.CycleCalendarTests testWeekdayAndWeekStart]' passed (0.000 seconds).
+Test Suite 'CycleCalendarTests' passed at 2026-10-10 00:28:59.538.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.273 (0.274) seconds
+Test Suite 'DepositTests' started at 2026-10-10 00:28:59.538.
+Test Case '-[GoukakuCoreTests.DepositTests testAchievementIsFinalAfterTheUndoWindowOrTheDayEnd]' started.
+Test Case '-[GoukakuCoreTests.DepositTests testAchievementIsFinalAfterTheUndoWindowOrTheDayEnd]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.DepositTests testMarksAndBreakdown]' started.
+Test Case '-[GoukakuCoreTests.DepositTests testMarksAndBreakdown]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.DepositTests testPlanIsSevenCyclesFromTheGivenDay]' started.
+Test Case '-[GoukakuCoreTests.DepositTests testPlanIsSevenCyclesFromTheGivenDay]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.DepositTests testRefundableOutcomesFollowTheAppJudgement]' started.
+Test Case '-[GoukakuCoreTests.DepositTests testRefundableOutcomesFollowTheAppJudgement]' passed (0.000 seconds).
+Test Suite 'DepositTests' passed at 2026-10-10 00:28:59.540.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'HistoryTests' started at 2026-10-10 00:28:59.540.
+Test Case '-[GoukakuCoreTests.HistoryTests testNoCommitOutcome]' started.
+Test Case '-[GoukakuCoreTests.HistoryTests testNoCommitOutcome]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.HistoryTests testOutcomes]' started.
+Test Case '-[GoukakuCoreTests.HistoryTests testOutcomes]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.HistoryTests testStreak]' started.
+Test Case '-[GoukakuCoreTests.HistoryTests testStreak]' passed (0.000 seconds).
+Test Suite 'HistoryTests' passed at 2026-10-10 00:28:59.541.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'LockEngineTests' started at 2026-10-10 00:28:59.541.
+Test Case '-[GoukakuCoreTests.LockEngineTests testAllRequiredHabitsMustBeDone]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testAllRequiredHabitsMustBeDone]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testCancelledEmergencyHasNoEffect]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testCancelledEmergencyHasNoEffect]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testCycleBoundaryRelocksAtDayStart]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testCycleBoundaryRelocksAtDayStart]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testDecisionIsStableUntilNextCheck]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testDecisionIsStableUntilNextCheck]' passed (0.658 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEarnModeWindows]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEarnModeWindows]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEarnWindowCarriesAcrossCycleBoundary]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEarnWindowCarriesAcrossCycleBoundary]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEmergencyContinuesAcrossCycleBoundary]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEmergencyContinuesAcrossCycleBoundary]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEmergencyWaitThenUnlockThenRelock]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEmergencyWaitThenUnlockThenRelock]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningBeforeAndAfterLockStart]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningBeforeAndAfterLockStart]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningCarryOverAfterMissedDay]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningCarryOverAfterMissedDay]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningLockStartAfterMidnight]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningLockStartAfterMidnight]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverAfterPause]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverAfterPause]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverAfterRestDay]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverAfterRestDay]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverRightAfterSwitchingToLock]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testEveningNoCarryOverRightAfterSwitchingToLock]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testHabitStartingInFutureIsNotRequiredYet]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testHabitStartingInFutureIsNotRequiredYet]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testInboxAchievementUnlocksBeforeAppIngestsIt]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testInboxAchievementUnlocksBeforeAppIngestsIt]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testLateNightCheckInCountsForCurrentCycle]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testLateNightCheckInCountsForCurrentCycle]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testMinimumCounts]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testMinimumCounts]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testMonitorOnlyNeverLocks]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testMonitorOnlyNeverLocks]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testMorningLockedUntilAchieved]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testMorningLockedUntilAchieved]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testMorningUnlockedAfterAchievement]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testMorningUnlockedAfterAchievement]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testNotStartedBeforeActiveSince]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testNotStartedBeforeActiveSince]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testOnlyConfirmedAndPendingReviewCount]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testOnlyConfirmedAndPendingReviewCount]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testPauseWinsAndReportsItsEnd]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testPauseWinsAndReportsItsEnd]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testRestDayIsUnlocked]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testRestDayIsUnlocked]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testStateWinsOverInboxForSameAchievement]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testStateWinsOverInboxForSameAchievement]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.LockEngineTests testUnscheduledWeekdayIsUnlocked]' started.
+Test Case '-[GoukakuCoreTests.LockEngineTests testUnscheduledWeekdayIsUnlocked]' passed (0.000 seconds).
+Test Suite 'LockEngineTests' passed at 2026-10-10 00:29:00.209.
+	 Executed 27 tests, with 0 failures (0 unexpected) in 0.665 (0.668) seconds
+Test Suite 'PolicyTests' started at 2026-10-10 00:29:00.209.
+Test Case '-[GoukakuCoreTests.PolicyTests testDayStartOnlyWhilePaused]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testDayStartOnlyWhilePaused]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testDirections]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testDirections]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testEmergencyCanRequest]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testEmergencyCanRequest]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testEmergencyRounding]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testEmergencyRounding]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testRelaxingChanges]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testRelaxingChanges]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testRestDayRules]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testRestDayRules]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testTamperDetector]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testTamperDetector]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.PolicyTests testTighteningChanges]' started.
+Test Case '-[GoukakuCoreTests.PolicyTests testTighteningChanges]' passed (0.000 seconds).
+Test Suite 'PolicyTests' passed at 2026-10-10 00:29:00.211.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'ReminderPlannerTests' started at 2026-10-10 00:29:00.212.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testEscalationAfterOneMissButNotAfterThree]' started.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testEscalationAfterOneMissButNotAfterThree]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testPausedTimesAreSkipped]' started.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testPausedTimesAreSkipped]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testQuietHoursAndCap]' started.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testQuietHoursAndCap]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testRegularPlan]' started.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testRegularPlan]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testSkipsSatisfiedTodayAndRestDays]' started.
+Test Case '-[GoukakuCoreTests.ReminderPlannerTests testSkipsSatisfiedTodayAndRestDays]' passed (0.000 seconds).
+Test Suite 'ReminderPlannerTests' passed at 2026-10-10 00:29:00.215.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'SchedulePlannerTests' started at 2026-10-10 00:29:00.215.
+Test Case '-[GoukakuCoreTests.SchedulePlannerTests testEveryValidConfigProducesSafeIntervals]' started.
+Test Case '-[GoukakuCoreTests.SchedulePlannerTests testEveryValidConfigProducesSafeIntervals]' passed (0.003 seconds).
+Test Case '-[GoukakuCoreTests.SchedulePlannerTests testInvalidValuesAreRejected]' started.
+Test Case '-[GoukakuCoreTests.SchedulePlannerTests testInvalidValuesAreRejected]' passed (0.000 seconds).
+Test Suite 'SchedulePlannerTests' passed at 2026-10-10 00:29:00.219.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'SharedStateStoreTests' started at 2026-10-10 00:29:00.219.
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testBackupRecoversCorruptedState]' started.
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testBackupRecoversCorruptedState]' passed (0.012 seconds).
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testLogCapKeepsInboxSmall]' started.
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testLogCapKeepsInboxSmall]' passed (0.339 seconds).
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testRoundTripAndInbox]' started.
+Test Case '-[GoukakuCoreTests.SharedStateStoreTests testRoundTripAndInbox]' passed (0.004 seconds).
+Test Suite 'SharedStateStoreTests' passed at 2026-10-10 00:29:00.574.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.355 (0.356) seconds
+Test Suite 'ShieldCopyTests' started at 2026-10-10 00:29:00.574.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testAwaitingCommitText]' started.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testAwaitingCommitText]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testCarryOverAndEmergencyPending]' started.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testCarryOverAndEmergencyPending]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testEarnExpiredText]' started.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testEarnExpiredText]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testMultiplePendingAndLongTitle]' started.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testMultiplePendingAndLongTitle]' passed (0.000 seconds).
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testStaleShieldText]' started.
+Test Case '-[GoukakuCoreTests.ShieldCopyTests testStaleShieldText]' passed (0.000 seconds).
+Test Suite 'ShieldCopyTests' passed at 2026-10-10 00:29:00.577.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'StatusSummaryTests' started at 2026-10-10 00:29:00.577.
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testAchieved]' started.
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testAchieved]' passed (0.003 seconds).
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testAwaitingCommit]' started.
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testAwaitingCommit]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testClockText]' started.
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testClockText]' passed (0.001 seconds).
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testEveningGraceAndEmergency]' started.
+Test Case '-[GoukakuCoreTests.StatusSummaryTests testEveningGraceAndEmergency]' passed (0.001 seconds).
+Test Suite 'StatusSummaryTests' passed at 2026-10-10 00:29:00.584.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.006 (0.007) seconds
+Test Suite 'GoukakuCorePackageTests.xctest' passed at 2026-10-10 00:29:00.584.
+	 Executed 73 tests, with 0 failures (0 unexpected) in 1.315 (1.326) seconds
+Test Suite 'All tests' passed at 2026-10-10 00:29:00.584.
+	 Executed 73 tests, with 0 failures (0 unexpected) in 1.315 (1.328) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

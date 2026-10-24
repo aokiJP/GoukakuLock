@@ -1,0 +1,38 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; classes = {}; objectVersion = 60; objects = {
+A610208EDFDDEF8B921DD458 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/AsobiApp.swift"; sourceTree = "<group>";};
+D44B0D4F0959C7C35D9D7C04 = {isa = PBXBuildFile; fileRef = A610208EDFDDEF8B921DD458;};
+86E02588FE99B8FB43EEBBA3 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/LocalAI.swift"; sourceTree = "<group>";};
+FEE061ED10BF223145D44151 = {isa = PBXBuildFile; fileRef = 86E02588FE99B8FB43EEBBA3;};
+EB11F39B48389C20506133FF = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/Store.swift"; sourceTree = "<group>";};
+45FD21795121B42BD3FE41D6 = {isa = PBXBuildFile; fileRef = EB11F39B48389C20506133FF;};
+F3A3A4CB3AE538D3B81E32A3 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Core/Experience.swift"; sourceTree = "<group>";};
+2097B7A2DB7DE235CB2DCED5 = {isa = PBXBuildFile; fileRef = F3A3A4CB3AE538D3B81E32A3;};
+5BA2688DFFD71DF813A46857 = {isa = PBXFileReference; lastKnownFileType = folder; path = Models; sourceTree = "<group>";};
+E6A1DD965DBE18B12197DB3A = {isa = PBXBuildFile; fileRef = 5BA2688DFFD71DF813A46857;};
+38A007151ABE87CC01A5B6E9 = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Asobi.app; sourceTree = BUILT_PRODUCTS_DIR;};
+FBDC4F23F93125BBEEAE800C = {isa = PBXGroup; children = (38A007151ABE87CC01A5B6E9,); name = Products; sourceTree = "<group>";};
+64292B1C2B2E13EAD8788FC8 = {isa = PBXGroup; children = (A610208EDFDDEF8B921DD458,86E02588FE99B8FB43EEBBA3,EB11F39B48389C20506133FF,F3A3A4CB3AE538D3B81E32A3,5BA2688DFFD71DF813A46857,FBDC4F23F93125BBEEAE800C,); sourceTree = "<group>";};
+B8341AA4898D9AFA17B06561 = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/ml-explore/mlx-swift-lm"; requirement = {kind = exactVersion; version = 3.32.3;};};
+AEB91C1C7A0676782ECB23B3 = {isa = XCSwiftPackageProductDependency; package = B8341AA4898D9AFA17B06561; productName = MLXLLM;};
+35DF6DD92205F5383F75771B = {isa = PBXBuildFile; productRef = AEB91C1C7A0676782ECB23B3;};
+8159414C67A408745689937A = {isa = XCSwiftPackageProductDependency; package = B8341AA4898D9AFA17B06561; productName = MLXLMCommon;};
+6E0DC2B0F4AAC16399F103B7 = {isa = PBXBuildFile; productRef = 8159414C67A408745689937A;};
+7FA42240E7139DF3BDAACB0E = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/ml-explore/mlx-swift"; requirement = {kind = exactVersion; version = 0.32.3;};};
+A4F9DEC933FC7928D40DAA00 = {isa = XCSwiftPackageProductDependency; package = 7FA42240E7139DF3BDAACB0E; productName = MLX;};
+021E31651D84BF1595D70E86 = {isa = PBXBuildFile; productRef = A4F9DEC933FC7928D40DAA00;};
+E09928F516BD512829C3B746 = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/huggingface/swift-transformers"; requirement = {kind = exactVersion; version = 1.3.4;};};
+1C3BEF156034E10D52CE9B71 = {isa = XCSwiftPackageProductDependency; package = E09928F516BD512829C3B746; productName = Tokenizers;};
+AA19511A98D83BE02627B8C2 = {isa = PBXBuildFile; productRef = 1C3BEF156034E10D52CE9B71;};
+BCE16DD0260827ECF338C787 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D44B0D4F0959C7C35D9D7C04,FEE061ED10BF223145D44151,45FD21795121B42BD3FE41D6,2097B7A2DB7DE235CB2DCED5,); runOnlyForDeploymentPostprocessing = 0;};
+0189424A5A60FED329FA868E = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (E6A1DD965DBE18B12197DB3A,); runOnlyForDeploymentPostprocessing = 0;};
+7561BFB015D8F536760CB671 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (35DF6DD92205F5383F75771B,6E0DC2B0F4AAC16399F103B7,021E31651D84BF1595D70E86,AA19511A98D83BE02627B8C2,); runOnlyForDeploymentPostprocessing = 0;};
+BD604D99E75E45D38BC7AC8F = {isa = XCBuildConfiguration; name = Debug; buildSettings = {SWIFT_VERSION = "6.0";IPHONEOS_DEPLOYMENT_TARGET = "18.0";SDKROOT = "iphoneos";TARGETED_DEVICE_FAMILY = "1";PRODUCT_BUNDLE_IDENTIFIER = "com.aokijp.Asobi";PRODUCT_NAME = "$(TARGET_NAME)";CODE_SIGN_STYLE = "Automatic";GENERATE_INFOPLIST_FILE = "YES";INFOPLIST_KEY_CFBundleDisplayName = "asobi";INFOPLIST_KEY_UILaunchScreen_Generation = "YES";INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";MARKETING_VERSION = "1.0";CURRENT_PROJECT_VERSION = "1";SWIFT_STRICT_CONCURRENCY = "complete";ENABLE_USER_SCRIPT_SANDBOXING = "YES";SWIFT_OPTIMIZATION_LEVEL = "-Onone";DEBUG_INFORMATION_FORMAT = "dwarf";SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";CLANG_ENABLE_MODULES = "YES";LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";};};
+D41F56CEA1AC933D25C57AEB = {isa = XCBuildConfiguration; name = Release; buildSettings = {SWIFT_VERSION = "6.0";IPHONEOS_DEPLOYMENT_TARGET = "18.0";SDKROOT = "iphoneos";TARGETED_DEVICE_FAMILY = "1";PRODUCT_BUNDLE_IDENTIFIER = "com.aokijp.Asobi";PRODUCT_NAME = "$(TARGET_NAME)";CODE_SIGN_STYLE = "Automatic";GENERATE_INFOPLIST_FILE = "YES";INFOPLIST_KEY_CFBundleDisplayName = "asobi";INFOPLIST_KEY_UILaunchScreen_Generation = "YES";INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";MARKETING_VERSION = "1.0";CURRENT_PROJECT_VERSION = "1";SWIFT_STRICT_CONCURRENCY = "complete";ENABLE_USER_SCRIPT_SANDBOXING = "YES";SWIFT_OPTIMIZATION_LEVEL = "-O";DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";CLANG_ENABLE_MODULES = "YES";LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";};};
+E30856D4D988D9571DE7D610 = {isa = XCConfigurationList; buildConfigurations = (BD604D99E75E45D38BC7AC8F,D41F56CEA1AC933D25C57AEB,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+89E1FD6268CC0F221A2BE178 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {};};
+E6DE6C99132752C914FEF632 = {isa = XCBuildConfiguration; name = Release; buildSettings = {};};
+862894B703A6DEDF96A9DD6C = {isa = XCConfigurationList; buildConfigurations = (89E1FD6268CC0F221A2BE178,E6DE6C99132752C914FEF632,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+0E8A3AD980EC179856012B7E = {isa = PBXNativeTarget; buildConfigurationList = E30856D4D988D9571DE7D610; buildPhases = (BCE16DD0260827ECF338C787,7561BFB015D8F536760CB671,0189424A5A60FED329FA868E,); buildRules = (); dependencies = (); name = Asobi; packageProductDependencies = (AEB91C1C7A0676782ECB23B3,8159414C67A408745689937A,A4F9DEC933FC7928D40DAA00,1C3BEF156034E10D52CE9B71,); productName = Asobi; productReference = 38A007151ABE87CC01A5B6E9; productType = "com.apple.product-type.application";};
+98F54143AB4E86B28C3AFEE0 = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2600;}; buildConfigurationList = 862894B703A6DEDF96A9DD6C; compatibilityVersion = "Xcode 15.0"; developmentRegion = ja; hasScannedForEncodings = 0; knownRegions = (ja,en,Base,); mainGroup = 64292B1C2B2E13EAD8788FC8; packageReferences = (B8341AA4898D9AFA17B06561,7FA42240E7139DF3BDAACB0E,E09928F516BD512829C3B746,); productRefGroup = FBDC4F23F93125BBEEAE800C; projectDirPath = ""; projectRoot = ""; targets = (0E8A3AD980EC179856012B7E,);};
+}; rootObject = 98F54143AB4E86B28C3AFEE0; }

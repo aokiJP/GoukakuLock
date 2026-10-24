@@ -1,0 +1,78 @@
+name: Asobi iPhone build
+on:
+  push:
+    branches: ['codex/asobi-on-device']
+    paths: ['Asobi/**', '.github/workflows/asobi.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: asobi-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v6
+      - name: Prepare tools
+        run: |
+          xcodebuild -version
+          xcrun -f metal || xcodebuild -downloadComponent MetalToolchain
+          mkdir -p Asobi/build
+      - name: Test engine
+        working-directory: Asobi
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tee build/core-tests.log
+      - uses: actions/cache@v4
+        with:
+          path: Asobi/Models
+          key: asobi-models-73e3e38-3b1b176-v1
+      - name: Fetch and verify bundled models
+        working-directory: Asobi
+        run: |
+          python3 scripts/fetch_models.py
+          python3 scripts/verify_models.py
+      - name: Build iPhone Release
+        working-directory: Asobi
+        run: |
+          set -o pipefail
+          xcodebuild build -project Asobi.xcodeproj -scheme Asobi -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData -skipMacroValidation -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee build/xcodebuild.log | xcbeautify --renderer github-actions
+      - name: Package unsigned IPA and complete project
+        working-directory: Asobi
+        run: |
+          mkdir -p build/Payload dist
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/Asobi.app build/Payload/
+          (cd build && zip -qry ../dist/Asobi-unsigned.ipa Payload)
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('dist/Asobi-Xcode-With-Models.zip','w',zipfile.ZIP_DEFLATED,compresslevel=1) as z:
+              for p in Path('.').rglob('*'):
+                  if p.is_file() and not any(x in p.parts for x in ['build','dist','.build','.git']): z.write(p,Path('Asobi')/p)
+          PY
+          (cd dist && shasum -a 256 * > SHA256SUMS.txt)
+          echo 'IPA is unsigned. Apple signing and an eligible provisioning profile are required before installation.' > dist/SIGNING-REQUIRED.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Asobi-unsigned-IPA
+          path: |
+            Asobi/dist/Asobi-unsigned.ipa
+            Asobi/dist/SIGNING-REQUIRED.txt
+            Asobi/dist/SHA256SUMS.txt
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Asobi-complete-Xcode-project
+          path: Asobi/dist/Asobi-Xcode-With-Models.zip
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: Asobi-build-logs
+          path: Asobi/build/*.log

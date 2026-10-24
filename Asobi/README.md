@@ -4,7 +4,11 @@ SwiftUI / iOS 18以上 / Metal 3対応iPhone。GoukakuLockの「AI・状態・�
 
 ## 現在の検証範囲
 
-この成果物は実装済みソースとXcodeプロジェクトです。Linux環境でSwiftのルールエンジンをテストしています。Xcode/iOS SDK/Appleの署名資格がないため、iOSアプリのコンパイル、実機推論、UI操作、署名済みIPAは未検証・未作成です。「インストールして動作確認済みの完成品」ではありません。実機での生成品質、速度、消費電力、メモリ使用量は未計測です。
+GitHub ActionsのmacOS / Xcode 26.6で、15件のルールエンジンテストとiPhone用Releaseビルドが成功しました。モデル入り未署名IPAとモデル入りXcodeプロジェクトをActionsのArtifactsから取得できます。
+
+ビルド結果: https://github.com/aokiJP/GoukakuLock/actions/runs/40087208193
+
+実機推論・画面操作・生成品質・消費電力・Appleの署名は未検証です。IPAは署名するまでiPhoneにインストールできません。Linuxで作成した初版のValidation文書は当時の記録です。
 
 ## 開く・ビルドする
 
